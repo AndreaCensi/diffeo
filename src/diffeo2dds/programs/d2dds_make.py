@@ -23,8 +23,8 @@ class MakeDDS(Diffeo2dds.sub):  # @UndefinedVariable
         outdir = self.options.output
         which = self.options.get_extra()
         
+        config = get_diffeo2dds_config()
         if not which:
-            config = get_diffeo2dds_config()
             which = sorted(config.symdds.keys())
         
         make_all_dds(config, which, outdir)

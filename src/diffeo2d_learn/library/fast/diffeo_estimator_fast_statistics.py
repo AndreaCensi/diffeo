@@ -1,9 +1,3 @@
-'''
-This estimator is an experiment to look at the statistics of the image to 
-estimate what the error function should look like and to use that for finding 
-the diffeomorphism
-'''
-
 from . import logger
 from .. import Diffeomorphism2D
 from PIL import Image  # @UnresolvedImport
@@ -23,6 +17,12 @@ Cont = 'quad'
 InferenceMethods = [Similarity]
     
 class DiffeomorphismEstimatorFasterStatistics(DiffeomorphismEstimatorFaster):
+    '''
+        This estimator is an experiment to look at the statistics of the image to 
+        estimate what the error function should look like and to use that for finding 
+        the diffeomorphism
+    '''
+
     def _update_scalar(self, y0, y1):
         # Call the supercalls method
         DiffeomorphismEstimatorFaster._update_scalar(self, y0, y1)

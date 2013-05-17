@@ -1,9 +1,8 @@
 - id: dpx1
   desc: Simple horizontal translation back and forth
   code:
-  - diffeo2dds.DDSFromSymbolic
-  - resolution: 64
-    actions: 
+  - diffeo2dds.SymDiffeoSystem
+  - actions: 
     - original_cmd: [1] # for visualization
       diffeo: px1
     - original_cmd: [-1]
@@ -13,9 +12,8 @@
 - id: dpx3
   desc: Simple horizontal left motion
   code:
-  - diffeo2dds.DDSFromSymbolic
-  - resolution: 64
-    actions: 
+  - diffeo2dds.SymDiffeoSystem
+  - actions: 
     - original_cmd: [1] # for visualization
       diffeo: px1
     topology: plane
@@ -26,9 +24,8 @@
     Simple horizontal translation back and forth,
     but the second motion is double the inverse.
   code:
-  - diffeo2dds.DDSFromSymbolic
-  - resolution: 64
-    actions: 
+  - diffeo2dds.SymDiffeoSystem
+  - actions: 
     - original_cmd: [1] 
       diffeo: px1
     - original_cmd: [-2]
@@ -39,9 +36,8 @@
   desc: |
     Left and right translation (toroidal case).
   code:
-  - diffeo2dds.DDSFromSymbolic
-  - resolution: 64
-    actions: 
+  - diffeo2dds.SymDiffeoSystem
+  - actions: 
     - original_cmd: [1] 
       diffeo: tx1
     - original_cmd: [-1]
@@ -52,9 +48,8 @@
   desc: |
     Only left translation (toroidal case).
   code:
-  - diffeo2dds.DDSFromSymbolic
-  - resolution: 64
-    actions:
+  - diffeo2dds.SymDiffeoSystem
+  - actions:
     - original_cmd: [1] 
       diffeo: tx1
     topology: torus
@@ -63,9 +58,8 @@
   desc: |
     Only rotation
   code:
-  - diffeo2dds.DDSFromSymbolic
-  - resolution: 64
-    actions: 
+  - diffeo2dds.SymDiffeoSystem
+  - actions: 
     - original_cmd: [1] 
       diffeo: pr1
     topology: plane
@@ -75,9 +69,8 @@
   desc: |
     Camera (pan/tilt)
   code:
-  - diffeo2dds.DDSFromSymbolic
-  - resolution: 64
-    actions: 
+  - diffeo2dds.SymDiffeoSystem
+  - actions: 
     - original_cmd: [1, 0] 
       diffeo: px1
     - original_cmd: [-1, 0] 
@@ -93,9 +86,8 @@
   desc: |
     Camera (pan/tilt)
   code:
-  - diffeo2dds.DDSFromSymbolic
-  - resolution: 64
-    actions: 
+  - diffeo2dds.SymDiffeoSystem
+  - actions: 
     - original_cmd: [1, 0] 
       diffeo: R3px1
     - original_cmd: [-1, 0] 
@@ -112,9 +104,8 @@
   desc: |
     Camera (pan: torus, tilt: plane)
   code:
-  - diffeo2dds.DDSFromSymbolic
-  - resolution: 64
-    actions: 
+  - diffeo2dds.SymDiffeoSystem
+  - actions: 
     - original_cmd: [1, 0] 
       diffeo: tx1
     - original_cmd: [-1, 0] 
@@ -130,9 +121,8 @@
   desc: |
     Camera (pan: torus, tilt: plane)
   code:
-  - diffeo2dds.DDSFromSymbolic
-  - resolution: 64
-    actions: 
+  - diffeo2dds.SymDiffeoSystem
+  - actions: 
     - original_cmd: [1, 0] 
       diffeo: R3tx1
     - original_cmd: [-1, 0] 
@@ -147,9 +137,8 @@
   desc: |
     Torus xy
   code:
-  - diffeo2dds.DDSFromSymbolic
-  - resolution: 64
-    actions: 
+  - diffeo2dds.SymDiffeoSystem
+  - actions: 
     - original_cmd: [1, 0] 
       diffeo: R3tx1
     - original_cmd: [-1, 0] 
@@ -166,9 +155,8 @@
   desc: |
     Camera with zoom
   code:
-  - diffeo2dds.DDSFromSymbolic
-  - resolution: 64
-    actions: 
+  - diffeo2dds.SymDiffeoSystem
+  - actions: 
     - original_cmd: [1, 0, 0] 
       diffeo: px1
     - original_cmd: [-1, 0, 0] 
@@ -187,9 +175,8 @@
   desc: |
     Robot with differential drive
   code:
-  - diffeo2dds.DDSFromSymbolic
-  - resolution: 64
-    actions: 
+  - diffeo2dds.SymDiffeoSystem
+  - actions: 
     - original_cmd: [1, 0, 0] 
       diffeo: px1
     - original_cmd: [-1, 0, 0] 

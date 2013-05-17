@@ -1,4 +1,5 @@
 from conf_tools import ConfigMaster, check_generic_code_desc, GenericCall
+from diffeo2dds.model.symdiffeo_system import SymDiffeoSystem
 
 
 class Diffeo2dDynamicsConfig(ConfigMaster):
@@ -11,10 +12,11 @@ class Diffeo2dDynamicsConfig(ConfigMaster):
                                      check_valid_image_config,
                                      GenericCall(check_valid_image))
 
-        self.symdds = self.add_class('symdds', '*.symdds.yaml',
-                                     check_valid_symdds_config,
-                                     GenericCall(check_valid_dds))
-
+        self.symdds = \
+            self.add_class_generic('symdds',
+                                   '*.symdds.yaml',
+                                   SymDiffeoSystem)
+        
         self.discdds = \
             self.add_class_generic('discdds', '*.discdds.yaml',
                                    DiffeoSystem)

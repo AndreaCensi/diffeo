@@ -1,0 +1,21 @@
+- id: test_random_dpx1
+  desc: Synthetic random stream
+  code:
+  - diffeo2dds_sim.library.RobotInteractionStream
+  - agent: random_agent
+    robot: 
+    - diffeo2dds_sim.library.DiffeoSystemSimulation
+    - image_stream:
+      - diffeo2dds_learn.library.RandomImageStream
+      - shape: [64, 64]
+        seed: 42
+      discdds: 
+      - diffeo2dds.DDSFromSymbolic
+      - resolution: 64
+        actions: 
+        - original_cmd: [1] # for visualization
+          diffeo: px1
+        - original_cmd: [-1]
+          diffeo: Ipx1
+        topology: plane
+

@@ -6,23 +6,27 @@ from diffeo2s.symdiffeo.square_domain import SquareDomain
 from diffeo2s.symdiffeo.viewport import diffeo_from_function_viewport
 import numpy as np
 from diffeo2s.symdiffeo.compositions import make_chain
+from diffeo2dds.configuration.config_master import get_diffeo2dds_config
 
 __all__ = ['DDSFromSymbolic']
 
 @contract(resolution='int,>1', returns=DiffeoSystem)
-def DDSFromSymbolic(resolution, actions, topology=None):  # @UnusedVariable
+def DDSFromSymbolic(resolution, symdiffeosystem):  # @UnusedVariable
     """ 
         Creates a DiffeoSystem from synthetic diffeomorphisms. 
     """  
-    config = get_diffeo2s_config()
+    diffeo2s_config = get_diffeo2s_config()
+    diffeo2dds_config = get_diffeo2dds_config()
+    
+    _, symdds = diffeo2dds_config.symdds.instance_smarter(symdiffeosystem)
     
     logger.info('Creating symbolic diffeomorphism (resolution = %d)' % 
                 resolution)
     
     diffeoactions = []
-    for _, action in enumerate(actions):
+    for _, action in enumerate(symdds.actions):
         
-        id_diffeo, diffeo = parse_diffeo_spec(config, action['diffeo'])
+        id_diffeo, diffeo = parse_diffeo_spec(diffeo2s_config, action['diffeo'])
         label = action.get('label', id_diffeo)
         
         original_cmd = np.array(action['original_cmd'])
@@ -36,8 +40,8 @@ def DDSFromSymbolic(resolution, actions, topology=None):  # @UnusedVariable
         D2d = Diffeomorphism2D(D, Dinfo)
         
         diffeo_inv = diffeo.get_inverse()
-        D_inv, Dinfo_inv = diffeo_from_function_viewport(diffeo_inv,
-                                                          manifold, viewport, shape)    
+        D_inv, Dinfo_inv = \
+            diffeo_from_function_viewport(diffeo_inv, manifold, viewport, shape)    
         D2d_inv = Diffeomorphism2D(D_inv, Dinfo_inv) 
 
         action = DiffeoAction(label=label,
@@ -46,7 +50,7 @@ def DDSFromSymbolic(resolution, actions, topology=None):  # @UnusedVariable
                               original_cmd=original_cmd)
         diffeoactions.append(action)
         
-    dds = DiffeoSystem('%s' % actions, actions=diffeoactions)
+    dds = DiffeoSystem('unnamed', actions=diffeoactions)
     return dds
 
 @contract(spec='str|list(str)')  

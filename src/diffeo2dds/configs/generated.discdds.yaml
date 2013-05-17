@@ -1,0 +1,6 @@
+- id: "sym-${id_symdds}-${resolution}"
+  desc: "Discretization of ${id_symdds} to resolution ${resolution}"
+  code: 
+  - diffeo2dds.DDSFromSymbolic
+  - resolution: "${resolution}"
+    symdiffeosystem: "${id_symdds}"

@@ -1,0 +1,6 @@
+- id: test_random_64
+  desc: Stream of random images for testing purposes
+  code:
+  - diffeo2dds_learn.library.RandomImageStream
+  - shape: [64, 64]
+    seed: 42

@@ -1,65 +1,44 @@
-from diffeo2dds_learn import DiffeoSystemEstimatorInterface
+from .. import logger
+from ..interface import DiffeoSystemEstimatorInterface
+from diffeo2dds.model.diffeo_system import DiffeoSystem
+from diffeo2d_learn.configuration.master import get_diffeo2dlearn_config
+from contracts import contract
+from diffeo2dds.model.diffeo_action import DiffeoAction
+import numpy as np
 import warnings
 
-__all__ = ['DiffeoLearner']
 
-class DiffeoLearner(DiffeoSystemEstimatorInterface):
+__all__ = ['DiffeoSystemLearner']
+
+
+class DiffeoSystemLearner(DiffeoSystemEstimatorInterface):
     ''' 
-        Keeps a list of diffeomorphism estimators to learn a diffeomorphism
-        for each command. 
+        Keeps a list of diffeomorphism estimators 
+        to learn a diffeomorphism for each command.
+        
+        It can use different estimators for the diffeomorphism
+        itself. These are specified using the id_diffeo_estimator
+        parameter. 
     '''
     
-    def __init__(self, use_fast, diffeo_estimator_params):
+    def __init__(self, id_diffeo2d_estimator):
         '''
-        
+
         :param use_fast: Use DiffeomorphismEstimatorFaster.
         '''
         self.command_list = []
+        warnings.warn('remove state')
         self.state_list = []
         self.estimators = []
-        self.estimators_inv = []    
-        self.use_fast = use_fast
-        self.diffeo_estimator_params = diffeo_estimator_params
+        self.estimators_inv = []
         
-        if diffeo_estimator_params.has_key('update_uncertainty'):
-            self.update_uncertainty = diffeo_estimator_params['update_uncertainty']
+        self.id_diffeo2d_estimator = id_diffeo2d_estimator    
         
     def new_estimator(self):
-        if self.use_fast:
-            warnings.warn('Using experimental diffeo estimator (faster)')
-            return DiffeomorphismEstimatorFaster(**self.diffeo_estimator_params)
-        else:
-            return DiffeomorphismEstimator(**self.diffeo_estimator_params)
-    
-    def estimator_index(self, command, state=None):
-        if state is None:
-            # Use original version
-            return self.command_index(command)
-        else:
-            for i, command in enumerate(self.command_list):
-                state_list = np.array(self.state_list)
-                if state_list[i, 0] <= state and state <= state_list[i, 1]:
-                    # Then we found the correct index
-                    return i
-                else:
-                    # Keep looking for the estimator with the correct state interval
-                    pass
-                
-            # If the command, state combination was not found, then initiate a 
-            # new estimator
-            # index = len(self.command_list)
-            state_interv = [state, state]
-            logger.info('Adding new command %s for states in: %s' 
-                        % (str(command), str(state_interv)))
-            self.command_list.append(command)
-            self.state_list.append(state_interv)
-            self.estimators.append(self.new_estimator())
-            self.estimators_inv.append(self.new_estimator())
-            assert len(self.command_list)
-            assert len(self.state_list)
-#            return index
-            return 0  # AC: XXX: highly suspect
-            
+        """ Instances a new estimator. """
+        config = get_diffeo2dlearn_config()
+        estimator = config.diffeo2d_estimators.instance(self.id_diffeo2d_estimator)
+        return estimator            
                     
     def command_index(self, command):
         if not command in self.command_list:    
@@ -127,13 +106,9 @@ class DiffeoLearner(DiffeoSystemEstimatorInterface):
             self.estimators[cmd_ind].update(Y0, Y1)
             self.estimators_inv[cmd_ind].update(Y1, Y0)
                 
-                            
-    def summarize(self, prefix=''):
-        """
-            Summarizes all estimators
-            Output:
-                All summarized diffeomorphisms stored in self.diffeo_list
-        """
+                
+    @contract(returns=DiffeoSystem)            
+    def get_value(self, prefix=''):
         n = len(self.estimators)
         action_list = []
         for i in range(n):
@@ -169,83 +144,57 @@ class DiffeoLearner(DiffeoSystemEstimatorInterface):
             self.estimators[i].display(report.section('d%s' % i))
             self.estimators_inv[i].display(report.section('d%s-inv' % i))
             
-        
-    def analyze(self, prefix='', folder=''):
-        """
-            Make some analysis of all estimators
-            Action: DiffeoAnalysis.make_images() for all estimators
-        """
-        n = len(self.estimators)
-        
-        for i in range(n):
-            command = np.array(self.command_list[i])
-            name = prefix + str(list(command)).replace(' ', '')
-#            diffeo = self.estimators[i].summarize()
-            DiffeoAnalysis(self.estimators[i], name, self.estimators[i].shape,
-                           self.estimators[i].lengths, folder).make_images()
-                
-                
-    def diffeo_dump(self, path, name):
-        '''
-            Save the summarized diffeomorphisms system to a pickle file
-        
-            :param path: output directory
-            :param name: name of this system
-        '''
-        # TODO: remove this function, and remove local variable self.system
-        ds_dump(self.system, path, name, "Learned")
- 
             
 # class DiffeoLearnerStatistics(DiffeoLearner):
 #    def new_estimator(self):
 #        return DiffeomorphismEstimatorFasterStatistics(**self.diffeo_estimator_params)
 
-class DiffeoLearnerRefine(DiffeoLearner):
-    def new_estimator(self):
-        return DiffeomorphismEstimatorRefine(**self.diffeo_estimator_params)
-    
-    def refine_init(self):
-#        pdb.set_trace()
-        for i in range(len(self.estimators)):
-            self.estimators[i].refine_init()
-        for i in range(len(self.estimators_inv)):
-            self.estimators_inv[i].refine_init()
-            
-class DiffeoLearnerRefineFast(DiffeoLearner):
-    def new_estimator(self):
-        return DiffeomorphismEstimatorRefineFast(**self.diffeo_estimator_params)
-
-    def command_index(self, command):
-        if not command in self.command_list:    
-            logger.info('Adding new command %s' % str(command))
-            self.command_list.append(command)
-            estimator = self.new_estimator()
-            estimator_inv = self.new_estimator()
-            if hasattr(self, 'area_data'):
-                estimator.set_search_areas(self.area_data[0][0], self.area_data[0][1])
-                estimator_inv.set_search_areas(self.area_data[1][0], self.area_data[1][1])
-            self.estimators.append(estimator)
-            self.estimators_inv.append(estimator_inv)
-            
-        index = self.command_list.index(command)
-        return index
-
-    def calculate_areas(self, dds, nrefine):
-        result = []
-#        pdb.set_trace()
-        logger.info('Calculating new areas, number of estimators are: %s' % len(self.estimators))
-        for i in range(len(self.estimators)):
-            diffeo = dds.actions[i].diffeo
-            diffeo_inv = dds.actions[i].diffeo_inv
-            res = self.estimators[i].calculate_areas(diffeo, nrefine)
-            res_inv = self.estimators[i].calculate_areas(diffeo_inv, nrefine)
-            result.append((res, res_inv))
-        return result
-    
-    def set_search_areas(self, area_data):
-        self.area_data = area_data
-    
-#    def refine_init(self):
+# class DiffeoLearnerRefine(DiffeoLearner):
+#     def new_estimator(self):
+#         return DiffeomorphismEstimatorRefine(**self.diffeo_estimator_params)
+#     
+#     def refine_init(self):
+# #        pdb.set_trace()
+#         for i in range(len(self.estimators)):
+#             self.estimators[i].refine_init()
+#         for i in range(len(self.estimators_inv)):
+#             self.estimators_inv[i].refine_init()
+#             
+# class DiffeoLearnerRefineFast(DiffeoLearner):
+#     def new_estimator(self):
+#         return DiffeomorphismEstimatorRefineFast(**self.diffeo_estimator_params)
+# 
+#     def command_index(self, command):
+#         if not command in self.command_list:    
+#             logger.info('Adding new command %s' % str(command))
+#             self.command_list.append(command)
+#             estimator = self.new_estimator()
+#             estimator_inv = self.new_estimator()
+#             if hasattr(self, 'area_data'):
+#                 estimator.set_search_areas(self.area_data[0][0], self.area_data[0][1])
+#                 estimator_inv.set_search_areas(self.area_data[1][0], self.area_data[1][1])
+#             self.estimators.append(estimator)
+#             self.estimators_inv.append(estimator_inv)
+#             
+#         index = self.command_list.index(command)
+#         return index
+# 
+#     def calculate_areas(self, dds, nrefine):
+#         result = []
+# #        pdb.set_trace()
+#         logger.info('Calculating new areas, number of estimators are: %s' % len(self.estimators))
+#         for i in range(len(self.estimators)):
+#             diffeo = dds.actions[i].diffeo
+#             diffeo_inv = dds.actions[i].diffeo_inv
+#             res = self.estimators[i].calculate_areas(diffeo, nrefine)
+#             res_inv = self.estimators[i].calculate_areas(diffeo_inv, nrefine)
+#             result.append((res, res_inv))
+#         return result
+#     
+#     def set_search_areas(self, area_data):
+#         self.area_data = area_data
+#     
+# #    def refine_init(self):
 # #        pdb.set_trace()
 #        for i in range(len(self.estimators)):
 #            self.estimators[i].refine_init()

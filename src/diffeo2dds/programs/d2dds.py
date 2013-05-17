@@ -8,12 +8,12 @@ class Diffeo2dds(QuickMultiCmdApp):
     
     def define_multicmd_options(self, options):
         options.add_flag('dummy', help='workaround for a bug')
-        options.add_string_list('config_dirs', help='Configuration directory',
-                               default=['default'])
+        options.add_string('config', help='Configuration directory',
+                               default='default')
   
     def initial_setup(self):
         options = self.get_options()
         # Load configurations for all modules
-        GlobalConfig.global_load_dirs(options.config_dirs)
+        GlobalConfig.global_load_dir(options.config)
                   
         

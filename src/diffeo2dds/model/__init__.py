@@ -4,3 +4,4 @@ from .diffeo_action import *
 from .diffeo_action_distances import *
 from .diffeo_system import *
 from .writing import *
+from .symdiffeo_system import *

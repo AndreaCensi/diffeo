@@ -3,9 +3,8 @@
   desc: |
     Car-like robot 
   code:
-  - diffeo2dds.DDSFromSymbolic
-  - resolution: 128
-    actions:  # vel, steering
+  - diffeo2dds.SymDiffeoSystem
+  - actions:  # vel, steering
     - original_cmd: [1, 0] # forward 
       diffeo: pX10
       label: fwd
@@ -32,9 +31,8 @@
   desc: |
     Car-like robot 
   code:
-  - diffeo2dds.DDSFromSymbolic
-  - resolution: 128
-    actions:  # vel, steering
+  - diffeo2dds.SymDiffeoSystem
+  - actions:  # vel, steering
     - original_cmd: [1, 0] # forward 
       diffeo: pX10
       label: fwd
@@ -57,14 +55,13 @@
 
 
 
-- id: "dcl3r${resolution}"
+- id: "dcl3r"
   desc: |
     Car-like robot (3rd config)
     tolerance: 0.04 for commuting
   code:
-  - diffeo2dds.DDSFromSymbolic
-  - resolution: "${resolution}"
-    actions:  # vel, steering
+  - diffeo2dds.SymDiffeoSystem
+  - actions:  # vel, steering
     - original_cmd: [1, 0] # forward 
       diffeo: pX10
       label: fwd
@@ -85,14 +82,13 @@
       label: bckL
     topology: plane
 
-- id: "dcl3br${resolution}"
+- id: "dcl3br"
   desc: |
     Car-like robot (3rd config)
     tolerance: 0.04 for commuting
   code:
-  - diffeo2dds.DDSFromSymbolic
-  - resolution: "${resolution}"
-    actions:  # vel, steering
+  - diffeo2dds.SymDiffeoSystem
+  - actions:  # vel, steering
     - original_cmd: [1, 0] # forward 
       diffeo: pX10
       label: fwd
@@ -115,14 +111,13 @@
 
 
 
-- id: "dcl4r${resolution}"
+- id: "dcl4r"
   desc: |
     Car-like robot (3rd config)
     tolerance: 0.05 for commuting
   code:
-  - diffeo2dds.DDSFromSymbolic
-  - resolution: "${resolution}"
-    actions:  # vel, steering
+  - diffeo2dds.SymDiffeoSystem
+  - actions:  # vel, steering
     - original_cmd: [0, 0.2, 0] # forward 
       diffeo: "X0.2_R0" # 0.52 rad = 30 deg
       label: F

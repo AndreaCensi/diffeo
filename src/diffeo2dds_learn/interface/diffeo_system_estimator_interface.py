@@ -1,6 +1,7 @@
 from abc import abstractmethod, ABCMeta
 from contracts import contract
-from diffeo2d_dynamics.discdds.diffeo_system import DiffeoSystem
+from diffeo2dds import DiffeoSystem
+
 
 class DiffeoSystemEstimatorInterface(object):
     
@@ -14,7 +15,7 @@ class DiffeoSystemEstimatorInterface(object):
         
     @abstractmethod
     @contract(y0='array[MxN]', u0='array[K]', y1='array[MxN]')
-    def update(self, Y0, U0, Y1):
+    def update(self, y0, u0, y1):
         pass
 
     @abstractmethod
