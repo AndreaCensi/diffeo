@@ -5,8 +5,9 @@ import sys
 __all__ = ['DDSLList']
 
 class DDSLList(DDSL.sub):  # @UndefinedVariable
+    """Lists the available configuration"""
+    
     cmd = 'list'
-    description = 'Lists the available configuration'
     
     def define_program_options(self, params):
         params.add_flag('verbose', help='Instances all configuration')        

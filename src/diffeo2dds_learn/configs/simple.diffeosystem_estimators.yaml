@@ -1,0 +1,23 @@
+- id: "test_dds_estimator_fast_${match}_${displ}"
+  desc: "Faster estimator (optimized), displacement ${displ}, match ${match}" 
+  code:
+  - diffeo2dds_learn.library.DiffeoSystemEstimator
+  - diffeo2d_estimator: 
+    - diffeo2d_learn.library.DiffeomorphismEstimatorFaster
+    - max_displ: "0.${displ}"
+      inference_method: "${match}"  # order, sim, quad
+
+- id: "test_dds_estimator_simple_${match}_${displ}"
+  desc: "Faster estimator (optimized), displacement ${displ}, match ${match}" 
+  code:
+  - diffeo2dds_learn.library.DiffeoSystemEstimator
+  - diffeo2d_estimator: 
+    - diffeo2d_learn.library.DiffeomorphismEstimatorSimple
+    - max_displ: "0.${displ}"
+      match_method: "${match}" # continuous, binary
+
+- id: test_dds_estimator_simple_continuous_10  
+- id: test_dds_estimator_simple_binary_10  
+- id: test_dds_estimator_fast_order_10  
+- id: test_dds_estimator_fast_sim_10  
+- id: test_dds_estimator_fast_quad_10  

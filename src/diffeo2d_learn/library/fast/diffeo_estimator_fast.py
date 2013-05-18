@@ -1,20 +1,18 @@
-from .. import logger
 from contracts import contract
 from diffeo2d import (Diffeomorphism2D, flat_structure_cache, add_border, togrid,
-    diffeo_identity)
-from diffeo2d.visualization import (diffeomorphism_to_rgb, diffeo_to_rgb_angle,
+    diffeo_identity, diffeo_text_stats, diffeomorphism_to_rgb, diffeo_to_rgb_angle,
     diffeo_to_rgb_norm, diffeo_to_rgb_curv, angle_legend)
+from diffeo2d_learn import Diffeo2dEstimatorInterface, logger
 from reprep.plot_utils import plot_vertical_line
 import numpy as np
 import time
-from diffeo2d.stats import diffeo_text_stats
 
 Order = 'order'
 Similarity = 'sim'
 Cont = 'quad'
 InferenceMethods = [Order, Similarity, Cont]
     
-class DiffeomorphismEstimatorFaster():
+class DiffeomorphismEstimatorFaster(Diffeo2dEstimatorInterface):
     ''' Learns a diffeomorphism between two 2D fields. '''
     
     @contract(max_displ='seq[2](>0,<1)', inference_method='str')
@@ -43,7 +41,7 @@ class DiffeomorphismEstimatorFaster():
         return self.shape is not None
              
     @contract(y0='array[MxN]', y1='array[MxN]')
-    def update(self, y0, y1, u0=None, x0=None):
+    def update(self, y0, y1):
         if y0.dtype == np.uint8:
             y0 = (y0 / 255.0).astype('float32')
             y1 = (y1 / 255.0).astype('float32')
@@ -73,8 +71,8 @@ class DiffeomorphismEstimatorFaster():
         ts.append(time.time())
         if check_times:
             delta = np.diff(ts)
-            logger.info('Update times: vect %5.3f scal %5.3f seconds' % 
-                    (delta[0], delta[1]))
+            msg = 'Update times: vect %5.3f scal %5.3f seconds' % (delta[0], delta[1])
+            logger.info(msg)
         
     def _update_scalar(self, y0, y1):
         # unroll the Y1 image
@@ -225,13 +223,12 @@ class DiffeomorphismEstimatorFaster():
                 plot_safe(pylab)
     
         
-        
     @contract(score='array[NxA]', returns='array[UxV]')  # ,U*V=N*A') not with border
     def make_grid(self, score):
         fourd = self.flat_structure.unrolled2multidim(score)  # HxWxXxY
         return togrid(add_border(fourd))
         
-    def summarize(self):
+    def get_value(self):
         ''' 
             Find maximum likelihood estimate for diffeomorphism looking 
             at each pixel singularly. 
@@ -240,7 +237,7 @@ class DiffeomorphismEstimatorFaster():
         '''
         if not self.initialized():
             msg = 'Cannot summarize() because not initialized yet.'
-            raise ValueError(msg)
+            raise Diffeo2dEstimatorInterface.NotReady(msg)
         certainty = np.zeros(self.shape, dtype='float32')
         certainty.fill(np.nan)
         

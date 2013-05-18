@@ -5,6 +5,7 @@ from diffeo2d_learn import get_diffeo2dlearn_config
 from diffeo2dds import DiffeoAction, DiffeoSystem
 import numpy as np
 import warnings
+from diffeo2d_learn.diffeo_estimator_interface import Diffeo2dEstimatorInterface
 
 
 __all__ = ['DiffeoSystemEstimator']
@@ -31,12 +32,15 @@ class DiffeoSystemEstimator(DiffeoSystemEstimatorInterface):
         self.estimators = []
         self.estimators_inv = []
         
-        self.diffeo2d_estimator = diffeo2d_estimator    
+        self.diffeo2d_estimator = diffeo2d_estimator
+        
+        # becomes (i, n) if parallel_process_hint is called
+        self.parallel_hint = None    
         
     def new_estimator(self):
         """ Instances a new estimator. """
         config = get_diffeo2dlearn_config()
-        _, estimator = config.diffeo2d_estimators.instance_smarter(self.id_diffeo2d_estimator)
+        _, estimator = config.diffeo2d_estimators.instance_smarter(self.diffeo2d_estimator)
         return estimator            
                     
     def command_index(self, command):
@@ -47,10 +51,15 @@ class DiffeoSystemEstimator(DiffeoSystemEstimatorInterface):
             self.estimators_inv.append(self.new_estimator())
             
         index = self.command_list.index(command)
-        return index
-    
+        return index 
+         
+    @contract(i='int,>=0,i', n='int,>=1,>=i')
+    def parallel_process_hint(self, i, n):
+        self.parallel_hint = (i, n)
+        
     def merge(self, other):
-        """ Merges the values obtained by "other" with ours. 
+        """ 
+            Merges the values obtained by "other" with ours. 
             Note that we don't make a deep copy of structures.
         """
         for i in range(len(self.command_list)):
@@ -61,10 +70,12 @@ class DiffeoSystemEstimator(DiffeoSystemEstimatorInterface):
                 logger.info('Ours: %s' % self.command_list)
                 logger.info('His:  %s' % other.command_list)
                 continue
+            
             j = other.command_list.index(command)
             
             self.estimators[i].merge(other.estimators[j])
             self.estimators_inv[i].merge(other.estimators_inv[j])
+            
         # Now add the ones we don't have.
         for j in range(len(other.command_list)):
             command = other.command_list[j]
@@ -89,7 +100,15 @@ class DiffeoSystemEstimator(DiffeoSystemEstimatorInterface):
             self.estimators_inv.append(other.estimators_inv[j])
         
     def update(self, Y0, U0, Y1, X0=None):
-        cmd_ind = self.estimator_index(U0, None)
+        cmd_ind = self.command_index(U0)
+        
+        if self.parallel_hint is not None:
+            # check to see if we need to take care of this
+            i, n = self.parallel_hint
+            ours = cmd_ind % n == i
+            if not ours:
+                return
+        
         est = self.estimators[cmd_ind]
         est_inv = self.estimators_inv[cmd_ind]
         # XXX: cleaning up with state or not
@@ -107,28 +126,26 @@ class DiffeoSystemEstimator(DiffeoSystemEstimatorInterface):
             est.update(Y0, Y1)
             est_inv.update(Y1, Y0)
                 
-                
+        
     @contract(returns=DiffeoSystem)            
     def get_value(self, prefix=''):
         n = len(self.estimators)
         action_list = []
         for i in range(n):
             command = np.array(self.command_list[i])
-            if len(self.state_list) <= i:
-                state = 0
-            else:
-                state = self.state_list[i]
-                
             name = prefix + str(list(command)).replace(' ', '')
-            diffeo = self.estimators[i].summarize()
-#            DiffeoAnalysis(self.estimators[i], name, self.estimators[i].shape,
-#                           self.estimators[i].lengths).make_images()
-
-#            self.estimators[i].summarize_continuous(prefix + str(command) + '.png')
-            diffeo_inv = self.estimators_inv[i].summarize()
-            name = 'Uninterpreted Diffeomorphism' + str(i)
-            action = DiffeoAction(name, diffeo, diffeo_inv, command, state)
             
+            try:
+                diffeo = self.estimators[i].get_value()
+                diffeo_inv = self.estimators_inv[i].get_value()
+            except Diffeo2dEstimatorInterface.NotReady:
+                logger.info('Skipping command %r %r' % (i, command))
+                continue
+                
+            name = 'Uninterpreted Diffeomorphism' + str(i)
+            action = DiffeoAction(name, diffeo, diffeo_inv, command)
+            
+            warnings.warn('to remove')
             # Use new update uncertainty method if param specifies so
             if hasattr(self, 'update_uncertainty') and self.update_uncertainty:
                 action.update_uncertainty()

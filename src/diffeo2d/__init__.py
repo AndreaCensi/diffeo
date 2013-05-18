@@ -14,3 +14,6 @@ from .diffeomorphism2d import *
 from .diffeomorphism2d_continuous import *
 
 from .plumbing import *
+from .stats import *
+
+

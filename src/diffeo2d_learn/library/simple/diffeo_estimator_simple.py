@@ -1,12 +1,8 @@
-from PIL import Image  # @UnresolvedImport
 from contracts import contract
 from diffeo2d import Diffeomorphism2D, Flattening, cmap, coords_iterate
-from diffeo2d.visualization import (diffeomorphism_to_rgb, diffeo_to_rgb_angle,
-    diffeo_to_rgb_norm, diffeo_to_rgb_curv, angle_legend)
-from diffeo2d_learn import Diffeo2dEstimatorInterface
-import numpy as np
 from diffeo2d.stats import diffeo_text_stats
-
+from diffeo2d_learn import Diffeo2dEstimatorInterface, logger
+import numpy as np
 
 def sim_continuous(a, b):
     # XXX strange conversions
@@ -22,6 +18,10 @@ def sim_binary(a, b):  # good for 0-1
 MATCH_CONTINUOUS = 'continuous'
 MATCH_BINARY = 'binary'
 
+
+__all__ = ['DiffeomorphismEstimatorSimple']
+
+
 class DiffeomorphismEstimatorSimple(Diffeo2dEstimatorInterface):
     ''' Learns a diffeomorphism between two 2D fields. '''
 
@@ -32,8 +32,6 @@ class DiffeomorphismEstimatorSimple(Diffeo2dEstimatorInterface):
             :param match_method: Either "continuous" or "binary" (to compute the 
                 error function).
         """
-        print('diffeo_estimator.py in boot_agents.diffeo is deprecated')
-        assert False
         self.shape = None
         self.max_displ = np.array(max_displ)
         self.last_y0 = None
@@ -109,9 +107,9 @@ class DiffeomorphismEstimatorSimple(Diffeo2dEstimatorInterface):
         # for each sensel, create an area
         self.lengths = np.ceil(self.max_displ * 
                                np.array(self.shape)).astype('int32')
-        print(' Field Shape: %s' % str(self.shape))
-        print('    Fraction: %s' % str(self.max_displ))
-        print(' Search area: %s' % str(self.lengths))
+        # print(' Field Shape: %s' % str(self.shape))
+        # print('    Fraction: %s' % str(self.max_displ))
+        # print(' Search area: %s' % str(self.lengths))
 
         self.neighbor_coords = [None] * self.nsensels
         self.neighbor_indices = [None] * self.nsensels
@@ -122,8 +120,8 @@ class DiffeomorphismEstimatorSimple(Diffeo2dEstimatorInterface):
         self.neighbor_num_bestmatch_flat = [None] * self.nsensels
 
         self.flattening = Flattening.by_rows(y.shape)
-        print('Creating structure shape %s lengths %s' % 
-              (self.shape, self.lengths))
+        logger.info('Creating structure shape %s lengths %s' % 
+                  (self.shape, self.lengths))
         cmg = cmap(self.lengths)
         for coord in coords_iterate(self.shape):
             k = self.flattening.cell2index[coord]
@@ -149,7 +147,7 @@ class DiffeomorphismEstimatorSimple(Diffeo2dEstimatorInterface):
                                                         dtype='uint')
         print('done')
     
-    def summarize(self):
+    def get_value(self):
         ''' 
             Find maximum likelihood estimate for diffeomorphism looking 
             at each pixel singularly. 
@@ -163,6 +161,7 @@ class DiffeomorphismEstimatorSimple(Diffeo2dEstimatorInterface):
         E4 = np.zeros(self.shape, dtype='float32')
         num_problems = 0
         
+        from PIL import Image  # @UnresolvedImport
         order_image = Image.new('L', np.flipud(self.shape) * np.flipud(self.lengths))
         
         i = 0
@@ -228,6 +227,7 @@ class DiffeomorphismEstimatorSimple(Diffeo2dEstimatorInterface):
         maxerror = np.zeros(self.shape, dtype='float32')
         minerror = np.zeros(self.shape, dtype='float32')
         
+        from PIL import Image  # @UnresolvedImport
         sim_image = Image.new('L', np.flipud(self.shape) * np.flipud(self.lengths))
         zer_image = Image.new('L', np.flipud(self.shape) * np.flipud(self.lengths))
         for c in coords_iterate(self.shape):
@@ -239,7 +239,7 @@ class DiffeomorphismEstimatorSimple(Diffeo2dEstimatorInterface):
             sim_square = sim.reshape(self.lengths).astype('float32') / self.num_samples
             from diffeo2d_learn.library.simple.display import sim_square_modify
             sim_square, minerror[c], maxerror[c] = sim_square_modify(sim_square, np.min(self.neighbor_similarity_flat) / self.num_samples, np.max(self.neighbor_similarity_flat) / self.num_samples)
-            avg_square = (np.max(sim_square) + np.min(sim_square)) / 2
+            # avg_square = (np.max(sim_square) + np.min(sim_square)) / 2
             sim_zeroed = np.zeros(sim_square.shape)
             sim_zeroed[sim_square > 0.85] = sim_square[sim_square > 0.85] 
             from diffeo2d_learn.library.simple.display import get_cm
@@ -327,6 +327,9 @@ class DiffeomorphismEstimatorSimple(Diffeo2dEstimatorInterface):
         # diffeo = self.summarize_averaged(10, 0.02) # good for camera
         # diffeo = self.summarize_averaged(2, 0.1)
         print('Publishing')
+        from diffeo2d.visualization import (diffeomorphism_to_rgb, diffeo_to_rgb_angle,
+                                            diffeo_to_rgb_norm, diffeo_to_rgb_curv, angle_legend)
+
         pub.array_as_image('mle', diffeomorphism_to_rgb(diffeo.d))
         pub.array_as_image('angle', diffeo_to_rgb_angle(diffeo.d))
         pub.array_as_image('norm', diffeo_to_rgb_norm(diffeo.d, max_value=10))

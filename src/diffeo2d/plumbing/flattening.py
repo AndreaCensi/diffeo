@@ -3,9 +3,11 @@ from compmake.utils import memoize_simple as memoize
 
 
 
-class Flattening:
-    ''' A Flattening is a way to assign a 1D index to each cell of a 
-        2D array. '''
+class Flattening(object):
+    ''' 
+        A Flattening is a way to assign a 1D index to each cell of a 
+        2D array. 
+    '''
     
     @contract(cell2index='array[MxN](int32,>=0,<M*N)',
               index2cell='array[(M*N)x2](int32,>=0)')

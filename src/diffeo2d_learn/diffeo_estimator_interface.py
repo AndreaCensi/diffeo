@@ -18,11 +18,17 @@ class Diffeo2dEstimatorInterface(object):
             Considers the sample for learning 
         """
     
+    class NotReady(Exception):
+        """ Data is not ready, we never had an update. """
+        pass
+    
     @abstractmethod
     @contract(returns='valid_diffeomorphism')
     def get_value(self):
         ''' 
             Returns a Diffeomorphism2D.
+            
+            Raises NotReady if no data was passed.
         '''
         
     @contract(i='int,>=0,i', n='int,>=1,>=i')
