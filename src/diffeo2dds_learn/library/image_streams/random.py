@@ -3,6 +3,7 @@ from contracts import contract
 import numpy as np
 import warnings
 
+__all__ = ['RandomImageStream']
 
 class RandomImageStream(ImageStream):
     

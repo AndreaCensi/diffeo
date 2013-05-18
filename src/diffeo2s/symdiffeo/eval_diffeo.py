@@ -3,6 +3,7 @@ from contracts import contract
 import geometry
 import numpy as np
 
+__all__ = ['EvalDiffeo']
 
 def rotdeg(p, deg):
     R = geometry.rot2d(np.deg2rad(deg))

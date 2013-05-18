@@ -1,6 +1,11 @@
-from . import contract, np, SquareDomain, SymbolicDiffeo, LinearCoordinateChange
+from contracts import contract
+import numpy as np
+from . import SquareDomain, SymbolicDiffeo, LinearCoordinateChange
 from diffeo2d.misc_utils import coords_iterate
  
+
+__all__ = ['diffeo_from_function_viewport']
+
 
 @contract(diffeo=SymbolicDiffeo, viewport=SquareDomain, shape='valid_2d_shape',
           returns='tuple(valid_diffeomorphism, array[HxW])')

@@ -4,8 +4,7 @@ from bootstrapping_olympics.interfaces.streamels import (
     make_streamels_finite_commands, make_streamels_rgb_float)
 from bootstrapping_olympics.utils.dates import unique_timestamp_string
 from contracts import contract
-from diffeo2dds import get_diffeo2dds_config
-from diffeo2dds.model.uncertain_image import UncertainImage
+from diffeo2dds import UncertainImage, get_diffeo2dds_config
 from diffeo2dds_learn import get_diffeo2ddslearn_config
 import numpy as np
 import time

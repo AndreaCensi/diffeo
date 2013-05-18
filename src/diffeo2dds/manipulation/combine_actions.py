@@ -1,8 +1,10 @@
 from . import contract
-from diffeo2dds.configuration.config_master import get_diffeo2dds_config
-from diffeo2dds.model.diffeo_system import DiffeoSystem
+from ..configuration import get_diffeo2dds_config
+from ..model import DiffeoSystem
+
 
 __all__ = ['DDSCompositeActions']
+
 
 @contract(actions='list(dict)')
 def DDSCompositeActions(id_dds, label, actions):

@@ -1,9 +1,12 @@
-from . import contract, np
 from abc import ABCMeta, abstractmethod
+from contracts import contract
+import numpy as np
 from geometry import R2, TorusW
 
+__all__ = ['Topology', 'NoInverseAvailable', 'SymbolicDiffeo']
 
-class Topology:
+
+class Topology(object):
     PLANE = 'plane'
     TORUS = 'torus'
     KNOWN = {}
@@ -14,7 +17,7 @@ class Topology:
 class NoInverseAvailable(Exception):
     pass
 
-class SymbolicDiffeo:
+class SymbolicDiffeo(object):
     """ Interface for a symbolic diffeomorphism. """
     
     __metaclass__ = ABCMeta

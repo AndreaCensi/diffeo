@@ -1,4 +1,7 @@
-from . import contract, np
+from contracts import contract
+import numpy as np
+
+__all__ = ['SquareDomain']
 
 class SquareDomain:
     @contract(bounds='seq[N,>0](seq[2])')

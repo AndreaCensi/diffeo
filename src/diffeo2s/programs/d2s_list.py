@@ -2,8 +2,9 @@ from .d2s import Diffeo2s
 from diffeo2s.configuration import get_diffeo2s_config
 import sys
 
+__all__ = ['Diffeo2sList']
 
-class List(Diffeo2s.sub):  # @UndefinedVariable
+class Diffeo2sList(Diffeo2s.sub):  # @UndefinedVariable
     cmd = 'list'
     description = 'Lists the available configuration'
     

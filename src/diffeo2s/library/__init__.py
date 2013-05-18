@@ -10,8 +10,7 @@
     topology.
     
 """
-from .. import np, contract
-from diffeo2s.configuration.config_master import get_diffeo2s_config
+from diffeo2s.configuration import get_diffeo2s_config
 
 
 class DiffeoLibrary:

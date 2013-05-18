@@ -1,13 +1,12 @@
 from PIL import Image  # @UnresolvedImport
 from contracts import contract
 from diffeo2d import Diffeomorphism2D, Flattening, cmap, coords_iterate
-from diffeo2d.diffeo_display import (diffeomorphism_to_rgb, diffeo_to_rgb_angle,
-    diffeo_to_rgb_norm, diffeo_to_rgb_curv, diffeo_text_stats, angle_legend)
-from matplotlib import cm
-import matplotlib.pyplot as plt
+from diffeo2d.visualization import (diffeomorphism_to_rgb, diffeo_to_rgb_angle,
+    diffeo_to_rgb_norm, diffeo_to_rgb_curv, angle_legend)
+from diffeo2d_learn import Diffeo2dEstimatorInterface
 import numpy as np
-import numpy.linalg as la
-from diffeo2d_learn.diffeo_estimator_interface import Diffeo2dEstimatorInterface
+from diffeo2d.stats import diffeo_text_stats
+
 
 def sim_continuous(a, b):
     # XXX strange conversions
@@ -187,8 +186,7 @@ class DiffeomorphismEstimatorSimple(Diffeo2dEstimatorInterface):
                 variance[c] = sim[best]   
                 maximum_likelihood_index[c] = best_index
             
-            
-
+        
             E2[c] = self.neighbor_similarity_best[k] / self.num_samples
             # Best match error
             E3[c] = np.min(self.neighbor_num_bestmatch_flat[k]) / self.num_samples
@@ -239,10 +237,12 @@ class DiffeomorphismEstimatorSimple(Diffeo2dEstimatorInterface):
             sim = self.neighbor_similarity_flat[k]
             
             sim_square = sim.reshape(self.lengths).astype('float32') / self.num_samples
+            from diffeo2d_learn.library.simple.display import sim_square_modify
             sim_square, minerror[c], maxerror[c] = sim_square_modify(sim_square, np.min(self.neighbor_similarity_flat) / self.num_samples, np.max(self.neighbor_similarity_flat) / self.num_samples)
             avg_square = (np.max(sim_square) + np.min(sim_square)) / 2
             sim_zeroed = np.zeros(sim_square.shape)
             sim_zeroed[sim_square > 0.85] = sim_square[sim_square > 0.85] 
+            from diffeo2d_learn.library.simple.display import get_cm
             center[c], spread[c] = get_cm(sim_square)
 
             p0 = tuple(np.flipud(np.array(c) * self.lengths))
@@ -253,7 +253,9 @@ class DiffeomorphismEstimatorSimple(Diffeo2dEstimatorInterface):
         zer_image.save(quivername + 'simzeroed.png')
             
             
+        from diffeo2d_learn.library.simple.display import display_disp_quiver
         display_disp_quiver(center, quivername)
+        from diffeo2d_learn.library.simple.display import display_continuous_stats
         display_continuous_stats(center, spread, minerror, maxerror, quivername)
         
         dcont = displacement_to_coord(center)
@@ -322,8 +324,8 @@ class DiffeomorphismEstimatorSimple(Diffeo2dEstimatorInterface):
 
     def publish(self, pub):
         diffeo = self.summarize()
-#        diffeo = self.summarize_averaged(10, 0.02) # good for camera
-#        diffeo = self.summarize_averaged(2, 0.1)
+        # diffeo = self.summarize_averaged(10, 0.02) # good for camera
+        # diffeo = self.summarize_averaged(2, 0.1)
         print('Publishing')
         pub.array_as_image('mle', diffeomorphism_to_rgb(diffeo.d))
         pub.array_as_image('angle', diffeo_to_rgb_angle(diffeo.d))
@@ -391,83 +393,3 @@ def displacement_to_coord(x):
     
     return x
 
-@contract(diff='valid_diffeomorphism,array[MxNx2]')
-def display_diffeo_images(diff, name):
-    im_ang = Image.fromarray(diffeo_to_rgb_angle(diff)).resize((400, 300))
-    im_norm = Image.fromarray(diffeo_to_rgb_norm(diff)).resize((400, 300))
-    im_ang.save(name + 'ang.png')
-    im_ang.save(name + 'norm.png')
-
-    
-def sim_square_check(sim_square):
-#    fig = plt.figure()
-#    ax = fig.gca(projection='3d')
-#    X, Y = np.meshgrid(range(sim_square.shape[0]), range(sim_square.shape[0]))
-#    surf = ax.plot_surface(X, Y, sim_square, rstride=1, cstride=1, cmap=cm.jet,
-#        linewidth=0, antialiased=False)
-#    fig.colorbar(surf, shrink=0.5, aspect=5)
-#    plt.savefig('test.png')
-    Image.fromarray((sim_square * 255).astype('uint8')).resize((400, 300)).save('sim_square.png')
-    
-def display_disp_quiver(diff, name):
-    Y, X = np.meshgrid(range(diff.shape[1]), range(diff.shape[0]))
-    fig = plt.figure()
-    Q = plt.quiver(X, Y, diff[:, :, 1], -diff[:, :, 0])
-    plt.savefig(name)
-    
-def display_continuous_stats(diff, variance, minerror, maxerror, name):
-    Y, X = np.meshgrid(range(diff.shape[1]), range(diff.shape[0]))
-    fig = plt.figure(figsize=(16, 12), dpi=600)
-    Q = plt.quiver(X, Y, diff[:, :, 1], diff[:, :, 0])
-    
-    minvar = np.min(variance)
-    maxvar = np.max(variance)
-    norm_variance = (variance - minvar) / (maxvar - minvar) * 50 + 1
-#    plt.scatter(X + diff[:, :, 0], Y + diff[:, :, 1], c=minerror, s=norm_variance)
-    plt.scatter(X, Y, c=minerror, s=norm_variance)
-    
-    plt.savefig(name)
-    
-
-def sim_square_modify(sim_square, minval=None, maxval=None):
-    if minval is None:
-        mi = np.min(sim_square)
-    else:
-        mi = minval
-    if maxval is None:
-        ma = np.max(sim_square)
-    else:
-        ma = maxval
-    
-    mod_square = -(sim_square - ma) / (ma - mi)
-    return mod_square, mi, ma
-    
-def get_cm(sim_arr):
-    shape = np.array(sim_arr.shape)
-    cent = (shape.astype('float') - [1, 1]) / 2
-    # center of mass
-    torque = np.array([0.0, 0.0])
-    mass = 0.0
-    inertia_sum = 0.0
-    
-    area = np.zeros(sim_arr.shape)
-    area[sim_arr > np.max(sim_arr) * 0.9] = sim_arr[sim_arr > np.max(sim_arr) * 0.9]
-        
-    for cn in coords_iterate(shape):
-        r = (np.array(cn) - cent)
-        torque += area[cn] * r
-        mass += area[cn]
-        
-    # if no mass, return zero
-    if mass == 0:
-        return np.array([0, 0]), 0    
-    
-    cm = torque / mass
-    
-    for cn in coords_iterate(shape):
-        r = (np.array(cn) - cent)
-        a = la.norm(r)
-        inertia_sum += a ** 2 * area[cn]
-    
-    inertia = inertia_sum / mass 
-    return cm, inertia

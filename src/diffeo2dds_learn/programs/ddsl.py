@@ -1,13 +1,13 @@
 from conf_tools import GlobalConfig
 from quickapp import QuickMultiCmdApp
 
-__all__ = ['Diffeo2s']
+__all__ = ['DDSL']
 
 
-class Diffeo2s(QuickMultiCmdApp):
-    """Main program for manipulating symbolic diffeomorphisms."""
+class DDSL(QuickMultiCmdApp):
+    """ Main program for learning symbolic diffeomorphisms. """
     
-    cmd = 'd2s'
+    cmd = 'ddsl'
     
     def define_multicmd_options(self, options):
         options.add_flag('dummy', help='workaround for a bug')
@@ -20,3 +20,4 @@ class Diffeo2s(QuickMultiCmdApp):
         GlobalConfig.global_load_dirs(options.config_dirs)
                   
         
+

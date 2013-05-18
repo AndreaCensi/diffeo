@@ -2,6 +2,8 @@ from ..interface import DiffeoSystemEstimatorInterface, Stream
 from conf_tools import ConfigMaster
 from diffeo2dds_learn.interface.streams import ImageStream
 
+__all__ = ['get_diffeo2ddslearn_config']
+
 class Diffeo2ddsLearnConfig(ConfigMaster):
     def __init__(self):
         ConfigMaster.__init__(self, 'diffeo2dlearn')

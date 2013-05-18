@@ -19,3 +19,22 @@
           diffeo: Ipx1
         topology: plane
 
+
+- id: "test_random_${id_symdds}_${resolution}"
+  desc: "Synthetic random stream (symdds ${id_symdds}, resolution ${resolution})"
+  code:
+  - diffeo2dds_sim.library.RobotInteractionStream
+  - agent: random_agent
+    robot: 
+    - diffeo2dds_sim.library.DiffeoSystemSimulation
+    - image_stream:
+      - diffeo2dds_learn.library.RandomImageStream
+      - shape: ["${resolution}", "${resolution}"]
+        seed: 42
+      discdds: 
+       - diffeo2dds.DDSFromSymbolic
+       - resolution: "${resolution}"
+         symdiffeosystem: "${id_symdds}"
+
+
+- id: "test_random_dpx1_64"

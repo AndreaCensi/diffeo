@@ -1,4 +1,6 @@
-from . import SymbolicDiffeo, contract, np
+from . import SymbolicDiffeo
+from contracts import contract
+import numpy as np
 from geometry import se2, SE2
 import geometry
 

@@ -1,17 +1,16 @@
 from .. import logger
 from ..interface import DiffeoSystemEstimatorInterface
-from diffeo2dds.model.diffeo_system import DiffeoSystem
-from diffeo2d_learn.configuration.master import get_diffeo2dlearn_config
 from contracts import contract
-from diffeo2dds.model.diffeo_action import DiffeoAction
+from diffeo2d_learn import get_diffeo2dlearn_config
+from diffeo2dds import DiffeoAction, DiffeoSystem
 import numpy as np
 import warnings
 
 
-__all__ = ['DiffeoSystemLearner']
+__all__ = ['DiffeoSystemEstimator']
 
 
-class DiffeoSystemLearner(DiffeoSystemEstimatorInterface):
+class DiffeoSystemEstimator(DiffeoSystemEstimatorInterface):
     ''' 
         Keeps a list of diffeomorphism estimators 
         to learn a diffeomorphism for each command.
@@ -21,23 +20,23 @@ class DiffeoSystemLearner(DiffeoSystemEstimatorInterface):
         parameter. 
     '''
     
-    def __init__(self, id_diffeo2d_estimator):
+    def __init__(self, diffeo2d_estimator):
         '''
 
         :param use_fast: Use DiffeomorphismEstimatorFaster.
         '''
         self.command_list = []
-        warnings.warn('remove state')
+        warnings.warn('TODO: remove state')
         self.state_list = []
         self.estimators = []
         self.estimators_inv = []
         
-        self.id_diffeo2d_estimator = id_diffeo2d_estimator    
+        self.diffeo2d_estimator = diffeo2d_estimator    
         
     def new_estimator(self):
         """ Instances a new estimator. """
         config = get_diffeo2dlearn_config()
-        estimator = config.diffeo2d_estimators.instance(self.id_diffeo2d_estimator)
+        _, estimator = config.diffeo2d_estimators.instance_smarter(self.id_diffeo2d_estimator)
         return estimator            
                     
     def command_index(self, command):
@@ -91,20 +90,22 @@ class DiffeoSystemLearner(DiffeoSystemEstimatorInterface):
         
     def update(self, Y0, U0, Y1, X0=None):
         cmd_ind = self.estimator_index(U0, None)
+        est = self.estimators[cmd_ind]
+        est_inv = self.estimators_inv[cmd_ind]
         # XXX: cleaning up with state or not
         if Y0.ndim == 3:
             # if there are 3 channels...
             for ch in range(3):
                 if X0 is None:
-                    self.estimators[cmd_ind].update(Y0[:, :, ch], Y1[:, :, ch])
-                    self.estimators_inv[cmd_ind].update(Y1[:, :, ch], Y0[:, :, ch])
+                    est.update(Y0[:, :, ch], Y1[:, :, ch])
+                    est_inv.update(Y1[:, :, ch], Y0[:, :, ch])
                 else:
-                    self.estimators[cmd_ind].update(Y0[:, :, ch], Y1[:, :, ch], U0, X0)
-                    self.estimators_inv[cmd_ind].update(Y1[:, :, ch], Y0[:, :, ch], U0, X0)
+                    est.update(Y0[:, :, ch], Y1[:, :, ch], U0, X0)
+                    est_inv.update(Y1[:, :, ch], Y0[:, :, ch], U0, X0)
         else:
             assert Y0.ndim == 2
-            self.estimators[cmd_ind].update(Y0, Y1)
-            self.estimators_inv[cmd_ind].update(Y1, Y0)
+            est.update(Y0, Y1)
+            est_inv.update(Y1, Y0)
                 
                 
     @contract(returns=DiffeoSystem)            

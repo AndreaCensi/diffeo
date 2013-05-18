@@ -1,12 +1,12 @@
 from .. import DiffeoAction, DiffeoSystem, logger
 from contracts import contract
 from diffeo2d import Diffeomorphism2D
-from diffeo2s.configuration.config_master import get_diffeo2s_config
+from diffeo2dds.configuration.config_master import get_diffeo2dds_config
+from diffeo2s import get_diffeo2s_config
+from diffeo2s.symdiffeo.compositions import make_chain
 from diffeo2s.symdiffeo.square_domain import SquareDomain
 from diffeo2s.symdiffeo.viewport import diffeo_from_function_viewport
 import numpy as np
-from diffeo2s.symdiffeo.compositions import make_chain
-from diffeo2dds.configuration.config_master import get_diffeo2dds_config
 
 __all__ = ['DDSFromSymbolic']
 

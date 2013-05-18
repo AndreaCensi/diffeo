@@ -1,7 +1,8 @@
-from . import diffeo_torus, np
+import numpy as np
+from . import diffeo_torus
 
 
-@diffeo_torus # actually, it's diffeo_square
+@diffeo_torus  # actually, it's diffeo_square
 def rot90(X):
     R = [[0, 1], [-1, 0]]
     return np.dot(R, X)

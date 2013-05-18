@@ -1,6 +1,7 @@
 from . import SymbolicDiffeo, Topology, NoInverseAvailable
 from diffeo2s.library import twirl
 
+__all__ = ['Twirl']
 
 
 class Twirl(SymbolicDiffeo):

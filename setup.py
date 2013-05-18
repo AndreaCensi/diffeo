@@ -34,16 +34,18 @@ setup(
     packages=find_packages('src'),
     entry_points={
      'console_scripts': [
-       'd2s = diffeo2s.programs:d2s_main',
-       'd2dds = diffeo2dds.programs:d2dds_main',
+       'ds = diffeo2s.programs:d2s_main',
+       'dds = diffeo2dds.programs:d2dds_main',
+       'ddsl = diffeo2dds_learn.programs:ddsl_main',
       ]
     },
+      
     install_requires=[
         'PyContracts',
         'PyGeometry',
+        'compmake',
         'reprep',
         'QuickApp'
-        
     ],
 
     tests_require=['nose']

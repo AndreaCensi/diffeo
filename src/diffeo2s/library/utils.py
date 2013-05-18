@@ -1,5 +1,6 @@
-from . import np, contract, DiffeoLibrary
-from contracts import new_contract
+from . import  DiffeoLibrary
+import numpy as np
+from contracts import new_contract, contract
 import functools
 
 __all__ = ['diffeo_torus', 'diffeo_torus_reflection']

@@ -1,4 +1,5 @@
-from . import diffeo_torus_reflection, np
+import numpy as np
+from . import diffeo_torus_reflection
 
 
 @diffeo_torus_reflection
