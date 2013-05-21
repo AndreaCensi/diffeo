@@ -1,11 +1,9 @@
-from .. import logger
-from ..interface import DiffeoSystemEstimatorInterface
+from diffeo2dds_learn import logger, DiffeoSystemEstimatorInterface
 from contracts import contract
-from diffeo2d_learn import get_diffeo2dlearn_config
+from diffeo2d_learn import Diffeo2dEstimatorInterface, get_diffeo2dlearn_config
 from diffeo2dds import DiffeoAction, DiffeoSystem
 import numpy as np
 import warnings
-from diffeo2d_learn.diffeo_estimator_interface import Diffeo2dEstimatorInterface
 
 
 __all__ = ['DiffeoSystemEstimator']
@@ -20,11 +18,11 @@ class DiffeoSystemEstimator(DiffeoSystemEstimatorInterface):
         itself. These are specified using the id_diffeo_estimator
         parameter. 
     '''
-    
+
+    @contract(diffeo2d_estimator='str|code_spec')    
     def __init__(self, diffeo2d_estimator):
         '''
 
-        :param use_fast: Use DiffeomorphismEstimatorFaster.
         '''
         self.command_list = []
         warnings.warn('TODO: remove state')
@@ -43,7 +41,12 @@ class DiffeoSystemEstimator(DiffeoSystemEstimatorInterface):
         _, estimator = config.diffeo2d_estimators.instance_smarter(self.diffeo2d_estimator)
         return estimator            
                     
+    @contract(returns='int', command='array')
     def command_index(self, command):
+        command = tuple(command)
+        # logger.info('Checking command %s in %r' % (str(command), self.command_list))
+        # logger.info('%s' % str(command in self.command_list))
+        
         if not command in self.command_list:    
             logger.info('Adding new command %s' % str(command))
             self.command_list.append(command)
@@ -99,8 +102,8 @@ class DiffeoSystemEstimator(DiffeoSystemEstimatorInterface):
             self.estimators.append(other.estimators[j])
             self.estimators_inv.append(other.estimators_inv[j])
         
-    def update(self, Y0, U0, Y1, X0=None):
-        cmd_ind = self.command_index(U0)
+    def update(self, y0, u0, y1, X0=None):
+        cmd_ind = self.command_index(u0)
         
         if self.parallel_hint is not None:
             # check to see if we need to take care of this
@@ -112,19 +115,19 @@ class DiffeoSystemEstimator(DiffeoSystemEstimatorInterface):
         est = self.estimators[cmd_ind]
         est_inv = self.estimators_inv[cmd_ind]
         # XXX: cleaning up with state or not
-        if Y0.ndim == 3:
+        if y0.ndim == 3:
             # if there are 3 channels...
             for ch in range(3):
                 if X0 is None:
-                    est.update(Y0[:, :, ch], Y1[:, :, ch])
-                    est_inv.update(Y1[:, :, ch], Y0[:, :, ch])
+                    est.update(y0[:, :, ch], y1[:, :, ch])
+                    est_inv.update(y1[:, :, ch], y0[:, :, ch])
                 else:
-                    est.update(Y0[:, :, ch], Y1[:, :, ch], U0, X0)
-                    est_inv.update(Y1[:, :, ch], Y0[:, :, ch], U0, X0)
+                    est.update(y0[:, :, ch], y1[:, :, ch], u0, X0)
+                    est_inv.update(y1[:, :, ch], y0[:, :, ch], u0, X0)
         else:
-            assert Y0.ndim == 2
-            est.update(Y0, Y1)
-            est_inv.update(Y1, Y0)
+            assert y0.ndim == 2
+            est.update(y0, y1)
+            est_inv.update(y1, y0)
                 
         
     @contract(returns=DiffeoSystem)            

@@ -56,7 +56,8 @@ class FlatStructure():
     
             self.neighbor_indices_flat[k, :] = np.array(indices.flat)  # using numpy's flattening
 
-    @contract(k='int,>=0,<N', neighbor_index='int,>=0,<A', returns='seq[2](int)')
+    # k < N, index < A
+    @contract(k='int,>=0', neighbor_index='int,>=0', returns='seq[2](int)')
     def neighbor_cell(self, k, neighbor_index):
         j = self.neighbor_indices_flat[k][neighbor_index]
         return self.flattening.index2cell[j]

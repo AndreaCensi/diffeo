@@ -1,7 +1,8 @@
-from abc import abstractmethod, ABCMeta
+from abc import abstractmethod
 from contracts import contract
 from diffeo2dds import DiffeoSystem
 from reprep import Report
+from contracts import ContractsMeta
 
 __all__ = ['DiffeoSystemEstimatorInterface']
 
@@ -14,7 +15,7 @@ class DiffeoSystemEstimatorInterface(object):
         when requested.
     """ 
     
-    __metaclass__ = ABCMeta
+    __metaclass__ = ContractsMeta
         
     @abstractmethod
     @contract(y0='array[MxN]', u0='array[K]', y1='array[MxN]')

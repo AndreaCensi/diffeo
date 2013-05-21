@@ -233,10 +233,11 @@ class Diffeomorphism2D(object):
 
         angles = np.array(angle.flat)
         valid_angles = angles[np.logical_not(np.isnan(angles))]
-        with f.plot('angle_hist', caption='histogram of angle values '
-                    '(excluding where norm=0)') as pylab:
-            pylab.hist(valid_angles, nbins)
-        
+        if len(valid_angles) > 0:
+            with f.plot('angle_hist', caption='histogram of angle values '
+                        '(excluding where norm=0)') as pylab:
+                pylab.hist(valid_angles, nbins)
+            
         try:
             with f.plot('var_hist', caption='histogram of certainty values') as pylab:
                 pylab.hist(self.variance.flat, nbins)

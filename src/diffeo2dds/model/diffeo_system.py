@@ -1,16 +1,16 @@
 from . import DiffeoAction, np, contract, UncertainImage, logger
 from bootstrapping_olympics.utils import raise_x_not_found
+from diffeo2dds.model.diffeo_action_distances import (diffeoaction_distance_L2,
+    diffeoaction_distance_L2_infow, diffeoaction_anti_distance_L2,
+    diffeoaction_anti_distance_L2_infow, diffeoaction_comm_distance_L2,
+    diffeoaction_comm_distance_L2_infow)
+from diffeo2dds.model.plan_utils import plan_friendly
+from diffeo2s.utils.matrices import construct_matrix
 from reprep import Report
 import warnings
-from diffeo2s.utils.matrices import construct_matrix
-from diffeo2dds.model.diffeo_action_distances import diffeoaction_distance_L2, \
-    diffeoaction_distance_L2_infow, diffeoaction_anti_distance_L2, \
-    diffeoaction_anti_distance_L2_infow, diffeoaction_comm_distance_L2, \
-    diffeoaction_comm_distance_L2_infow
-from diffeo2dds.model.plan_utils import plan_friendly
 
 
-class DiffeoSystem():
+class DiffeoSystem(object):
     """
         A DiffeoSystem is a set of discretized diffeomorphisms.
         

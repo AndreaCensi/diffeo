@@ -9,8 +9,9 @@ import time
 
 Order = 'order'
 Similarity = 'sim'
-Cont = 'quad'
+# Cont = 'quad'
 # InferenceMethods = [Order, Similarity, Cont]
+    
     
 class DiffeomorphismEstimatorFaster(Diffeo2dEstimatorInterface):
     ''' Learns a diffeomorphism between two 2D fields. '''
@@ -249,21 +250,21 @@ class DiffeomorphismEstimatorFaster(Diffeo2dEstimatorInterface):
         dd[:] = -1
         for i in range(self.nsensels):
             
-            if self.inference_method == 'order':
+            if self.inference_method == Order:
                 eord_score = self.neig_eord_score[i, :]
                 best = np.argmin(eord_score)
             
-            if self.inference_method == 'sim':
+            if self.inference_method == Similarity:
                 esim_score = self.neig_esim_score[i, :]
                 best = np.argmin(esim_score)
                 
             jc = self.flat_structure.neighbor_cell(i, best)
             ic = self.flat_structure.flattening.index2cell[i]
             
-            if self.inference_method == 'order':
+            if self.inference_method == Order:
                 certain = -np.min(eord_score) / np.mean(eord_score)
                 
-            if self.inference_method == 'sim':
+            if self.inference_method == Similarity:
                 first = np.sort(esim_score)[:10]
                 certain = -(first[0] - np.mean(first[1:]))
                 # certain = -np.min(esim_score) / np.mean(esim_score)
@@ -329,31 +330,27 @@ class DiffeomorphismEstimatorFaster(Diffeo2dEstimatorInterface):
         if not self.initialized() and other.initialized():
             # Let's initialized like the other
             self.init_structures(other.shape)
+            self.num_samples = other.num_samples
+            self.neig_esimmin_score = other.neig_esimmin_score
+            if self.inference_method == Similarity:
+                self.neig_esim_score = other.neig_esim_score
+            if self.inference_method == Order:
+                self.neig_eord_score = other.neig_eord_score
+            return
         
+        if self.inference_method != other.inference_method:
+            raise ValueError()
+            
         assert other.initialized(), "Can only merge initialized structures"
         logger.info('merging %s + %s samples' % (self.num_samples, other.num_samples))
-        self.num_samples += other.num_samples
 
-        # if self.inference_method == Similarity:   
-        #     self.neig_esim_score += other.neig_esim_score
-        # elif self.inference_method == Order:
-        #     self.neig_eord_score += other.neig_eord_score
-        # else:
-        #     assert False
-        
-        self.neig_esim_score += other.neig_esim_score
-        
-        if hasattr(self, 'neig_eord_score') and hasattr(other, 'neig_eord_score'):
+        self.num_samples += other.num_samples
+        self.neig_esimmin_score += other.neig_esimmin_score
+
+        if self.inference_method == Order:
             self.neig_eord_score += other.neig_eord_score
+        elif self.inference_method == Similarity:
+            self.neig_esim_score += other.neig_esim_score
         else:
-            logger.warn(('neig_eord_score is missing in at least one estimator.' + 
-            'Merged estimator will not have neig_eord_score.'))
-            
-        if hasattr(self, 'neig_esimmin_score') and hasattr(other, 'neig_esimmin_score'):
-            # AC: this was as below, it was a bug, I think
-            self.neig_esimmin_score += other.neig_esimmin_score
-            # self.neig_esimmin_score = other.neig_esimmin_score
-        else:
-            logger.warn(('neig_esimmin_score is missing in at least one estimator.' + 
-            'Merged estimator will not have neig_eord_score.'))
- 
+            assert False
+
