@@ -34,6 +34,7 @@ setup(
     packages=find_packages('src'),
     entry_points={
      'console_scripts': [
+       'diffeo = diffeo:diffeo_main',
        'ds = diffeo2s.programs:d2s_main',
        'dds = diffeo2dds.programs:d2dds_main',
        'ddsl = diffeo2dds_learn.programs:ddsl_main',

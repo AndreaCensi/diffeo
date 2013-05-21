@@ -1,6 +1,9 @@
 from abc import abstractmethod, ABCMeta
 from contracts import contract
 from diffeo2dds import DiffeoSystem
+from reprep import Report
+
+__all__ = ['DiffeoSystemEstimatorInterface']
 
 
 class DiffeoSystemEstimatorInterface(object):
@@ -47,3 +50,10 @@ class DiffeoSystemEstimatorInterface(object):
             in another copy of itself that 
         """
         raise NotImplementedError()
+
+
+    @abstractmethod
+    @contract(report=Report)
+    def display(self, report):
+        """ Creates a report to show the internal state. """
+        pass

@@ -16,7 +16,8 @@ class DDSLLearnParallel(DDSL.sub, QuickApp):  # @UndefinedVariable
     def define_options(self, params):
         params.add_string('estimator', help='Which learner to use.')
         params.add_string('stream', help='Which data stream to use.')
-        params.add_int('n', help='Number of threads to use.')
+        params.add_int('n', default=4,
+                       help='Number of threads to use.')
         
     def define_jobs_context(self, context): 
         estimator = self.options.estimator

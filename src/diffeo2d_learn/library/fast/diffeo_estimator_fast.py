@@ -10,7 +10,7 @@ import time
 Order = 'order'
 Similarity = 'sim'
 Cont = 'quad'
-InferenceMethods = [Order, Similarity, Cont]
+# InferenceMethods = [Order, Similarity, Cont]
     
 class DiffeomorphismEstimatorFaster(Diffeo2dEstimatorInterface):
     ''' Learns a diffeomorphism between two 2D fields. '''
@@ -27,9 +27,10 @@ class DiffeomorphismEstimatorFaster(Diffeo2dEstimatorInterface):
         self.last_y1 = None
         self.inference_method = inference_method
         
-        if self.inference_method not in InferenceMethods:
+        accepted = [Order, Similarity]
+        if self.inference_method not in accepted:
             msg = ('I need one of %s; found %s' % 
-                   (InferenceMethods, inference_method))
+                   (accepted, inference_method))
             raise ValueError(msg)
         
         self.num_samples = 0
@@ -91,7 +92,8 @@ class DiffeomorphismEstimatorFaster(Diffeo2dEstimatorInterface):
             elif self.inference_method == Similarity:
                 self.neig_esim_score[k, :] += diff
             else:
-                assert False
+                msg = 'Unknown inference method %r' % self.inference_method
+                raise ValueError(msg)
                 
             self.neig_esimmin_score[k] += np.min(diff)
             
@@ -111,7 +113,9 @@ class DiffeomorphismEstimatorFaster(Diffeo2dEstimatorInterface):
         elif self.inference_method == Similarity:
             self.neig_esim_score += difference
         else:
-            assert False
+            msg = 'Unknown inference method %r' % self.inference_method
+            raise ValueError(msg)
+
                     
         self.neig_esimmin_score += np.min(difference, axis=1)
         

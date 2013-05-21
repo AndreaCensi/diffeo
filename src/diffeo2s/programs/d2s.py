@@ -3,11 +3,10 @@ from quickapp import QuickMultiCmdApp
 
 __all__ = ['Diffeo2s']
 
-
 class Diffeo2s(QuickMultiCmdApp):
     """Main program for manipulating symbolic diffeomorphisms."""
     
-    cmd = 'd2s'
+    cmd = 'symbolic'
     
     def define_multicmd_options(self, options):
         options.add_flag('dummy', help='workaround for a bug')
@@ -20,3 +19,4 @@ class Diffeo2s(QuickMultiCmdApp):
         GlobalConfig.global_load_dirs(options.config_dirs)
                   
         
+

@@ -7,7 +7,7 @@ __all__ = ['DDSL']
 class DDSL(QuickMultiCmdApp):
     """ Main program for learning symbolic diffeomorphisms. """
     
-    cmd = 'ddsl'
+    cmd = 'dds-learn'
     
     def define_multicmd_options(self, options):
         options.add_flag('dummy', help='workaround for a bug')

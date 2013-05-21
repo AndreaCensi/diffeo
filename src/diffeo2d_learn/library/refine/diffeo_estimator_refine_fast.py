@@ -282,7 +282,6 @@ class DiffeomorphismEstimatorRefineFast():
     
     def display(self, report):
         self.show_areas(report)
-#        pdb.set_trace()
         
         report.data('num_samples', self.num_samples)
         report.data('grid_shape', self.grid_shape)
@@ -513,8 +512,3 @@ def extract_wraparound(Y, (xl, xu, yl, yu)):
     return Yi_sub
 
 
-
-
-
-def compare():
-    pass

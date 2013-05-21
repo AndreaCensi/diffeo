@@ -1,23 +1,7 @@
 from contracts import contract
 from diffeo2d import Diffeomorphism2D, Flattening, cmap, coords_iterate
-from diffeo2d.stats import diffeo_text_stats
 from diffeo2d_learn import Diffeo2dEstimatorInterface, logger
 import numpy as np
-
-def sim_continuous(a, b):
-    # XXX strange conversions
-    diff = np.abs(a.astype(np.int16) - b.astype(np.int16)) ** 2
-    # diff = np.abs(a - b)
-    return diff
-
-
-def sim_binary(a, b):  # good for 0-1
-    return a * b
-
-
-MATCH_CONTINUOUS = 'continuous'
-MATCH_BINARY = 'binary'
-
 
 __all__ = ['DiffeomorphismEstimatorSimple']
 
@@ -37,7 +21,11 @@ class DiffeomorphismEstimatorSimple(Diffeo2dEstimatorInterface):
         self.last_y0 = None
         self.last_y1 = None
 
-        assert match_method in [MATCH_CONTINUOUS, MATCH_BINARY]
+        accepted = [MATCH_CONTINUOUS, MATCH_BINARY]
+        if not match_method in accepted:
+            msg = 'Need one of %s, not %s.' % (accepted, match_method)
+            raise ValueError(msg)
+        
         self.match_method = match_method
 
         self.num_samples = 0
@@ -154,6 +142,11 @@ class DiffeomorphismEstimatorSimple(Diffeo2dEstimatorInterface):
             
             Returns a Diffeomorphism2D.
         '''
+        
+        if self.num_samples == 0:
+            msg = 'No data seen yet'
+            raise Diffeo2dEstimatorInterface.NotReady(msg)
+        
         maximum_likelihood_index = np.zeros(self.shape, dtype='int32')
         variance = np.zeros(self.shape, dtype='float32')
         E2 = np.zeros(self.shape, dtype='float32')
@@ -161,9 +154,9 @@ class DiffeomorphismEstimatorSimple(Diffeo2dEstimatorInterface):
         E4 = np.zeros(self.shape, dtype='float32')
         num_problems = 0
         
-        from PIL import Image  # @UnresolvedImport
-        order_image = Image.new('L', np.flipud(self.shape) * np.flipud(self.lengths))
-        
+#         from PIL import Image  # @UnresolvedImport
+#         order_image = Image.new('L', np.flipud(self.shape) * np.flipud(self.lengths))
+#         
         i = 0
         # for each coordinate
         for c in coords_iterate(self.shape):
@@ -192,18 +185,18 @@ class DiffeomorphismEstimatorSimple(Diffeo2dEstimatorInterface):
             
             E4[c] = np.min(self.neighbor_argsort_flat[k]) / self.num_samples
             
-            p0 = tuple(np.flipud(np.array(c) * self.lengths))
-            E4_square = (self.neighbor_argsort_flat[k] / self.num_samples).reshape(self.lengths)
-            order_image.paste(Image.fromarray((E4_square / np.max(E4_square) * 255).astype('uint8')), p0 + tuple(p0 + self.lengths))
+            # p0 = tuple(np.flipud(np.array(c) * self.lengths))
+            # E4_square = (self.neighbor_argsort_flat[k] / self.num_samples).reshape(self.lengths)
+            # order_image.paste(Image.fromarray((E4_square / np.max(E4_square) * 255).astype('uint8')), p0 + tuple(p0 + self.lengths))
 
             i += 1
             
-        order_image.save('order.png')
+        # order_image.save('order.png')
         
         d = self.flattening.flat2coords(maximum_likelihood_index)
 
         if num_problems > 0:
-            print('Warning, %d were not informative.' % num_problems)
+            logger.info('Warning, %d were not informative.' % num_problems)
             pass
         
 #         sqrt_2_sigma2 = np.sqrt(2 * variance / self.num_samples)
@@ -227,9 +220,9 @@ class DiffeomorphismEstimatorSimple(Diffeo2dEstimatorInterface):
         maxerror = np.zeros(self.shape, dtype='float32')
         minerror = np.zeros(self.shape, dtype='float32')
         
-        from PIL import Image  # @UnresolvedImport
-        sim_image = Image.new('L', np.flipud(self.shape) * np.flipud(self.lengths))
-        zer_image = Image.new('L', np.flipud(self.shape) * np.flipud(self.lengths))
+        # from PIL import Image  # @UnresolvedImport
+        # sim_image = Image.new('L', np.flipud(self.shape) * np.flipud(self.lengths))
+        # zer_image = Image.new('L', np.flipud(self.shape) * np.flipud(self.lengths))
         for c in coords_iterate(self.shape):
             # find index in flat array
             k = self.flattening.cell2index[c]
@@ -246,11 +239,11 @@ class DiffeomorphismEstimatorSimple(Diffeo2dEstimatorInterface):
             center[c], spread[c] = get_cm(sim_square)
 
             p0 = tuple(np.flipud(np.array(c) * self.lengths))
-            sim_image.paste(Image.fromarray((sim_square * 255).astype('uint8')), p0 + tuple(p0 + self.lengths))
-            zer_image.paste(Image.fromarray((sim_zeroed * 255).astype('uint8')), p0 + tuple(p0 + self.lengths))
+            # sim_image.paste(Image.fromarray((sim_square * 255).astype('uint8')), p0 + tuple(p0 + self.lengths))
+            # zer_image.paste(Image.fromarray((sim_zeroed * 255).astype('uint8')), p0 + tuple(p0 + self.lengths))
             
-        sim_image.save(quivername + 'simimage.png')
-        zer_image.save(quivername + 'simzeroed.png')
+        # sim_image.save(quivername + 'simimage.png')
+        # zer_image.save(quivername + 'simzeroed.png')
             
             
         from diffeo2d_learn.library.simple.display import display_disp_quiver
@@ -303,7 +296,6 @@ class DiffeomorphismEstimatorSimple(Diffeo2dEstimatorInterface):
         neighbors = self.neighbor_indices_flat[k]
         sim = self.neighbor_similarity_flat[k]
         M.flat[neighbors] = sim
-
         best = np.argmax(sim)
         M.flat[neighbors[best]] = np.NaN
         return M
@@ -313,32 +305,22 @@ class DiffeomorphismEstimatorSimple(Diffeo2dEstimatorInterface):
         for _ in range(n):
             diff = self.summarize_smooth(noise)
             d.append(diff.d)
-            print('.')
+            # print('.')
         ds = np.array(d, 'float')
         avg = ds.mean(axis=0)
         # var  = diff.variance
         var = ds[:, :, :, 0].var(axis=0) + ds[:, :, :, 1].var(axis=0)
-        print var.shape
+        # print var.shape
         assert avg.shape == diff.d.shape
         return Diffeomorphism2D(avg, var)
 
-    def publish(self, pub):
-        diffeo = self.summarize()
-        # diffeo = self.summarize_averaged(10, 0.02) # good for camera
-        # diffeo = self.summarize_averaged(2, 0.1)
-        print('Publishing')
-        from diffeo2d.visualization import (diffeomorphism_to_rgb, diffeo_to_rgb_angle,
-                                            diffeo_to_rgb_norm, diffeo_to_rgb_curv, angle_legend)
+    def display(self, report):
+        f = report.figure('estimated')
 
-        pub.array_as_image('mle', diffeomorphism_to_rgb(diffeo.d))
-        pub.array_as_image('angle', diffeo_to_rgb_angle(diffeo.d))
-        pub.array_as_image('norm', diffeo_to_rgb_norm(diffeo.d, max_value=10))
-        pub.array_as_image('curv', diffeo_to_rgb_curv(diffeo.d))
-        pub.array_as_image('variance', diffeo.variance, filter='scale')
-
-        pub.text('num_samples', self.num_samples)
-        pub.text('statistics', diffeo_text_stats(diffeo.d))
-        pub.array_as_image('legend', angle_legend((50, 50)))
+        report.text('num_samples', self.num_samples)
+        
+        if self.num_samples == 0:
+            return
 
         n = 20
         M = None
@@ -357,20 +339,38 @@ class DiffeomorphismEstimatorSimple(Diffeo2dEstimatorInterface):
             if Mmax > 0:
                 M[ok] = Mc[ok] / Mmax
 
-        pub.array_as_image('coords', M, filter='scale')
+        report.data('coords', M).display('scale').add_to(f)
 
         if self.last_y0 is not None:
+            f2 = report.figure('last_input')
             y0 = self.last_y0
             y1 = self.last_y1
             none = np.logical_and(y0 == 0, y1 == 0)
             x = y0 - y1
             x[none] = np.nan
-            pub.array_as_image('motion', x, filter='posneg')
+            report.data('y0', y0).display('scale').add_to(f2, caption='y0')
+            report.data('y1', y1).display('scale').add_to(f2, caption='y1')
+            report.data('motion', x).display('posneg').add_to(f2, caption='motion')
+
+
+def sim_continuous(a, b):
+    # XXX strange conversions
+    diff = np.abs(a.astype(np.int16) - b.astype(np.int16)) ** 2
+    # diff = np.abs(a - b)
+    return diff
+
+def sim_binary(a, b):  # good for 0-1
+    return a * b
+
+
+MATCH_CONTINUOUS = 'continuous'
+MATCH_BINARY = 'binary'
+
+
 
 
 # ## Test functions
-
-
+# TODO: remove
 @contract(x='array[MxNx2]')
 def get_valid_diffeomorphism(x):
     M, N = x.shape[0], x.shape[1]
@@ -395,4 +395,5 @@ def displacement_to_coord(x):
     x[:, :, 1] = x[:, :, 1] + X
     
     return x
+
 

@@ -2,9 +2,9 @@ from conf_tools import GlobalConfig
 from quickapp import QuickMultiCmdApp
 
 class Diffeo2dds(QuickMultiCmdApp):
+    '''Main program for manipulating symbolic diffeomorphisms.'''
     
-    cmd = 'd2dds'
-    description = 'Main program for manipulating symbolic diffeomorphisms.'
+    cmd = 'dds'
     
     def define_multicmd_options(self, options):
         options.add_flag('dummy', help='workaround for a bug')
