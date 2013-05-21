@@ -1,7 +1,9 @@
-from . import contract, np
-from diffeo2d.visualization.uncertainty import scalaruncertainty2rgb
-from diffeo2s.utils.resampling_signal import resample_signal, resample_signal_2d
+import numpy as np
+from contracts import contract
+from diffeo2d.visualization import scalaruncertainty2rgb
+from diffeo2s.utils import resample_signal, resample_signal_2d
  
+__all__ = ['UncertainImage']
  
 class UncertainImage(object):
     

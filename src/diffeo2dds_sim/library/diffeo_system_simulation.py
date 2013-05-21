@@ -1,8 +1,7 @@
-from bootstrapping_olympics import (RobotInterface, RobotObservations,
-    EpisodeDesc, BootSpec, StreamSpec)
-from bootstrapping_olympics.interfaces.streamels import (
-    make_streamels_finite_commands, make_streamels_rgb_float)
-from bootstrapping_olympics.utils.dates import unique_timestamp_string
+from bootstrapping_olympics import (make_streamels_finite_commands,
+    make_streamels_rgb_float, RobotInterface, RobotObservations, EpisodeDesc,
+    BootSpec, StreamSpec)
+from bootstrapping_olympics.utils import unique_timestamp_string
 from contracts import contract
 from diffeo2dds import UncertainImage, get_diffeo2dds_config
 from diffeo2dds_learn import get_diffeo2ddslearn_config

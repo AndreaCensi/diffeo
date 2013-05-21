@@ -1,8 +1,12 @@
-from . import  contract, np
-from .. import (DiffeomorphismEstimator, diffeomorphism_from_function,
-    coords_iterate, diffeomorphism_to_rgb_cont, MATCH_CONTINUOUS)
+import numpy as np
+from contracts import contract
+
 import time
-from ..library import for_all_diffeos
+from diffeo2d.misc_utils import coords_iterate
+from diffeo2d.diffeo_basic import diffeomorphism_from_function
+from diffeo2d.tests.testing import for_all_diffeos
+from diffeo2d_learn.library.simple.diffeo_estimator_simple import MATCH_CONTINUOUS
+from diffeo2d.visualization.basic import diffeomorphism_to_rgb_cont
 
 
 @contract(diffeo='valid_diffeomorphism,array[MxNx2]', y='array[MxN]',
@@ -18,7 +22,7 @@ def apply_diffeomorphism(diffeo, y):
 @contract(shape='valid_2d_shape', K='int', diffeo='valid_diffeomorphism')
 def generate_input(shape, K, diffeo, epsilon=0.5):
     t0 = time.clock()
-    for k in range(K): #@UnusedVariable
+    for k in range(K):  # @UnusedVariable
         y = np.random.randn(*shape)
         yd = apply_diffeomorphism(diffeo, y)
         y1 = yd + epsilon * np.random.rand(*shape)
@@ -29,7 +33,7 @@ def generate_input(shape, K, diffeo, epsilon=0.5):
 
 
 @for_all_diffeos
-def estimation(fid, f): #@UnusedVariable
+def estimation(fid, f):  # @UnusedVariable
     shape = [50, 50]
     diffeo = diffeomorphism_from_function(shape, f)
 

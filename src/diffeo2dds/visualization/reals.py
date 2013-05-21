@@ -1,9 +1,12 @@
 import numpy as np
 from contracts import contract
-from geometry.manifolds import SE2, se2
-from geometry.poses import rotation_translation_from_SE2
-from diffeo2dds.visualization.statespace import DiffeoSystemStateSpace
+from geometry import SE2, se2
+from geometry import rotation_translation_from_SE2
+from .statespace import DiffeoSystemStateSpace
         
+__all__ = ['Reals', 'EuclideanMotions']
+
+
 class Reals(DiffeoSystemStateSpace):
     
     @contract(ndim='int,>=1', dt='>0')

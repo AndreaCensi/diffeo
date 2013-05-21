@@ -1,8 +1,12 @@
-from . import contract, np
+from ..stats import diffeo_stats
+from contracts import contract
 from reprep import posneg, scale
 import itertools
-from ..stats import diffeo_stats
+import numpy as np
 
+__all__ = ['diffeomorphism_to_rgb', 'diffeomorphism_to_rgb_cont',
+           'diffeo_to_rgb_norm', 'diffeo_to_rgb_angle',
+           'angle_legend', 'diffeo_to_rgb_inc', 'diffeo_to_rgb_curv']
 
 @contract(D='valid_diffeomorphism')
 def diffeomorphism_to_rgb(D, nquads=15):

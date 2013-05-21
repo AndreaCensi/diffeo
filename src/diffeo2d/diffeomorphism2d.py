@@ -1,4 +1,3 @@
-from . import np, contract
 from .diffeo_basic import (diffeo_identity, diffeo_apply, diffeo_distance_L2,
     diffeo_local_differences)
 from .plumbing import FastDiffeoApply
@@ -6,6 +5,12 @@ from .stats import diffeo_stats
 from .visualization import (diffeo_to_rgb_norm, diffeo_to_rgb_angle,
     scalaruncertainty2rgb)
 from geometry.utils import assert_allclose
+from contracts import contract
+import numpy as np
+
+
+__all__ = ['Diffeomorphism2D']
+
 
 class Diffeomorphism2D(object):
     """

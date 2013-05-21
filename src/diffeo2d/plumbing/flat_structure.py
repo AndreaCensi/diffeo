@@ -1,12 +1,16 @@
-from . import logger, np, contract
 from .. import dmod
-from .flattening import Flattening, coords_iterate
 from ..misc_utils import cmap
+from .flattening import Flattening, coords_iterate
+from compmake.utils import memoize_simple
+from contracts import contract
+from diffeo2d import logger
 from geometry.utils import assert_allclose
+import numpy as np
 import warnings
-from compmake.utils.memoize import memoize_simple
 
-class FlatStructure():
+__all__ = ['FlatStructure', 'flat_structure_cache', 'add_border', 'togrid']
+
+class FlatStructure(object):
             
     @contract(shape='tuple(H,W)', neighborarea='tuple(X,Y)')
     def __init__(self, shape, neighborarea):

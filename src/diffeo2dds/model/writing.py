@@ -1,6 +1,8 @@
 from compmake.utils import safe_pickle_dump, safe_pickle_load
 from conf_tools.load_entries import write_entries
 import os
+
+__all__ = ['load_pickle', 'ds_dump']
            
 def ds_dump(dds, path, name, desc):
     '''

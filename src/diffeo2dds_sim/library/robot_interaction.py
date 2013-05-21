@@ -1,7 +1,10 @@
-from bootstrapping_olympics.configuration.master import get_boot_config
-from bootstrapping_olympics.misc.interaction import bd_sequence_from_robot_agent
-from diffeo2dds_learn.interface.streams import Stream, LogItem
+from bootstrapping_olympics import get_boot_config
+from bootstrapping_olympics.misc import bd_sequence_from_robot_agent
+from diffeo2dds_learn import Stream, LogItem
 import itertools
+
+__all__ = ['RobotInteractionStream']
+
 
 class RobotInteractionStream(Stream):
     

@@ -1,11 +1,11 @@
 from .diffeomorphism2d import Diffeomorphism2D
-from .visualization import angle_legend
-from .visualization import scalaruncertainty2rgb
+from .visualization import angle_legend, scalaruncertainty2rgb
 from reprep import Report
 import numpy as np
 import pickle
 import warnings
  
+__all__ = ['Diffeomorphism2DContinuous']
  
 class Diffeomorphism2DContinuous(Diffeomorphism2D):
     def __init__(self, d, variance=None):

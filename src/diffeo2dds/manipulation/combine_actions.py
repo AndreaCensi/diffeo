@@ -1,4 +1,4 @@
-from . import contract
+from contracts import contract
 from ..configuration import get_diffeo2dds_config
 from ..model import DiffeoSystem
 

@@ -1,6 +1,11 @@
 import itertools
 from contracts import contract
 
+
+__all__ = ['plans_of_max_length', 'plan_friendly', 'plan_friendly_tex',
+           'plan_group', 'plan_steps']
+
+
 @contract(ncmd='M,>=1', maxsteps='K',
           returns='seq(seq[<=K](int,>=0,<M))')
 def plans_of_max_length(ncmd, maxsteps):
@@ -20,7 +25,7 @@ def plan_friendly(plan, names=None, empty='<>', use_exponent=False):
     
     if names is None:
         names = [chr(ord('a') + x) for x in range(26)]
-        #names = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'l']
+        # names = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'l']
     
     def cmd(u, n):
         if use_exponent:

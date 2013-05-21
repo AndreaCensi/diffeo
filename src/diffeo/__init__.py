@@ -1,4 +1,6 @@
 """ A module to contain the interface to the others. """
+__version__ = '1.0dev1'
+
 from conf_tools.master import GlobalConfig
 from diffeo2dds.programs import Diffeo2dds
 from diffeo2dds_learn.programs import DDSL

@@ -1,6 +1,9 @@
 from contracts import contract
 from abc import ABCMeta, abstractmethod
 
+__all__ = ['DiffeoSystemStateSpace']
+
+
 class DiffeoSystemStateSpace:
     """ 
         This class if for visualization/debug only.

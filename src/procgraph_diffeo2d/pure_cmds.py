@@ -1,5 +1,5 @@
 from procgraph import  Block
-from diffeo_agents.pure_commands import PureCommands
+from bootstrapping_olympics.library.nuisances_causal.commands.pure_commands import PureCommands
 
 
 class PureCmds(Block):

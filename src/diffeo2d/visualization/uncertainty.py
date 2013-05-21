@@ -1,6 +1,9 @@
 from reprep.graphics.filter_scale import scale
 import numpy as np
 
+__all__ = ['scalaruncertainty2rgb']
+
+
 def scalaruncertainty2rgb(x, umin=0, umax=1):
     """ Converts the scalar uncertainty (in [min, max]) to rgb. (green=1, red=0) """
     # set exactly 0 to nan, and color it gray

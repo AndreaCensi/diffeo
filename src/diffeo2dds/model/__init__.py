@@ -1,4 +1,5 @@
-from .. import np, contract, logger
+from diffeo2d import logger
+
 from .plan_utils import *
 from .diffeo_action import *
 from .diffeo_action_distances import *

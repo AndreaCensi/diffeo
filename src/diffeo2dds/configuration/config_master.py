@@ -1,6 +1,7 @@
 from conf_tools import ConfigMaster, check_generic_code_desc, GenericCall
 from diffeo2dds.model.symdiffeo_system import SymDiffeoSystem
 
+__all__ = ['get_diffeo2dds_config']
 
 class Diffeo2dDynamicsConfig(ConfigMaster):
     def __init__(self):

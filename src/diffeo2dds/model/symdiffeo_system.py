@@ -1,5 +1,9 @@
 from contracts import contract
 
+
+__all__ = ['SymDiffeoSystem']
+
+
 class SymDiffeoSystem(object):
     """ This is an idealized description of a diffeo system. """
     

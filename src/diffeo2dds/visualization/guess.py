@@ -1,6 +1,10 @@
-from . import contract, DiffeoSystemStateSpace, logger
 import numpy as np
-from diffeo2dds.visualization.reals import EuclideanMotions, Reals
+from contracts import contract
+from diffeo2dds import logger
+from .reals import EuclideanMotions, Reals
+from .statespace import DiffeoSystemStateSpace
+
+__all__ = ['guess_state_space']
 
 
 @contract(returns=DiffeoSystemStateSpace)

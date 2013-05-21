@@ -1,8 +1,11 @@
-from . import np, logger
+from diffeo2d import Diffeomorphism2D, diffeo_stats
+from diffeo2dds import DiffeoAction, DiffeoSystem, get_diffeo2dds_config, logger
+import numpy as np
+
 
 def HardChoiceIso(id_dds, norm_percentile, factor):
     """ Instantiates the given DDS and changes it. """
-    config = get_current_config()
+    config = get_diffeo2dds_config()
     dds = config.discdds.instance(id_dds)
     ddst = make_hard_choices(dds, info_threshold=None,
                              use_isomorphism_heuristics=True,

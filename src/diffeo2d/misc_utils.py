@@ -3,7 +3,7 @@ import numpy as np
 import itertools
 new_contract('valid_2d_shape', 'seq[2](>0)')
 
-__all__ = ['coords_iterate']
+__all__ = ['coords_iterate', 'cmap']
 
 
 @contract(size='valid_2d_shape')

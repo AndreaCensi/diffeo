@@ -7,14 +7,14 @@ from reprep.plot_utils import plot_vertical_line
 import numpy as np
 import time
 
-Order = 'order'
-Similarity = 'sim'
-# Cont = 'quad'
-# InferenceMethods = [Order, Similarity, Cont]
-    
+
+__all__ = ['DiffeomorphismEstimatorFaster']
     
 class DiffeomorphismEstimatorFaster(Diffeo2dEstimatorInterface):
     ''' Learns a diffeomorphism between two 2D fields. '''
+
+    Order = 'order'
+    Similarity = 'sim'
     
     @contract(max_displ='seq[2](>0,<1)', inference_method='str')
     def __init__(self, max_displ, inference_method):
@@ -28,7 +28,8 @@ class DiffeomorphismEstimatorFaster(Diffeo2dEstimatorInterface):
         self.last_y1 = None
         self.inference_method = inference_method
         
-        accepted = [Order, Similarity]
+        accepted = [DiffeomorphismEstimatorFaster.Order,
+                    DiffeomorphismEstimatorFaster.Similarity]
         if self.inference_method not in accepted:
             msg = ('I need one of %s; found %s' % 
                    (accepted, inference_method))
@@ -86,11 +87,11 @@ class DiffeomorphismEstimatorFaster(Diffeo2dEstimatorInterface):
         for k in xrange(self.nsensels):
             diff = np.abs(y0_flat[k] - Y1[k, :])
             
-            if self.inference_method == Order:
+            if self.inference_method == DiffeomorphismEstimatorFaster.Order:
                 order = np.argsort(diff)
                 # diff_order = scale_score(diff, kind='quicksort')
                 self.neig_eord_score[k, order] += order_comp 
-            elif self.inference_method == Similarity:
+            elif self.inference_method == DiffeomorphismEstimatorFaster.Similarity:
                 self.neig_esim_score[k, :] += diff
             else:
                 msg = 'Unknown inference method %r' % self.inference_method
@@ -105,13 +106,13 @@ class DiffeomorphismEstimatorFaster(Diffeo2dEstimatorInterface):
         
         difference = np.abs(Y0 - Y1)
         
-        if self.inference_method == Order:
+        if self.inference_method == DiffeomorphismEstimatorFaster.Order:
             # Yes, double argsort(). This is correct.
             # (but slow; seee update_scalar above)
             simorder = np.argsort(np.argsort(difference, axis=1), axis=1)
             self.neig_eord_score += simorder
         
-        elif self.inference_method == Similarity:
+        elif self.inference_method == DiffeomorphismEstimatorFaster.Similarity:
             self.neig_esim_score += difference
         else:
             msg = 'Unknown inference method %r' % self.inference_method
@@ -142,9 +143,9 @@ class DiffeomorphismEstimatorFaster(Diffeo2dEstimatorInterface):
         logger.debug('done creating')
 
         buffer_shape = (self.nsensels, self.area_size)
-        if self.inference_method == Similarity:   
+        if self.inference_method == DiffeomorphismEstimatorFaster.Similarity:   
             self.neig_esim_score = np.zeros(buffer_shape, 'float32')
-        elif self.inference_method == Order:
+        elif self.inference_method == DiffeomorphismEstimatorFaster.Order:
             self.neig_eord_score = np.zeros(buffer_shape, 'float32')
         else:
             assert False
@@ -200,7 +201,7 @@ class DiffeomorphismEstimatorFaster(Diffeo2dEstimatorInterface):
             plot_vertical_line(pylab, safe_d, 'g--')
             plot_vertical_line(pylab, max_d, 'r--')
             
-        if self.inference_method == Order:
+        if self.inference_method == DiffeomorphismEstimatorFaster.Order:
             eord = self.make_grid(self.neig_eord_score)
             report.data('neig_eord_score_rect', eord).display('scale').add_to(f, caption='order')
             eord_bdist = distance_to_border_for_best(self.neig_eord_score)
@@ -213,7 +214,7 @@ class DiffeomorphismEstimatorFaster(Diffeo2dEstimatorInterface):
                 pylab.hist(eord_cdist.flat, bins)
                 plot_safe(pylab)
 
-        if self.inference_method == Similarity:
+        if self.inference_method == DiffeomorphismEstimatorFaster.Similarity:
             esim = self.make_grid(self.neig_esim_score)
             report.data('neig_esim_score_rect', esim).display('scale').add_to(f, caption='sim')
             esim_bdist = distance_to_border_for_best(self.neig_esim_score)
@@ -250,21 +251,21 @@ class DiffeomorphismEstimatorFaster(Diffeo2dEstimatorInterface):
         dd[:] = -1
         for i in range(self.nsensels):
             
-            if self.inference_method == Order:
+            if self.inference_method == DiffeomorphismEstimatorFaster.Order:
                 eord_score = self.neig_eord_score[i, :]
                 best = np.argmin(eord_score)
             
-            if self.inference_method == Similarity:
+            if self.inference_method == DiffeomorphismEstimatorFaster.Similarity:
                 esim_score = self.neig_esim_score[i, :]
                 best = np.argmin(esim_score)
                 
             jc = self.flat_structure.neighbor_cell(i, best)
             ic = self.flat_structure.flattening.index2cell[i]
             
-            if self.inference_method == Order:
+            if self.inference_method == DiffeomorphismEstimatorFaster.Order:
                 certain = -np.min(eord_score) / np.mean(eord_score)
                 
-            if self.inference_method == Similarity:
+            if self.inference_method == DiffeomorphismEstimatorFaster.Similarity:
                 first = np.sort(esim_score)[:10]
                 certain = -(first[0] - np.mean(first[1:]))
                 # certain = -np.min(esim_score) / np.mean(esim_score)
@@ -332,9 +333,9 @@ class DiffeomorphismEstimatorFaster(Diffeo2dEstimatorInterface):
             self.init_structures(other.shape)
             self.num_samples = other.num_samples
             self.neig_esimmin_score = other.neig_esimmin_score
-            if self.inference_method == Similarity:
+            if self.inference_method == DiffeomorphismEstimatorFaster.Similarity:
                 self.neig_esim_score = other.neig_esim_score
-            if self.inference_method == Order:
+            if self.inference_method == DiffeomorphismEstimatorFaster.Order:
                 self.neig_eord_score = other.neig_eord_score
             return
         
@@ -347,9 +348,9 @@ class DiffeomorphismEstimatorFaster(Diffeo2dEstimatorInterface):
         self.num_samples += other.num_samples
         self.neig_esimmin_score += other.neig_esimmin_score
 
-        if self.inference_method == Order:
+        if self.inference_method == DiffeomorphismEstimatorFaster.Order:
             self.neig_eord_score += other.neig_eord_score
-        elif self.inference_method == Similarity:
+        elif self.inference_method == DiffeomorphismEstimatorFaster.Similarity:
             self.neig_esim_score += other.neig_esim_score
         else:
             assert False

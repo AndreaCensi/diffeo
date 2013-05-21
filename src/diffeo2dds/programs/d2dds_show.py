@@ -1,7 +1,5 @@
-from .. import logger
-from ..configuration import get_diffeo2dds_config
-from ..model import UncertainImage
 from .d2dds import Diffeo2dds
+from diffeo2dds import logger, get_diffeo2dds_config, UncertainImage
 from reprep import Report
 import os
 

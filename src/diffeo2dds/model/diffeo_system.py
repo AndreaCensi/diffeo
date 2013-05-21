@@ -1,14 +1,19 @@
-from . import DiffeoAction, np, contract, UncertainImage, logger
+from .diffeo_action import DiffeoAction
+from .plan_utils import plan_friendly
+from .uncertain_image import UncertainImage
 from bootstrapping_olympics.utils import raise_x_not_found
+from contracts import contract
+from diffeo2dds import logger
 from diffeo2dds.model.diffeo_action_distances import (diffeoaction_distance_L2,
     diffeoaction_distance_L2_infow, diffeoaction_anti_distance_L2,
     diffeoaction_anti_distance_L2_infow, diffeoaction_comm_distance_L2,
     diffeoaction_comm_distance_L2_infow)
-from diffeo2dds.model.plan_utils import plan_friendly
-from diffeo2s.utils.matrices import construct_matrix
+from diffeo2s.utils import construct_matrix
 from reprep import Report
+import numpy as np
 import warnings
 
+__all__ = ['DiffeoSystem']
 
 class DiffeoSystem(object):
     """

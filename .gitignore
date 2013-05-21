@@ -36,3 +36,4 @@ nosetests.xml
 out
 out-*
 .compmake_history.txt
+*.pgc

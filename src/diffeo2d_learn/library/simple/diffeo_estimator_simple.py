@@ -1,5 +1,5 @@
 from contracts import contract
-from diffeo2d import Diffeomorphism2D, Flattening, cmap, coords_iterate
+from diffeo2d import Diffeomorphism2D, Flattening, coords_iterate, cmap
 from diffeo2d_learn import Diffeo2dEstimatorInterface, logger
 import numpy as np
 
@@ -7,7 +7,10 @@ __all__ = ['DiffeomorphismEstimatorSimple']
 
 
 class DiffeomorphismEstimatorSimple(Diffeo2dEstimatorInterface):
-    ''' Learns a diffeomorphism between two 2D fields. '''
+    ''' Learns a diffeomorphism between two 2D fields. 
+    
+        # TODO: implement merge
+    '''
 
     @contract(max_displ='seq[2](>0,<1)', match_method='str')
     def __init__(self, max_displ, match_method):

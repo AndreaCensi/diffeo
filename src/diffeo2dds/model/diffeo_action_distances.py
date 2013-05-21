@@ -1,6 +1,18 @@
-from . import DiffeoAction, contract
+from .diffeo_action import DiffeoAction
+from contracts import contract
 from diffeo2d import Diffeomorphism2D
 
+__all__ = [
+    'UncertainDiffeoDistance',
+    'DiffeoActionDistance',
+    'diffeoaction_comm_distance_L2_infow',
+    'diffeoaction_comm_distance_L2',
+    'diffeoaction_comm_distance',
+    'diffeoaction_anti_distance_L2_infow',
+    'diffeoaction_anti_distance_L2',
+    'diffeoaction_anti_distance',
+    'diffeoaction_distance']
+ 
 @contract(a1=DiffeoAction, a2=DiffeoAction)
 def diffeoaction_distance(a1, a2, diffeo_distance):
     """ 
@@ -65,7 +77,8 @@ def diffeoaction_comm_distance_L2(a1, a2):
 def diffeoaction_comm_distance_L2_infow(a1, a2):
     return diffeoaction_comm_distance(a1, a2, diffeoaction_distance_L2_infow)
 
-        
+
+
 class UncertainDiffeoDistance(object):
     
     @contract(d1=Diffeomorphism2D, d2=Diffeomorphism2D)

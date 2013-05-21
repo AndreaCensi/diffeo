@@ -1,6 +1,9 @@
-from . import contract, np, diffeo_identity, dmod
+from contracts import contract
+import numpy as np
+from . import  diffeo_identity, dmod
 from collections import namedtuple
 
+__all__ = ['diffeo_stats', 'diffeo_text_stats']
 
 DiffeoStats = namedtuple('DiffeoStats', 'norm angle dx dy curv')
 

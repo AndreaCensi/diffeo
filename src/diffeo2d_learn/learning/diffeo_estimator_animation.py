@@ -4,6 +4,7 @@ visualizing the learning progress
 '''
 
 from . import logger
+
 from .. import (diffeomorphism_to_rgb, contract, np, diffeo_to_rgb_norm,
     diffeo_to_rgb_angle, angle_legend, diffeo_to_rgb_curv, diffeo_text_stats,
     Diffeomorphism2D)
@@ -12,7 +13,7 @@ from boot_agents.diffeo.plumbing import flat_structure_cache, togrid, add_border
 from boot_agents.utils.nonparametric import scale_score
 from reprep.plot_utils import plot_vertical_line
 import time
-#import pylab
+# import pylab
 from matplotlib import cm
 import matplotlib.pyplot as plt
 import pdb
@@ -75,7 +76,7 @@ class DiffeomorphismEstimatorAnimation():
         
         ts = []
         ts.append(time.time())
-        #self._update_vectorial(y0, y1)
+        # self._update_vectorial(y0, y1)
         ts.append(time.time())
         self._update_scalar(y0, y1)
         ts.append(time.time())
@@ -102,7 +103,7 @@ class DiffeomorphismEstimatorAnimation():
         
 #        # 3D surface
 #        fig = plt.figure()
-##        ax = fig.gca(projection='3d')
+# #        ax = fig.gca(projection='3d')
 #        ax = Axes3D(fig)
 #        
 #        ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap=cm.jet, linewidth=0, antialiased=False)
@@ -128,7 +129,7 @@ class DiffeomorphismEstimatorAnimation():
             
             if self.inference_method == Order:
                 order = np.argsort(diff)
-                #diff_order = scale_score(diff, kind='quicksort')
+                # diff_order = scale_score(diff, kind='quicksort')
                 self.neig_eord_score[k, order] += order_comp 
             elif self.inference_method == Similarity:
                 self.neig_esim_score[k, :] += diff
@@ -262,9 +263,9 @@ class DiffeomorphismEstimatorAnimation():
     
         
         
-    @contract(score='array[NxA]', returns='array[UxV]') # ,U*V=N*A') not with border
+    @contract(score='array[NxA]', returns='array[UxV]')  # ,U*V=N*A') not with border
     def make_grid(self, score):
-        fourd = self.flat_structure.unrolled2multidim(score) # HxWxXxY
+        fourd = self.flat_structure.unrolled2multidim(score)  # HxWxXxY
         return togrid(add_border(fourd))
         
     def summarize(self):
@@ -298,7 +299,7 @@ class DiffeomorphismEstimatorAnimation():
             if self.inference_method == 'sim':
                 first = np.sort(esim_score)[:10]
                 certain = -(first[0] - np.mean(first[1:]))
-                #certain = -np.min(esim_score) / np.mean(esim_score)
+                # certain = -np.min(esim_score) / np.mean(esim_score)
 #            certain = np.min(esim_score) / self.num_samples
 #            certain = -np.mean(esim_score) / np.min(esim_score)
             
@@ -328,7 +329,7 @@ class DiffeomorphismEstimatorAnimation():
 
         n = 20
         M = None
-        for i in range(n): #@UnusedVariable
+        for i in range(n):  # @UnusedVariable
             c = self.flattening.random_coords()
             Mc = self.get_similarity(c)
             if M is None:

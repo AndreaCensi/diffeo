@@ -1,12 +1,15 @@
-from . import contract
+from .uncertain_image import UncertainImage
+from contracts import contract
+from diffeo2d import Diffeomorphism2D
 from reprep import Report
-import numpy as np
 import itertools
+import numpy as np
 import pdb
 import warnings
-from diffeo2d import Diffeomorphism2D
-from .uncertain_image import UncertainImage
     
+__all__ = ['DiffeoAction']
+
+
 class DiffeoAction():
     """ 
         An "action" is described by a pair of diffeomorphism.
@@ -127,6 +130,7 @@ class DiffeoAction():
         # This is the correct order
         diffeo = Diffeomorphism2D.compose(a2.diffeo, a1.diffeo)
         diffeo_inv = Diffeomorphism2D.compose(a1.diffeo_inv, a2.diffeo_inv)
+        # This was the wrong order
         # diffeo = Diffeomorphism2D.compose(a1.diffeo, a2.diffeo)
         # diffeo_inv = Diffeomorphism2D.compose(a2.diffeo_inv, a1.diffeo_inv)
         original_cmds = a1.get_original_cmds() + a2.get_original_cmds()

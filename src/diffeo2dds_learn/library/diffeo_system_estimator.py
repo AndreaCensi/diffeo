@@ -10,7 +10,9 @@ __all__ = ['DiffeoSystemEstimator']
 
 
 class DiffeoSystemEstimator(DiffeoSystemEstimatorInterface):
-    ''' 
+    
+    '''
+     
         Keeps a list of diffeomorphism estimators 
         to learn a diffeomorphism for each command.
         
@@ -148,7 +150,7 @@ class DiffeoSystemEstimator(DiffeoSystemEstimatorInterface):
             name = 'Uninterpreted Diffeomorphism' + str(i)
             action = DiffeoAction(name, diffeo, diffeo_inv, command)
             
-            warnings.warn('to remove')
+            warnings.warn('to put in a different place')
             # Use new update uncertainty method if param specifies so
             if hasattr(self, 'update_uncertainty') and self.update_uncertainty:
                 action.update_uncertainty()

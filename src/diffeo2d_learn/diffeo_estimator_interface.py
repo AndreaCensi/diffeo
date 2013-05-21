@@ -1,5 +1,5 @@
-from contracts import contract
 from abc import ABCMeta, abstractmethod
+from contracts import contract
 from reprep import Report
 
 

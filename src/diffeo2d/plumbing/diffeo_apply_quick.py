@@ -3,6 +3,7 @@ from contracts import contract
 import numpy as np
 from diffeo2d import diffeo_apply
 
+__all__ = ['FastDiffeoApply']
 
 class FastDiffeoApply():
     """ 
