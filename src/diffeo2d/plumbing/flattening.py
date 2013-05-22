@@ -1,8 +1,8 @@
 from compmake.utils import memoize_simple as memoize
-
 from contracts import contract
-import numpy as np
 from diffeo2d.misc_utils import coords_iterate
+import numpy as np
+
 
 __all__ = ['Flattening']
 

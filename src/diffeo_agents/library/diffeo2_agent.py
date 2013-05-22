@@ -1,7 +1,9 @@
 from bootstrapping_olympics import (AgentInterface, UnsupportedSpec,
     get_boot_config)
+from bootstrapping_olympics.library.nuisances import scipy_image_resample
 from contracts import contract
 from diffeo2dds_learn import get_diffeo2ddslearn_config
+from procgraph_pil.pil_operations import resize
 
 
 __all__ = ['Diffeo2Agent']
@@ -12,10 +14,11 @@ class Diffeo2Agent(AgentInterface):
     '''
     
     @contract(explorer='string|code_spec',
-              estimator='string|code_spec')
-    def __init__(self, explorer, estimator, servo): 
+              estimator='string|code_spec',
+              shape='None|seq[2](int,>0)')
+    def __init__(self, explorer, estimator, servo, shape=None): 
         '''
-        
+        :param shape: Target shape for the image. If none, use normal resolution.
         :param explorer: Explorer agent
         :param estimator: resolves to a DiffeoSystemEstimatorInterface
         :param servo: todo
@@ -23,13 +26,19 @@ class Diffeo2Agent(AgentInterface):
         self.explorer_spec = explorer
         self.estimator_spec = estimator
         self.servo_spec = servo
+        self.shape = shape
         
         self.last_obs = None
         self.last_data = None
         
     def init(self, boot_spec):
-        if len(boot_spec.get_observations().shape()) != 2:
-            msg = 'This agent can only work with 2D signals.'
+        shape = boot_spec.get_observations().shape()
+        is_2D = len(shape) == 2
+        is_RGB = len(shape) == 3 and shape[2] == 3
+         
+        if not(is_2D or is_RGB):
+            msg = 'This agent can only work with image-like signals. '
+            msg = 'Found shape: %r' % str(shape)
             raise UnsupportedSpec(msg)
 
         estimators = get_diffeo2ddslearn_config().diffeosystem_estimators 
@@ -51,7 +60,12 @@ class Diffeo2Agent(AgentInterface):
             
             self.last_data = (y0, u, y1)
             self.info('t0: %.3f t1: %.3f delta: %.3f u: %s' % (t0, t1, delta, u))
+            if self.shape is not None:
+                y0 = scipy_image_resample(y0, self.shape)
+                y1 = scipy_image_resample(y1, self.shape)
+                
             self.diffeosystem_estimator.update(y0=y0, u0=u, y1=y1)
+        
         self.last_obs = obs
         
     def choose_commands(self):
@@ -59,7 +73,6 @@ class Diffeo2Agent(AgentInterface):
 
     def merge(self, other):
         self.diffeosystem_estimator.merge(other.diffeosystem_estimator)
-        return self
 
     def display(self, report):
         with report.subsection('estimator') as sub:
@@ -69,8 +82,8 @@ class Diffeo2Agent(AgentInterface):
             discdds.display(sub)
     
     def publish(self, pub):
-        return self.display(pub.r)  # XXX
-    
+        return self.display(pub) 
+
     
 # 
 #         if self.last_data is not None:

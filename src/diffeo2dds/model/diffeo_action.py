@@ -2,15 +2,12 @@ from .uncertain_image import UncertainImage
 from contracts import contract
 from diffeo2d import Diffeomorphism2D
 from reprep import Report
-import itertools
-import numpy as np
-import pdb
 import warnings
     
 __all__ = ['DiffeoAction']
 
 
-class DiffeoAction():
+class DiffeoAction(object):
     """ 
         An "action" is described by a pair of diffeomorphism.
         
@@ -136,58 +133,4 @@ class DiffeoAction():
         original_cmds = a1.get_original_cmds() + a2.get_original_cmds()
         return DiffeoAction(label, diffeo, diffeo_inv, original_cmds)
         
-    def update_uncertainty(self, length_score=None):
-        '''
-        Update the uncertainties for the action by the improved uncertainty 
-        classification based on comparing the diffeomorphism with its inverse. 
-        '''
-        print('Using length schore function %s' % length_score)
-        field = self.diffeo.d
-        field_inv = self.diffeo_inv.d
-        
-        Y, X = np.meshgrid(range(field.shape[1]), range(field.shape[0]))
-    
-        D = np.zeros(X.shape + (2,))
-        D[:, :, 0] = field[:, :, 0] - X
-        D[:, :, 1] = field[:, :, 1] - Y
-        
-        D_inv = np.zeros(X.shape + (2,))
-        D_inv[:, :, 0] = field_inv[:, :, 0] - X
-        D_inv[:, :, 1] = field_inv[:, :, 1] - Y
-    
-        E = np.zeros(X.shape)
-        E_inv = np.zeros(X.shape)
-        
-        for c in itertools.product(range(X.shape[0]), range(X.shape[1])):
-            v = D[c]
-            v_inv = D_inv[tuple(D[c])]
-            # Length score
-            lsc = length_score(v, v_inv)
-            # Angle score
-#            asc = angle_score(v, v_inv)
-            asc = 1
-            
-            score = lsc * asc
-            if np.isnan(score):
-                print('Debugger break, something unexpected happened')
-                pdb.set_trace()
-            E[tuple(c)] = score
-            
-            v = D_inv[c]
-            v_inv = D[tuple(D_inv[c])]
-            # Length score
-            lsc = length_score(v, v_inv)
-            # Angle score
-#            asc = angle_score(v, v_inv)
-            asc = 1
-            
-            score = lsc * asc
-            if np.isnan(score):
-                pdb.set_trace()
-            E_inv[tuple(c)] = score
-            
-#        pdb.set_trace()
-        self.diffeo.variance = 1 - E / np.max(E)
-        self.diffeo.variance_max = np.max(E)
-        self.diffeo_inv.variance = 1 - E_inv / np.max(E_inv)
-        self.diffeo_inv.variance_max = np.max(E_inv)
+ 

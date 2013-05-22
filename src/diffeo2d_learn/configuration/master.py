@@ -9,6 +9,7 @@ class Diffeo2dLearnConfig(ConfigMaster):
                                                 '*.diffeo2d_estimators.yaml',
                                                 Diffeo2dEstimatorInterface)
 
+
     def get_default_dir(self):
         from pkg_resources import resource_filename  # @UnresolvedImport
         return resource_filename("diffeo2d_learn", "configs")

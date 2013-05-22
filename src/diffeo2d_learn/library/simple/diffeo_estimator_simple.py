@@ -1,3 +1,4 @@
+from conf_tools.utils import check_is_in
 from contracts import contract
 from diffeo2d import Diffeomorphism2D, Flattening, coords_iterate, cmap
 from diffeo2d_learn import Diffeo2dEstimatorInterface, logger
@@ -7,15 +8,15 @@ __all__ = ['DiffeomorphismEstimatorSimple']
 
 
 class DiffeomorphismEstimatorSimple(Diffeo2dEstimatorInterface):
-    ''' Learns a diffeomorphism between two 2D fields. 
-    
-        # TODO: implement merge
+    ''' 
+        Learns a discretized diffeomorphism between two 2D images. 
+        
     '''
 
     @contract(max_displ='seq[2](>0,<1)', match_method='str')
     def __init__(self, max_displ, match_method):
         """ 
-            :param max_displ: Maximum displacement the diffeomorphism d_max
+            :param max_displ: Maximum pointwise displacement for the diffeomorphism d_max
             :param match_method: Either "continuous" or "binary" (to compute the 
                 error function).
         """
@@ -25,13 +26,14 @@ class DiffeomorphismEstimatorSimple(Diffeo2dEstimatorInterface):
         self.last_y1 = None
 
         accepted = [MATCH_CONTINUOUS, MATCH_BINARY]
-        if not match_method in accepted:
-            msg = 'Need one of %s, not %s.' % (accepted, match_method)
-            raise ValueError(msg)
-        
+        check_is_in('match method', match_method, accepted)
         self.match_method = match_method
 
         self.num_samples = 0
+        
+    @contract(returns='tuple')
+    def initialized(self):
+        return self.shape is not None
 
     @contract(y0='array[MxN]', y1='array[MxN]')
     def update(self, y0, y1):
@@ -39,7 +41,7 @@ class DiffeomorphismEstimatorSimple(Diffeo2dEstimatorInterface):
 
         # init structures if not already
         if self.shape is None:
-            self.init_structures(y0)
+            self.init_structures(y0.shape)
 
         # check shape didn't change
         if self.shape != y0.shape:
@@ -88,12 +90,31 @@ class DiffeomorphismEstimatorSimple(Diffeo2dEstimatorInterface):
             self.neighbor_similarity_best[k] += np.min(neighbor_sim)
             self.neighbor_argsort_flat[k] += neighbor_argsort
 
+    def merge(self, other):
+        
+        if not other.initialized():
+            return
+        
+        if not self.initialized() and other.initialized():
+            self.init_structures(other.shape)
+            self.num_samples = other.num_samples
+            self.neighbor_similarity_flat = other.neighbor_similarity_flat
+            self.neighbor_similarity_best = other.neighbor_similarity_best
+            self.neighbor_argsort_flat = other.neighbor_argsort_flat            
+            return
+        
+        assert self.initialized() and other.initialized()
+        self.num_samples += other.num_samples
+        self.neighbor_similarity_flat += other.neighbor_similarity_flat
+        self.neighbor_similarity_best += other.neighbor_similarity_best
+        self.neighbor_argsort_flat += other.neighbor_argsort_flat
 
-    def init_structures(self, y):
-        self.shape = y.shape
-        self.nsensels = y.size
+    @contract(shape='seq[2](int, >0)')
+    def init_structures(self, shape):
+        self.shape = shape
+        self.nsensels = shape[0] * shape[1]
 
-        self.ydd = np.zeros(y.shape, dtype='float32')
+        self.ydd = np.zeros(shape, dtype='float32')
 
         # for each sensel, create an area
         self.lengths = np.ceil(self.max_displ * 
@@ -110,7 +131,7 @@ class DiffeomorphismEstimatorSimple(Diffeo2dEstimatorInterface):
         self.neighbor_argsort_flat = [None] * self.nsensels
         self.neighbor_num_bestmatch_flat = [None] * self.nsensels
 
-        self.flattening = Flattening.by_rows(y.shape)
+        self.flattening = Flattening.by_rows(shape)
         logger.info('Creating structure shape %s lengths %s' % 
                   (self.shape, self.lengths))
         cmg = cmap(self.lengths)
@@ -130,13 +151,10 @@ class DiffeomorphismEstimatorSimple(Diffeo2dEstimatorInterface):
 
             self.neighbor_indices[k] = indices
             self.neighbor_indices_flat[k] = np.array(indices.flat)
-            self.neighbor_similarity_flat[k] = np.zeros(indices.size,
-                                                        dtype='float32')
-            self.neighbor_argsort_flat[k] = np.zeros(indices.size,
-                                                        dtype='float32')
-            self.neighbor_num_bestmatch_flat[k] = np.zeros(indices.size,
-                                                        dtype='uint')
-        print('done')
+            self.neighbor_similarity_flat[k] = np.zeros(indices.size, 'float32')
+            self.neighbor_argsort_flat[k] = np.zeros(indices.size, 'float32')
+            self.neighbor_num_bestmatch_flat[k] = np.zeros(indices.size, 'uint')
+        
     
     def get_value(self):
         ''' 
@@ -146,7 +164,7 @@ class DiffeomorphismEstimatorSimple(Diffeo2dEstimatorInterface):
             Returns a Diffeomorphism2D.
         '''
         
-        if self.num_samples == 0:
+        if not self.initialized():
             msg = 'No data seen yet'
             raise Diffeo2dEstimatorInterface.NotReady(msg)
         
@@ -157,9 +175,7 @@ class DiffeomorphismEstimatorSimple(Diffeo2dEstimatorInterface):
         E4 = np.zeros(self.shape, dtype='float32')
         num_problems = 0
         
-#         from PIL import Image  # @UnresolvedImport
-#         order_image = Image.new('L', np.flipud(self.shape) * np.flipud(self.lengths))
-#         
+
         i = 0
         # for each coordinate
         for c in coords_iterate(self.shape):
@@ -188,24 +204,13 @@ class DiffeomorphismEstimatorSimple(Diffeo2dEstimatorInterface):
             
             E4[c] = np.min(self.neighbor_argsort_flat[k]) / self.num_samples
             
-            # p0 = tuple(np.flipud(np.array(c) * self.lengths))
-            # E4_square = (self.neighbor_argsort_flat[k] / self.num_samples).reshape(self.lengths)
-            # order_image.paste(Image.fromarray((E4_square / np.max(E4_square) * 255).astype('uint8')), p0 + tuple(p0 + self.lengths))
-
             i += 1
-            
-        # order_image.save('order.png')
         
         d = self.flattening.flat2coords(maximum_likelihood_index)
 
         if num_problems > 0:
             logger.info('Warning, %d were not informative.' % num_problems)
             pass
-        
-#         sqrt_2_sigma2 = np.sqrt(2 * variance / self.num_samples)
-        
-#        eps = 1
-#        P0 = (erf(-1 / sqrt_2_sigma2) - erf(1 / sqrt_2_sigma2)) / 2
         
         # normalization for this variance measure
         vmin = variance.min()
@@ -318,6 +323,10 @@ class DiffeomorphismEstimatorSimple(Diffeo2dEstimatorInterface):
         return Diffeomorphism2D(avg, var)
 
     def display(self, report):
+        if not self.initialized():
+            report.text('warn', 'not initialized')
+            return
+            
         f = report.figure('estimated')
 
         report.text('num_samples', self.num_samples)
