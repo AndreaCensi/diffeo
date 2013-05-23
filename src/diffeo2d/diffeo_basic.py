@@ -13,7 +13,8 @@ __all__ = ['valid_diffeomorphism', 'diffeo_identity',
             'diffeo_norm_L2',
             'dmod',
             'diffeo_inverse',
-            'diffeo_from_function']
+            'diffeo_from_function',
+            'diffeomorphism_from_function']
 
 
 
@@ -27,7 +28,7 @@ def valid_diffeomorphism(x):
 #     tests[2] = (0 <= x[:, :, 1]).all()
 #     tests[3] = (x[:, :, 1] < N).all()
 #     warnings.warn('skipping assertions, would have been :%s' % tests)
-
+    
     M, N = x.shape[0], x.shape[1]
     assert (0 <= x[:, :, 0]).all()
     assert (x[:, :, 0] < M).all()

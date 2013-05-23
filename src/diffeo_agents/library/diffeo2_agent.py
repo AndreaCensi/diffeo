@@ -3,7 +3,6 @@ from bootstrapping_olympics import (AgentInterface, UnsupportedSpec,
 from bootstrapping_olympics.library.nuisances import scipy_image_resample
 from contracts import contract
 from diffeo2dds_learn import get_diffeo2ddslearn_config
-from procgraph_pil.pil_operations import resize
 
 
 __all__ = ['Diffeo2Agent']

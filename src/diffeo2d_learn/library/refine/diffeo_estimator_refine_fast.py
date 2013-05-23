@@ -107,8 +107,6 @@ class DiffeomorphismEstimatorRefineFast():
             logger.info('Initiating structure from update()')
             self.init_structures(y0)
 
-#        self.tic()
-#        gx, gy = np.gradient(y0)
         gx = np.diff(y0, axis=0)
         gy = np.diff(y0, axis=1)
         self.y_gradx += np.abs(gx)
@@ -119,7 +117,7 @@ class DiffeomorphismEstimatorRefineFast():
         
         grid_size = grid_shape[0] * grid_shape[1]
         reduced_shape = np.array(shape) * grid_shape / np.array(self.area)
-#        self.time_unn += self.toc()
+
         
         Ycache = {}
         def get_Yi_ref(coords):

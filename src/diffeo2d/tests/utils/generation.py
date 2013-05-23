@@ -28,11 +28,12 @@
         
 """
 from contracts import describe_value
-__all__ = ['fancy_test_decorator']
-
+from diffeo2d import logger
 from nose.tools import istest, nottest
 import sys
-from .. import logger
+
+__all__ = ['fancy_test_decorator']
+
 
 
 def add_to_module(function, module_name):
@@ -52,7 +53,7 @@ def add_to_module(function, module_name):
 
     module.__dict__[name] = function
 
-    #logger.debug('Added test %s:%s' % (module.__name__, name))
+    # logger.debug('Added test %s:%s' % (module.__name__, name))
 
 
 def add_checker_f(f, x, arguments, attributes, naming):

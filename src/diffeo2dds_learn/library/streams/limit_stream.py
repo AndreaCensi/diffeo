@@ -1,6 +1,5 @@
 from contracts import contract
-from diffeo2dds_learn.interface.streams import Stream
-from diffeo2dds_learn.configuration.config_master import get_diffeo2ddslearn_config
+from diffeo2dds_learn import Stream, get_diffeo2ddslearn_config
 
 __all__ = ['LimitStream']
 
@@ -21,7 +20,8 @@ class LimitStream(Stream):
                 break
             yield x
         
-            print('read: %r' % i)
+            if i % 30 == 0:
+                print('read: %r' % i)
          
             i += 1 
             

@@ -4,7 +4,7 @@ from .plumbing import FastDiffeoApply
 from .stats import diffeo_stats
 from .visualization import (diffeo_to_rgb_norm, diffeo_to_rgb_angle,
     scalaruncertainty2rgb)
-from geometry.utils import assert_allclose
+from numpy.testing import assert_allclose
 from contracts import contract
 import numpy as np
 

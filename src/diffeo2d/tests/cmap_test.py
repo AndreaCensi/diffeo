@@ -1,6 +1,6 @@
-from . import np
-from . import assert_allclose
-from ..misc_utils import cmap
+from diffeo2d.misc_utils import cmap
+from numpy.testing import assert_allclose
+import numpy as np
 
 def cmap_test():
     a = cmap(np.array([5, 5]))

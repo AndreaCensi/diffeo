@@ -1,8 +1,9 @@
-from . import np
-from .. import diffeomorphism_from_function
-from reprep.plot_utils import turn_all_axes_off
+from diffeo2d import diffeomorphism_from_function
 from diffeo2d.tests.testing import for_all_diffeos
-from diffeo2d.visualization.basic import diffeomorphism_to_rgb
+from diffeo2d.visualization import diffeomorphism_to_rgb
+from reprep.plot_utils import turn_all_axes_off
+import numpy as np
+
 
 
 @for_all_diffeos

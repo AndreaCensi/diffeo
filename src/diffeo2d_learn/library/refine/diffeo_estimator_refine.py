@@ -119,7 +119,6 @@ class DiffeomorphismEstimatorRefine():
         
         res = self.res
         res_size = np.prod(res)
-#        pdb.set_trace()
         for i in range(self.nsensels): 
             a = self.A[i]
             b = self.B[i]
@@ -129,17 +128,14 @@ class DiffeomorphismEstimatorRefine():
             xu = c[0] + a[0] + b[0]
             yl = c[1] + a[1]
             yu = c[1] + a[1] + b[1]
-#            pdb.set_trace()
+
             if self.interpolator.__class__ == ImageInterpolatorFast:
                 pass
             else:
                 Yi_sub = self.interpolator.extract_wraparound(y0, ((xl, xu), (yl, yu)))
-#            if i > 80 * 20 + 40:
-#                pdb.set_trace()
                 Yi_ref = self.interpolator.refine(Yi_sub, res)
                 
             diff = np.abs(Yi_ref.astype('float') - y1[tuple(c)]).reshape(res_size)
-#            pdb.set_trace()
             self.neig_esim_score[i] += diff
         self.num_samples += 1
 
@@ -186,10 +182,8 @@ class DiffeomorphismEstimatorRefine():
     def display(self, report):
         self.show_areas(report, self.dd)
         
-        
         report.data('num_samples', self.num_samples)
         f = report.figure(cols=4)
-        
         
         def make_best(x):
             return x == np.min(x, axis=1)
@@ -291,7 +285,7 @@ class DiffeomorphismEstimatorRefine():
                        linestyle='none', marker='.')
 
 
-    def summarize(self):
+    def get_value(self):
         ''' 
             Find maximum likelihood estimate for diffeomorphism looking 
             at each pixel singularly. 
@@ -302,7 +296,6 @@ class DiffeomorphismEstimatorRefine():
         dd = np.zeros((self.shape[0], self.shape[1], 2))
         for i in range(self.nsensels):
             best = np.argmin(self.neig_esim_score[i])
-#            logger.info('best coord is: ' + str(best))
             best_coord_local = self.A[i] + self.interpolator.get_local_coord(self.B[i],
                                                                              self.res,
                                                                              best)
@@ -322,5 +315,3 @@ class DiffeomorphismEstimatorRefine():
     def merge(self, other):
         pass
     
-def compare():
-    pass

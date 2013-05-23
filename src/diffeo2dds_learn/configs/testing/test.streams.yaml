@@ -42,3 +42,17 @@
 
 
 - id: "test_random_dpx1_64_10"
+
+
+- id: "boot_${robot}"
+  desc: "Stream from logged robot ${robot}"
+  code:
+  - diffeo_agents.library.BootStream
+  - id_robot: "${robot}"
+    boot_root: 'out/boot_root'
+
+
+
+
+
+

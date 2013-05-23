@@ -1,6 +1,7 @@
 from .flattening import Flattening
+from numpy.testing import assert_allclose
 import numpy as np
-from geometry.utils.numpy_backport import assert_allclose
+
 
 
 def test_flattening1():

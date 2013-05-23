@@ -17,7 +17,7 @@ class Stream(object):
         
     @abstractmethod        
     def read_all(self):
-        """ Yields a LogItem sequence. """
+        pass
     
 
 class ImageStream(object):

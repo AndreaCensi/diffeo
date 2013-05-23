@@ -1,4 +1,4 @@
-from diffeo2dds_learn.interface.streams import ImageStream
+from diffeo2dds_learn import ImageStream
 from contracts import contract
 import numpy as np
 import warnings

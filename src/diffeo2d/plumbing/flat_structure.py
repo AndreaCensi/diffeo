@@ -4,17 +4,28 @@ from .flattening import Flattening, coords_iterate
 from compmake.utils import memoize_simple
 from contracts import contract
 from diffeo2d import logger
-from geometry.utils import assert_allclose
+from numpy.testing import assert_allclose
 import numpy as np
 import warnings
 
 __all__ = ['FlatStructure', 'flat_structure_cache', 'add_border', 'togrid']
 
 class FlatStructure(object):
+    """ 
+        This structure describes the topology of the image.
+        It allows to associate an area (subset of pixels) to each pixel. 
+        
+    """
+          
+    @contract(shape='tuple((H,int,>=1),(W,int,>=1))',
+              neighborarea='tuple((int,>=1),(int,>=1))',
+              centers='None|(array[HxWx2],valid_diffeomorphism)')
+    def __init__(self, shape, neighborarea, centers=None):
+        '''
+        :param shape:
+        :param neighborarea:
+        :param centers: if not None, area around centers
             
-    @contract(shape='tuple(H,W)', neighborarea='tuple(X,Y)')
-    def __init__(self, shape, neighborarea):
-        """
             Suppose 
                 shape = (H, W)
                 nighborarea = (X, Y)
@@ -24,10 +35,14 @@ class FlatStructure(object):
                 self.neighbor_indices_flat  
             is a K x N array.
 
-        """
-    
+        '''
         # for each sensel, create an area 
         cmg = cmap(np.array(neighborarea))
+        
+        # if the area size is even, it is bumbed to the next integer
+        assert cmg.shape[0] >= neighborarea[0]
+        assert cmg.shape[1] >= neighborarea[1]
+        
         self.area_shape = cmg.shape[0], cmg.shape[1]
         self.shape = shape
         self.H, self.W = shape
@@ -36,29 +51,39 @@ class FlatStructure(object):
         self.N = self.H * self.W
         self.A = self.X * self.Y
         
-#        neighbor_coords = [None] * N
+        # this is the important state
         self.neighbor_indices_flat = np.zeros((self.N, self.A), 'int32')
     
         logger.info('Creating Flattening..')
         self.flattening = Flattening.by_rows(tuple(shape))
         logger.info('..done')
         
-        self.cmg = cmg
+        # self.cmg = cmg
         for coord in coords_iterate(shape):
             k = self.flattening.cell2index[coord]
             cm = cmg.copy()
-            cm[:, :, 0] += coord[0]
-            cm[:, :, 1] += coord[1]
+            
+            # by default...
+            if centers is None:
+                # ... start at identity
+                center = (coord[0], coord[1])
+            else:
+                # otherwise start wherever we are told
+                center = centers[coord[0], coord[1]]
+                 
+            cm[:, :, 0] += center[0]
+            cm[:, :, 1] += center[1]
             # torus topology here
             cm[:, :, 0] = cm[:, :, 0] % shape[0]  
             cm[:, :, 1] = cm[:, :, 1] % shape[1]
-            #  neighbor_coords[k] = cm
+            
             indices = np.zeros(self.area_shape, 'int32')
             for a, b in coords_iterate(self.area_shape):
                 c = tuple(cm[a, b, :])
                 indices[a, b] = self.flattening.cell2index[c]
     
-            self.neighbor_indices_flat[k, :] = np.array(indices.flat)  # using numpy's flattening
+            # XXX using numpy's flattening 
+            self.neighbor_indices_flat[k, :] = np.array(indices.flat)  
 
     # k < N, index < A
     @contract(k='int,>=0', neighbor_index='int,>=0', returns='seq[2](int)')
@@ -153,7 +178,6 @@ class FlatStructure(object):
                 D[i, jj] = np.min([d_up, d_down, d_left, d_right])
         return D 
         
-    
     @contract(v='array[NxA]', returns='array[HxWxXxY],N=H*W,A=X*Y')
     def unrolled2multidim(self, v):
         """ De-unrolls both dimensions to obtain a 4d vector. """

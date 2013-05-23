@@ -18,7 +18,8 @@ class DiffeoSystemEstimatorInterface(object):
     __metaclass__ = ContractsMeta
         
     @abstractmethod
-    @contract(y0='array[MxN]', u0='array[K]', y1='array[MxN]')
+    @contract(y0='array[MxN]|array[MxNx3]',
+              u0='array[K]', y1='array[MxN]|array[MxNx3]')
     def update(self, y0, u0, y1):
         pass
 

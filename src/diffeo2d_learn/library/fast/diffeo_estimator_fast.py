@@ -7,11 +7,13 @@ from reprep.plot_utils import plot_vertical_line
 import numpy as np
 import time
 
-
 __all__ = ['DiffeomorphismEstimatorFaster']
     
 class DiffeomorphismEstimatorFaster(Diffeo2dEstimatorInterface):
-    ''' Learns a diffeomorphism between two 2D fields. '''
+    ''' 
+        This faster version uses vector operations. The meat of
+        the flattingeing is in the FlatStructure class.
+    '''
 
     Order = 'order'
     Similarity = 'sim'
@@ -89,6 +91,7 @@ class DiffeomorphismEstimatorFaster(Diffeo2dEstimatorInterface):
             
             if self.inference_method == DiffeomorphismEstimatorFaster.Order:
                 order = np.argsort(diff)
+                # this variant was actually quite slower:
                 # diff_order = scale_score(diff, kind='quicksort')
                 self.neig_eord_score[k, order] += order_comp 
             elif self.inference_method == DiffeomorphismEstimatorFaster.Similarity:
@@ -139,7 +142,7 @@ class DiffeomorphismEstimatorFaster(Diffeo2dEstimatorInterface):
         logger.debug('    Fraction: %s' % str(self.max_displ))
         logger.debug(' Search area: %s' % str(self.area))
         logger.debug('Creating FlatStructure...')
-        self.flat_structure = flat_structure_cache(self.shape, self.area)
+        self.flat_structure = self._create_flat_structure()
         logger.debug('done creating')
 
         buffer_shape = (self.nsensels, self.area_size)
@@ -155,6 +158,10 @@ class DiffeomorphismEstimatorFaster(Diffeo2dEstimatorInterface):
         # initialize a buffer of size NxA
         self.buffer_NA = np.zeros(buffer_shape, 'float32') 
     
+    def _create_flat_structure(self):
+        """ It is a method so it can be redefined. """
+        return flat_structure_cache(self.shape, self.area)
+        
     def display(self, report):
         
         if not self.initialized():

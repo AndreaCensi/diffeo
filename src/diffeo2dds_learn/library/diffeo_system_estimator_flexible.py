@@ -1,5 +1,4 @@
 from contracts import contract
-from diffeo2d_learn import Diffeo2dEstimatorInterface
 from diffeo2dds import DiffeoSystem
 from diffeo2dds_learn import (get_diffeo2ddslearn_config, logger,
     DiffeoSystemEstimatorInterface, DiffeoActionEstimatorInterface)

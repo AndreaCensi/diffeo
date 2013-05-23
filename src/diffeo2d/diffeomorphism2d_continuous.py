@@ -7,6 +7,7 @@ import warnings
  
 __all__ = ['Diffeomorphism2DContinuous']
  
+
 class Diffeomorphism2DContinuous(Diffeomorphism2D):
     def __init__(self, d, variance=None):
         self.d = d

@@ -1,21 +1,12 @@
-from .. import (coords_iterate, coords_to_X, X_to_coords, diffeo_identity,
-    diffeo_compose, dmod, diffeo_distance_Linf, diffeo_from_function, diffeo_inverse,
-    diffeo_distance_L2)
+from .. import (diffeo_identity, diffeo_compose, dmod, diffeo_distance_Linf,
+    diffeo_from_function, diffeo_inverse, diffeo_distance_L2)
 from diffeo2d.tests.testing import for_all_diffeo_pairs, for_all_diffeos
 from diffeo2s.library import identity, rotx, rotx2
 from functools import wraps
-from geometry.utils.numpy_backport import assert_allclose
 from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
+from numpy.testing import assert_allclose
 
-
-def X_to_coords_test():
-    shape = (40, 50)
-    for coords in coords_iterate(shape):
-        X = coords_to_X(coords, shape)
-        coords2 = X_to_coords(X, shape)
-        msg = 'coords: %s  X: %s  coords2: %s' % (coords, X, coords2)
-        assert_allclose(coords2, coords, err_msg=msg)
 
 
 def diffeo_composition_test_1():
