@@ -19,12 +19,16 @@ class DDSLDemo1(DDSL.sub, QuickApp):  # @UndefinedVariable
     ] 
     
     estimators = [
-        'test_dds_estimator_simple_continuous_10',
-        'test_dds_estimator_simple_binary_10',
-        'test_dds_estimator_fast_order_10',
-        'test_dds_estimator_fast_sim_10',
-        'test_dds_estimator_fast_order_10_unc_norm',
-        'test_dds_estimator_fast_sim_10_unc_normrel',
+     'test_ddsest_reg_fast_order',
+     'test_ddsest_reg_fast_sim',
+     'test_ddsest_reg_simple_cont',
+     'test_ddsest_reg_simple_bin',
+     'test_ddsest_reg_refine1',
+     'test_ddsest_unc_fast_order',
+     'test_ddsest_unc_fast_sim',
+     'test_ddsest_unc_simple_cont',
+     'test_ddsest_unc_simple_bin',
+     'test_ddsest_unc_refine1'
     ]
     
     def define_options(self, params):

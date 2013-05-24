@@ -1,10 +1,12 @@
 from conf_tools import ConfigMaster
-from diffeo2d_learn.diffeo_estimator_interface import Diffeo2dEstimatorInterface
+
+
+__all__ = ['get_diffeo2dlearn_config']
 
 class Diffeo2dLearnConfig(ConfigMaster):
     def __init__(self):
         ConfigMaster.__init__(self, 'diffeo2dlearn')
-
+        from diffeo2d_learn import Diffeo2dEstimatorInterface
         self.diffeo2d_estimators = self.add_class_generic('diffeo2d_estimators',
                                                 '*.diffeo2d_estimators.yaml',
                                                 Diffeo2dEstimatorInterface)

@@ -7,6 +7,7 @@ from diffeo2d import logger
 from numpy.testing import assert_allclose
 import numpy as np
 import warnings
+from diffeo2d.diffeo_basic import diffeo_identity
 
 __all__ = ['FlatStructure', 'flat_structure_cache', 'add_border', 'togrid']
 
@@ -58,19 +59,20 @@ class FlatStructure(object):
         self.flattening = Flattening.by_rows(tuple(shape))
         logger.info('..done')
         
+        if centers is None:
+            self.centers = diffeo_identity(shape)
+        else:
+            if centers.dtype == 'float':
+                # continuous diffeo
+                centers = np.round(centers).astype('int')
+            self.centers = centers
+            
         # self.cmg = cmg
         for coord in coords_iterate(shape):
             k = self.flattening.cell2index[coord]
             cm = cmg.copy()
             
-            # by default...
-            if centers is None:
-                # ... start at identity
-                center = (coord[0], coord[1])
-            else:
-                # otherwise start wherever we are told
-                center = centers[coord[0], coord[1]]
-                 
+            center = self.centers[coord]      
             cm[:, :, 0] += center[0]
             cm[:, :, 1] += center[1]
             # torus topology here
@@ -83,7 +85,10 @@ class FlatStructure(object):
                 indices[a, b] = self.flattening.cell2index[c]
     
             # XXX using numpy's flattening 
-            self.neighbor_indices_flat[k, :] = np.array(indices.flat)  
+            indices = np.array(indices.flat)
+            # warnings.warn('remove bias due to ordering')
+            # indices = np.random.permutation(indices)
+            self.neighbor_indices_flat[k, :] = indices  
 
     # k < N, index < A
     @contract(k='int,>=0', neighbor_index='int,>=0', returns='seq[2](int)')
@@ -142,6 +147,7 @@ class FlatStructure(object):
     @memoize_simple
     @contract(returns='array[NxA]')
     def get_distances(self):
+        """ This returns the distance of each neighbor to the pixel """
         D = np.zeros((self.N, self.A))
         for i in xrange(self.N):
             pi = self.flattening.index2cell[i]
@@ -158,17 +164,48 @@ class FlatStructure(object):
     
     @memoize_simple
     @contract(returns='array[NxA]')
+    def get_distances_to_area_center(self):
+        """ 
+            This returns the distance of each neighbor to the center 
+            of the area border. This is the same thing as get_distances()
+            only if the area center is on the nominal pixel. 
+        """
+        D = np.zeros((self.N, self.A))
+        for i in xrange(self.N):
+            pi = self.flattening.index2cell[i]
+            area_center = self.get_center_for_cell_area(pi)
+            for jj in xrange(self.A):
+                j = self.neighbor_indices_flat[i, jj]
+                pj = self.flattening.index2cell[j]
+                dx = area_center[0] - pj[0]
+                dy = area_center[1] - pj[1]
+                dxn = dmod(dx, self.shape[0] / 2)
+                dyn = dmod(dy, self.shape[1] / 2)
+                d = np.hypot(dxn, dyn)
+                D[i, jj] = d
+        return D 
+    
+    @contract(cell='seq[2](int)', returns='seq[2](int)')
+    def get_center_for_cell_area(self, cell):
+        res = self.centers[tuple(cell)]
+        return res
+        
+    @memoize_simple
+    @contract(returns='array[NxA]')
     def get_distances_to_area_border(self):
+        """ This returns the distance of each neighbor to the border of the area """
         D = np.zeros((self.N, self.A))
         Xd = np.floor(self.X / 2.0)
         Yd = np.floor(self.Y / 2.0)
         for i in xrange(self.N):
             pi = self.flattening.index2cell[i]
+            area_center = self.get_center_for_cell_area(pi)
+
             for jj in xrange(self.A):
                 j = self.neighbor_indices_flat[i, jj]
                 pj = self.flattening.index2cell[j]
-                dx = pi[0] - pj[0]
-                dy = pi[1] - pj[1]
+                dx = area_center[0] - pj[0]
+                dy = area_center[1] - pj[1]
                 dxn = dmod(dx, self.shape[0] / 2)
                 dyn = dmod(dy, self.shape[1] / 2)
                 d_up = np.abs((-Yd) - dyn)

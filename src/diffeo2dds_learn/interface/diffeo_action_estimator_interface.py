@@ -14,7 +14,15 @@ class DiffeoActionEstimatorInterface(object):
     """ 
     
     __metaclass__ = ContractsMeta
-        
+    
+    @abstractmethod
+    @contract(max_displ='seq[2](float,>0,<=1)')
+    def set_max_displ(self, max_displ):
+        """ 
+            Sets the maximum displacement to be used, in resolution-independent
+            units.  Must be called before any call to update().
+        """
+    
     @abstractmethod
     @contract(y0='array[MxN]|array[MxNx3]', y1='array[MxN]|array[MxNx3]')
     def update(self, y0, y1):

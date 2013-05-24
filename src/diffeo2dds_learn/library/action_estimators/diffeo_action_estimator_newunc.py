@@ -1,7 +1,7 @@
+from . import DiffeoActionEstimatorSimple
 from conf_tools.utils import check_is_in
 from contracts import contract
 from diffeo2dds import DiffeoAction
-from diffeo2dds_learn.library import DiffeoActionEstimatorSimple
 import itertools
 import numpy as np
 import pdb
@@ -82,7 +82,6 @@ def consistency_based_uncertainty(action, length_score):
             pdb.set_trace()
         E_inv[tuple(c)] = score
         
-    #        pdb.set_trace()
     action.diffeo.variance = 1 - E / np.max(E)
     action.diffeo.variance_max = np.max(E)
     action.diffeo_inv.variance = 1 - E_inv / np.max(E_inv)

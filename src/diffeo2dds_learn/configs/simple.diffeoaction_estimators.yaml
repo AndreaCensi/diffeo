@@ -1,0 +1,12 @@
+- id: "reg_${estimator}"
+  desc: "regular uncertainty estimation"
+  code: 
+  - diffeo2dds_learn.library.DiffeoActionEstimatorSimple
+  - diffeo2d_estimator: "${estimator}"
+
+- id: "unc_${estimator}"
+  desc: "Consistency-based uncertainty estimation"
+  code: 
+  - diffeo2dds_learn.library.DiffeoActionEstimatorNewUnc
+  - diffeo2d_estimator: "${estimator}"
+    score: normrel # norm

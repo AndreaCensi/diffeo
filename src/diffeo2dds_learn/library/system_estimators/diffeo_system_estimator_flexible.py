@@ -25,20 +25,23 @@ class DiffeoSystemEstimatorFlexible(DiffeoSystemEstimatorInterface):
         self.diffeo_action_estimator = diffeo_action_estimator
         
         # becomes (i, n) if parallel_process_hint is called
-        self.parallel_hint = None    
+        self.parallel_hint = None   
+    
+    def set_max_displ(self, max_displ): 
+        self.max_displ = max_displ
         
     @contract(returns=DiffeoActionEstimatorInterface)
     def new_estimator(self):
         """ Instances a new estimator. """
-        config = get_diffeo2ddslearn_config()
-        _, estimator = config.diffeoaction_estimators.instance_smarter(self.diffeo_action_estimator)
+        c = get_diffeo2ddslearn_config()
+        _, estimator = \
+        c.diffeoaction_estimators.instance_smarter(self.diffeo_action_estimator)
+        estimator.set_max_displ(self.max_displ)
         return estimator            
                     
     @contract(returns='int', command='array')
     def command_index(self, command):
         command = tuple(command)
-        # logger.info('Checking command %s in %r' % (str(command), self.command_list))
-        # logger.info('%s' % str(command in self.command_list))
         
         if not command in self.command_list:    
             logger.info('Adding new command %s' % str(command))

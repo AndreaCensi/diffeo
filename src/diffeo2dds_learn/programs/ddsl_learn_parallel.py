@@ -1,7 +1,6 @@
 from .ddsl import DDSL
 from .ddsl_learn import (learn_from_stream_parallel, get_estimated_dds,
     report_learner, report_dds, save_results)
-from conf_tools import GlobalConfig
 from quickapp import QuickApp
 
 
@@ -18,16 +17,22 @@ class DDSLLearnParallel(DDSL.sub, QuickApp):  # @UndefinedVariable
         params.add_string('stream', help='Which data stream to use.')
         params.add_int('n', default=4,
                        help='Number of threads to use.')
-        
+        params.add_float('max_displ', help='max displacement')
+
+       
     def define_jobs_context(self, context): 
         estimator = self.options.estimator
         stream = self.options.stream
         n = self.options.n
         
-        jobs_learning_parallel(context, estimator, stream, n)
+        m = self.options.max_displ
+        max_displ = (m, m)
+  
+        jobs_learning_parallel(context, estimator, stream, max_displ, n)
 
 
-def jobs_learning_parallel(context, estimator, stream, nthreads, intermediate_reports=True):
+def jobs_learning_parallel(context, estimator, stream, max_displ,
+                           nthreads, intermediate_reports=True):
     """ Creates jobs for learning in parallel. """
     
     # partial results
@@ -36,7 +41,8 @@ def jobs_learning_parallel(context, estimator, stream, nthreads, intermediate_re
         c = context.child('c%d' % (i + 1))
         
         learner_i = c.comp_config(learn_from_stream_parallel,
-                           stream=stream, estimator=estimator, i=i, n=nthreads,
+                           stream=stream, estimator=estimator, max_displ=max_displ,
+                           i=i, n=nthreads,
                            job_id='learn')
     
         partial.append(learner_i)

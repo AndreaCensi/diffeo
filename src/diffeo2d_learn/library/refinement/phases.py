@@ -1,16 +1,7 @@
-from bootstrapping_olympics.library.nuisances.shape.resample import (
-    scipy_image_resample)
 from contracts import contract
-from diffeo2d import (Diffeomorphism2D, flat_structure_cache, add_border, togrid,
-    diffeo_identity, diffeo_text_stats, diffeomorphism_to_rgb, diffeo_to_rgb_angle,
-    diffeo_to_rgb_norm, diffeo_to_rgb_curv, angle_legend)
-from diffeo2d_learn import Diffeo2dEstimatorInterface, logger
-from diffeo2d_learn.library.fast.diffeo_estimator_fast import (
-    DiffeomorphismEstimatorFaster)
-from reprep.plot_utils import plot_vertical_line
 import numpy as np
-import time
 
+__all__ = ['PhaseInfo', 'get_phase_sequence']
 
 class PhaseInfo():
     @contract(shape='array[2](int)',

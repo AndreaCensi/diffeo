@@ -1,6 +1,7 @@
-from abc import ABCMeta, abstractmethod
+from abc import abstractmethod
 from contracts import contract
 from reprep import Report
+from contracts import ContractsMeta
 
 
 __all__ = ['Diffeo2dEstimatorInterface']
@@ -14,7 +15,16 @@ class Diffeo2dEstimatorInterface(object):
         when requested.
     """ 
     
-    __metaclass__ = ABCMeta
+    __metaclass__ = ContractsMeta
+    
+    @abstractmethod
+    @contract(max_displ='seq[2](float,>0,<=1)')
+    def set_max_displ(self, max_displ):
+        """ 
+            Sets the maximum displacement to be used, in resolution-independent
+            units.  Must be called before any call to update().
+        """
+    
     
     @abstractmethod
     @contract(y0='array[MxN]', y1='array[MxN]')

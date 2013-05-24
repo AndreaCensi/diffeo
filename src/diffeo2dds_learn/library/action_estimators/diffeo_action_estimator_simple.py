@@ -11,14 +11,19 @@ class DiffeoActionEstimatorSimple(DiffeoActionEstimatorInterface):
     @contract(diffeo2d_estimator='str|code_spec')
     def __init__(self, diffeo2d_estimator): 
         self.diffeo2d_estimator = diffeo2d_estimator
+       
+    def set_max_displ(self, max_displ):
+        self.max_displ = max_displ
     
         self.est = self._new_estimator() 
         self.est_inv = self._new_estimator()
-   
+
     def _new_estimator(self):
         """ Instances a new estimator. """
         config = get_diffeo2dlearn_config()
-        _, estimator = config.diffeo2d_estimators.instance_smarter(self.diffeo2d_estimator)
+        _, estimator = \
+           config.diffeo2d_estimators.instance_smarter(self.diffeo2d_estimator)
+        estimator.set_max_displ(self.max_displ)
         return estimator            
 
     def update(self, y0, y1):

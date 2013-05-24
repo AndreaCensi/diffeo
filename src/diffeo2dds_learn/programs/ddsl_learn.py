@@ -1,5 +1,4 @@
 from .ddsl import DDSL
-from conf_tools import GlobalConfig
 from contracts import contract
 from diffeo2dds import DiffeoSystem, ds_dump
 from diffeo2dds_learn import (DiffeoSystemEstimatorInterface,
@@ -19,18 +18,22 @@ class DDSLLearn(DDSL.sub, QuickApp):  # @UndefinedVariable
     def define_options(self, params):
         params.add_string('estimator', help='Which learner to use.')
         params.add_string('stream', help='Which data stream to use.')
+        params.add_float('max_displ', help='max displacement')
         
     def define_jobs_context(self, context): 
         estimator = self.options.estimator
         stream = self.options.stream
         
-        jobs_learning(context, estimator, stream)
+        m = self.options.max_displ
+        max_displ = (m, m)
+        jobs_learning(context, estimator, stream, max_displ)
         
         
-def jobs_learning(context, estimator, stream):
+def jobs_learning(context, estimator, stream, max_displ):
     # learn
     learner = context.comp_config(learn_from_stream,
-                                  stream=stream, estimator=estimator)
+                                  stream=stream, estimator=estimator,
+                                  max_displ=max_displ)
     # summarize
     dds = context.comp(get_estimated_dds, learner)
     
@@ -46,33 +49,35 @@ def jobs_learning(context, estimator, stream):
     context.add_report(dds_report, 'dds', **params)
         
          
-@contract(stream='str', estimator='str')
-def learn_from_stream(stream, estimator):
+@contract(stream='str', estimator='str', max_displ='seq[2](float)')
+def learn_from_stream(stream, estimator, max_displ):
     """ Returns the estimator instance at the end of the learning. """
     ddsl_config = get_diffeo2ddslearn_config()
         
-    diffeo_learner = ddsl_config.diffeosystem_estimators.instance(estimator)
-    assert isinstance(diffeo_learner, DiffeoSystemEstimatorInterface)
+    estimator = ddsl_config.diffeosystem_estimators.instance(estimator)
+    estimator.set_max_displ(max_displ)
+    assert isinstance(estimator, DiffeoSystemEstimatorInterface)
     stream = ddsl_config.streams.instance(stream)
 
     for log_item in stream.read_all():
         y0 = log_item.y0
         y1 = log_item.y1
         u = log_item.u
-        diffeo_learner.update(y0, u, y1)
+        estimator.update(y0, u, y1)
         
-    return diffeo_learner 
+    return estimator 
 
 
-@contract(stream='str', estimator='str', i='int,>=0', n='int')
-def learn_from_stream_parallel(stream, estimator, i, n):
+@contract(stream='str', estimator='str', max_displ='seq[2](float)', i='int,>=0', n='int')
+def learn_from_stream_parallel(stream, estimator, max_displ, i, n):
     """ This version also gives the parallel hints. """
     ddsl_config = get_diffeo2ddslearn_config()
 
     stream = ddsl_config.streams.instance(stream)
-        
+
     estimator = ddsl_config.diffeosystem_estimators.instance(estimator)
     assert isinstance(estimator, DiffeoSystemEstimatorInterface)
+    estimator.set_max_displ(max_displ)
 
     # here we hint that you are one of many
     estimator.parallel_process_hint(i, n)

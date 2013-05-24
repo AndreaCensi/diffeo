@@ -68,6 +68,8 @@
         obs_nuisance: 
         - - bootstrapping_olympics.library.nuisances.Trim
           - trim: [[2,2],[2,2]]
+        - - bootstrapping_olympics.library.nuisances.Gaussian
+          - sigma: 0.1
 
 
 

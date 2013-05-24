@@ -7,6 +7,7 @@ from .visualization import (diffeo_to_rgb_norm, diffeo_to_rgb_angle,
 from numpy.testing import assert_allclose
 from contracts import contract
 import numpy as np
+import warnings
 
 
 __all__ = ['Diffeomorphism2D']
@@ -57,6 +58,15 @@ class Diffeomorphism2D(object):
         self.variance.setflags(write=False)
         self.d = self.d.copy()
         self.d.setflags(write=False)
+
+    def resample(self, shape):
+        from diffeo2c.resampling import diffeo_resample
+        d2 = diffeo_resample(self.d, shape)
+        warnings.warn('remove this dependency')
+        from bootstrapping_olympics.library.nuisances.shape.resample \
+            import scipy_image_resample
+        v2 = scipy_image_resample(self.variance, shape)
+        return Diffeomorphism2D(d2, v2)
 
     def __sizeof__(self):
         """ Returns approximate memory usage in bytes. """

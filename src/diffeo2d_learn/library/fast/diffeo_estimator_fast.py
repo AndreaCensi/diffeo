@@ -19,14 +19,13 @@ class DiffeomorphismEstimatorFaster(Diffeo2dEstimatorInterface):
     Order = 'order'
     Similarity = 'sim'
     
-    @contract(max_displ='seq[2](>0,<1)', inference_method='str')
-    def __init__(self, max_displ, inference_method):
+    @contract(inference_method='str')
+    def __init__(self, inference_method):
         """ 
             :param max_displ: Maximum displacement  
             :param inference_method: order, sim
         """
         self.shape = None
-        self.max_displ = np.array(max_displ)
         self.last_y0 = None
         self.last_y1 = None
         self.inference_method = inference_method
@@ -41,6 +40,10 @@ class DiffeomorphismEstimatorFaster(Diffeo2dEstimatorInterface):
         self.num_samples = 0
 
         self.buffer_NA = None
+
+    def set_max_displ(self, max_displ):
+        self.max_displ = np.array(max_displ)
+
 
     def initialized(self):
         """ Returns true if the structures have already been initialized. """
@@ -168,8 +171,17 @@ class DiffeomorphismEstimatorFaster(Diffeo2dEstimatorInterface):
             report.text('notice', 'Cannot display() because not initialized.')
             return
         
-        report.text('klass', type(self).__name__)
+        report.text('estimator', type(self).__name__)
         report.data('num_samples', self.num_samples)
+        
+        score = self._get_score()
+        flattening = self.flat_structure.flattening
+        min_score = flattening.flat2rect(np.min(score, axis=1))
+        max_score = flattening.flat2rect(np.max(score, axis=1))
+        caption = 'minimum and maximum score per pixel across neighbors'
+        f = report.figure('scores', caption=caption)
+        f.data('min_score', min_score).display('scale')
+        f.data('max_score', max_score).display('scale')
         
         f = report.figure(cols=4)
         
@@ -185,9 +197,8 @@ class DiffeomorphismEstimatorFaster(Diffeo2dEstimatorInterface):
             plot_vertical_line(pylab, safe_d, 'g--')
             plot_vertical_line(pylab, max_d, 'r--')
             
-        score = self._get_score()    
         as_grid = self.make_grid(score)
-        report.data('grid', rgb_zoom(scale(as_grid), 4))
+        f.data_rgb('grid', rgb_zoom(scale(as_grid), 4))
         distance_to_border = distance_to_border_for_best(self.flat_structure, score) 
         distance_to_center = distance_from_center_for_best(self.flat_structure, score)
         
@@ -205,7 +216,8 @@ class DiffeomorphismEstimatorFaster(Diffeo2dEstimatorInterface):
         with f.plot('distance_to_border_hist') as pylab:
             pylab.hist(distance_to_border.flat, bins)
         
-        with f.plot('distance_to_center_hist') as pylab:
+        caption = 'Red line: on border; Green line (red-1): safe to be here.'
+        with f.plot('distance_to_center_hist', caption=caption) as pylab:
             pylab.hist(distance_to_center.flat, bins)
             plot_safe(pylab)
     
@@ -361,7 +373,7 @@ def distance_from_center_for_best(flat_structure, score):
     N, _ = score.shape
     best = np.argmin(score, axis=1)
     assert best.shape == (N,)
-    D = flat_structure.get_distances()
+    D = flat_structure.get_distances_to_area_center()
     res = np.zeros(N)
     for i in range(N):
         res[i] = D[i, best[i]]

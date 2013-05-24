@@ -13,15 +13,14 @@ class DiffeomorphismEstimatorSimple(Diffeo2dEstimatorInterface):
         
     '''
 
-    @contract(max_displ='seq[2](>0,<1)', match_method='str')
-    def __init__(self, max_displ, match_method):
+    @contract(match_method='str')
+    def __init__(self, match_method):
         """ 
             :param max_displ: Maximum pointwise displacement for the diffeomorphism d_max
             :param match_method: Either "continuous" or "binary" (to compute the 
                 error function).
         """
         self.shape = None
-        self.max_displ = np.array(max_displ)
         self.last_y0 = None
         self.last_y1 = None
 
@@ -30,7 +29,11 @@ class DiffeomorphismEstimatorSimple(Diffeo2dEstimatorInterface):
         self.match_method = match_method
 
         self.num_samples = 0
-        
+
+    def set_max_displ(self, max_displ):
+        self.max_displ = np.array(max_displ)
+   
+   
     @contract(returns='tuple')
     def initialized(self):
         return self.shape is not None
