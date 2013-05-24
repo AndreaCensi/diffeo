@@ -1,16 +1,16 @@
+from .phases import get_phase_sequence
+from bootstrapping_olympics import BootWithInternalLog
 from bootstrapping_olympics.library.nuisances.shape import scipy_image_resample
 from contracts import contract
+from diffeo2c.resampling import diffeo_resample
+from diffeo2d.diffeo_basic import diffeo_identity
+from diffeo2d.plumbing import FlatStructure
 from diffeo2d_learn import Diffeo2dEstimatorInterface
 from diffeo2d_learn.library.fast.diffeo_estimator_fast import (
     DiffeomorphismEstimatorFaster)
-from .phases import get_phase_sequence
 import numpy as np
-from diffeo2d.plumbing import FlatStructure
-from diffeo2d.diffeo_basic import diffeo_identity
-from diffeo2c.resampling import diffeo_resample
 import warnings
 warnings.warn('remove dependency')
-from bootstrapping_olympics import BootWithInternalLog
  
 __all__ = ['DiffeomorphismEstimatorDoubleRefine']
 
@@ -22,7 +22,7 @@ class DiffeomorphismEstimatorDoubleRefine(Diffeo2dEstimatorInterface, BootWithIn
               desired_resolution_factor='float',
               change_threshold='float,>=0')
     def __init__(self, g, gamma, desired_resolution_factor,
-                 change_threshold):
+                 change_threshold, min_shape):
         '''
         
         :param max_displ:
@@ -34,6 +34,7 @@ class DiffeomorphismEstimatorDoubleRefine(Diffeo2dEstimatorInterface, BootWithIn
         self.g = g
         self.gamma = gamma
         self.change_threshold = change_threshold
+        self.min_shape = min_shape
         
         # variables
         self.estimators = None
@@ -58,7 +59,8 @@ class DiffeomorphismEstimatorDoubleRefine(Diffeo2dEstimatorInterface, BootWithIn
                                     self.desired_resolution_factor,
                                     search_grid=search_grid,
                                     gamma=self.gamma,
-                                    max_displ=self.max_displ)
+                                    max_displ=self.max_displ,
+                                    min_shape=self.min_shape)
         for p in self.phases:
             print('- %s' % p)
         
@@ -144,7 +146,7 @@ class DiffeomorphismEstimatorDoubleRefine(Diffeo2dEstimatorInterface, BootWithIn
         
         # should_switch = self.phase_obs >= obs_per_phase
         should_switch = mean_changes <= self.change_threshold
-#         should_switch = False
+
         if should_switch:
             if self.current_phase < len(self.phases) - 1:
                 self.info('Switching to next phase.')

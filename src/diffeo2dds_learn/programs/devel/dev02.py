@@ -24,7 +24,7 @@ class Dev02(Dev.get_sub(), QuickApp):  # @UndefinedVariable
      'test_ddsest_unc_refine1'
      ]
 
-    streams = ['test_gauss_drx1_68_500']
+    streams = ['test_gauss_drx1_68_500', 'test_gauss_dpx1_68_500']
           
     def define_options(self, params):
         pass
