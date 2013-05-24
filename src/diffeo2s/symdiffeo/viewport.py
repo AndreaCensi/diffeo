@@ -23,21 +23,28 @@ def diffeo_from_function_viewport(diffeo, manifold, viewport, shape):
     for coords in coords_iterate(shape):
         # coords = (i,j)
         # coordinates of the center of the cell
-        center_offset = np.array([0.5, 0.5])
-        cell_center = coords + center_offset
+        # center_offset = np.array([0.5, 0.5])
+        cell_center = np.array(coords, dtype='float32')  # + center_offset
         # the domain is ([0,M]x[0,N]) so it is still inside
         assert domain.belongs(cell_center)
         # transform to the "world"
         world = domain2viewport(cell_center)
         # apply the diffeomorphism
-        world2 = manifold.normalize(diffeo(world)) 
+        d_world = diffeo(world)
+        world2 = manifold.normalize(d_world) 
         # Are we inside the viewport?
         if viewport.belongs(world2):
             cell2 = viewport2domain(world2)
             assert domain.belongs(cell2)
             new_cell = np.floor(cell2)
-            approx = np.linalg.norm(cell2 - (new_cell + center_offset))
-            quality = np.exp(-approx)
+            valid = ((0 <= new_cell[0] < shape[0]) and
+                     (0 <= new_cell[1] < shape[1]))
+            if not valid:
+                msg = 'Invalid cell %r for shape %r' % (new_cell, shape)
+                msg += '\n world: %r -> %r ~= %r' % (world, d_world, world2)
+                raise ValueError(msg)
+            # approx = np.linalg.norm(cell2 - (new_cell + center_offset))
+            # quality = np.exp(-approx)
             quality = 1
             info[coords[0], coords[1]] = quality
             D[coords[0], coords[1], 0] = new_cell[0]

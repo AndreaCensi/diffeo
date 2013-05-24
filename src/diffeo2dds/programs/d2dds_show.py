@@ -6,7 +6,7 @@ import os
 __all__ = ['Diffeo2ddsShow']
 
 
-class Diffeo2ddsShow(Diffeo2dds.sub):  # @UndefinedVariable
+class Diffeo2ddsShow(Diffeo2dds.get_sub()):
     """ Creates a report for a DDS. """
     
     cmd = 'show'

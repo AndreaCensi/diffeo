@@ -33,7 +33,7 @@
         match_method: "${match}" # continuous, binary
 
 
-- id: "test_dds_estimator_refine1"
+- id: "test_dds_estimator_refine_${displ}"
   desc: "" 
   code:
   - diffeo2dds_learn.library.DiffeoSystemEstimatorFlexible
@@ -41,7 +41,7 @@
     - diffeo2dds_learn.library.DiffeoActionEstimatorSimple
     - diffeo2d_estimator: 
       - diffeo2d_learn.library.DiffeomorphismEstimatorDoubleRefine
-      - max_displ: [0.3, 0.3]
+      - max_displ: ["0.${displ}", "0.${displ}"]
         g: 5
         gamma: 1.5
         desired_resolution_factor: 2.0

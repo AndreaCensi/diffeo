@@ -6,7 +6,7 @@ from quickapp import QuickApp
 __all__ = ['Dev01']
 
 
-class Dev01(Dev.sub, QuickApp):  # @UndefinedVariable
+class Dev01(Dev.get_sub(), QuickApp):  # @UndefinedVariable
     """ Some tests developing the new algorithm. """
      
     cmd = 'dev01'
@@ -42,5 +42,5 @@ class Dev01(Dev.sub, QuickApp):  # @UndefinedVariable
         config = get_diffeo2ddslearn_config()
         config.streams[spec['id']] = spec
         
-#         id_stream = 'test_random_dpx1_30_300'
+        id_stream = 'test_gauss_drx1_30_300'
         context.subtask(DDSLLearn, stream=id_stream, estimator=estimator)

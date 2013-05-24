@@ -1,8 +1,10 @@
-from . import SymbolicDiffeo
 from contracts import contract
 import numpy as np
 from geometry import se2, SE2
 import geometry
+from diffeo2s.symdiffeo.sym_diffeo import SymbolicDiffeo
+
+__all__ = ['SymbolicDiffeo']
 
 class MotionDiffeo(SymbolicDiffeo):
     """ A rigid motion of the plane/torus. """

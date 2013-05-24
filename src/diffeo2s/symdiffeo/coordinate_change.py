@@ -1,7 +1,7 @@
+from . import SymbolicDiffeo
 from contracts import contract
 import numpy as np
 
-from . import SymbolicDiffeo
 
 __all__ = ['LinearCoordinateChange']
 

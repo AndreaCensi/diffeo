@@ -3,6 +3,7 @@ from diffeo2d import (Diffeomorphism2D, flat_structure_cache, add_border, togrid
     diffeo_identity, diffeo_text_stats, diffeomorphism_to_rgb, diffeo_to_rgb_angle,
     diffeo_to_rgb_norm, diffeo_to_rgb_curv, angle_legend)
 from diffeo2d_learn import Diffeo2dEstimatorInterface, logger
+from reprep import rgb_zoom, scale
 from reprep.plot_utils import plot_vertical_line
 import numpy as np
 import time
@@ -163,77 +164,59 @@ class DiffeomorphismEstimatorFaster(Diffeo2dEstimatorInterface):
         return flat_structure_cache(self.shape, self.area)
         
     def display(self, report):
-        
         if not self.initialized():
             report.text('notice', 'Cannot display() because not initialized.')
             return
-            
+        
+        report.text('klass', type(self).__name__)
         report.data('num_samples', self.num_samples)
+        
         f = report.figure(cols=4)
         
         def make_best(x):
             return x == np.min(x, axis=1)
-        
-        @contract(score='array[NxA]', returns='array[HxW],H*W=N')
-        def distance_to_border_for_best(score):
-            N, _ = score.shape
-            best = np.argmin(score, axis=1)
-            assert best.shape == (N,)
-            D = self.flat_structure.get_distances_to_area_border()
-            res = np.zeros(N)
-            for i in range(N):
-                res[i] = D[i, best[i]]
-            return self.flat_structure.flattening.flat2rect(res)
-
-        @contract(score='array[NxA]', returns='array[HxW],H*W=N')
-        def distance_from_center_for_best(score):
-            N, _ = score.shape
-            best = np.argmin(score, axis=1)
-            assert best.shape == (N,)
-            D = self.flat_structure.get_distances()
-            res = np.zeros(N)
-            for i in range(N):
-                res[i] = D[i, best[i]]
-            return self.flat_structure.flattening.flat2rect(res)
-
+    
         max_d = int(np.ceil(np.hypot(np.floor(self.area[0] / 2.0),
                                      np.floor(self.area[1] / 2.0))))
         safe_d = int(np.floor(np.min(self.area) / 2.0))
         
-        bdist_scale = dict(min_value=0, max_value=max_d, max_color=[0, 1, 0])
-        cdist_scale = dict(min_value=0, max_value=max_d, max_color=[1, 0, 0])
-        bins = range(max_d + 2)
         
         def plot_safe(pylab):
             plot_vertical_line(pylab, safe_d, 'g--')
             plot_vertical_line(pylab, max_d, 'r--')
             
+        score = self._get_score()    
+        as_grid = self.make_grid(score)
+        report.data('grid', rgb_zoom(scale(as_grid), 4))
+        distance_to_border = distance_to_border_for_best(self.flat_structure, score) 
+        distance_to_center = distance_from_center_for_best(self.flat_structure, score)
+        
+        bdist_scale = dict(min_value=0, max_value=max_d, max_color=[0, 1, 0])
+        d = report.data('distance_to_border', distance_to_border).display('scale', **bdist_scale)
+        d.add_to(f, caption='Distance to border of best guess, white=0, green=%d' % max_d)
+        
+        cdist_scale = dict(min_value=0, max_value=max_d, max_color=[1, 0, 0])
+        d = report.data('distance_to_center', distance_to_center).display('scale', **cdist_scale)
+        d.add_to(f, caption='Distance to center of best guess, white=0, red=%d' % max_d)
+        
+        bins = np.array(range(max_d + 2))
+        # values will be integers (0, 1, 2, ...), center bins appropriately
+        bins = bins - 0.5
+        with f.plot('distance_to_border_hist') as pylab:
+            pylab.hist(distance_to_border.flat, bins)
+        
+        with f.plot('distance_to_center_hist') as pylab:
+            pylab.hist(distance_to_center.flat, bins)
+            plot_safe(pylab)
+    
+    def _get_score(self):
         if self.inference_method == DiffeomorphismEstimatorFaster.Order:
-            eord = self.make_grid(self.neig_eord_score)
-            report.data('neig_eord_score_rect', eord).display('scale').add_to(f, caption='order')
-            eord_bdist = distance_to_border_for_best(self.neig_eord_score)
-            eord_cdist = distance_from_center_for_best(self.neig_eord_score)
-            report.data('eord_bdist', eord_bdist).display('scale', **bdist_scale).add_to(f, caption='eord_bdist')
-            report.data('eord_cdist', eord_cdist).display('scale', **cdist_scale).add_to(f, caption='eord_cdist')
-            with f.plot('eord_bdist_hist') as pylab:
-                pylab.hist(eord_bdist.flat, bins)
-            with f.plot('eord_cdist_hist') as pylab:
-                pylab.hist(eord_cdist.flat, bins)
-                plot_safe(pylab)
+            return self.neig_eord_score
 
         if self.inference_method == DiffeomorphismEstimatorFaster.Similarity:
-            esim = self.make_grid(self.neig_esim_score)
-            report.data('neig_esim_score_rect', esim).display('scale').add_to(f, caption='sim')
-            esim_bdist = distance_to_border_for_best(self.neig_esim_score)
-            esim_cdist = distance_from_center_for_best(self.neig_esim_score)
-            report.data('esim_bdist', esim_bdist).display('scale', **bdist_scale).add_to(f, caption='esim_bdist')
-            report.data('esim_cdist', esim_cdist).display('scale', **cdist_scale).add_to(f, caption='esim_cdist')
+            return self.neig_esim_score
         
-            with f.plot('esim_bdist_hist') as pylab:
-                pylab.hist(esim_bdist.flat, bins)
-            with f.plot('esim_cdist_hist') as pylab:
-                pylab.hist(esim_cdist.flat, bins)
-                plot_safe(pylab)
+        assert False
     
         
     @contract(score='array[NxA]', returns='array[UxV]')  # ,U*V=N*A') not with border
@@ -362,3 +345,24 @@ class DiffeomorphismEstimatorFaster(Diffeo2dEstimatorInterface):
         else:
             assert False
 
+@contract(score='array[NxA]', returns='array[HxW],H*W=N')
+def distance_to_border_for_best(flat_structure, score):
+    N, _ = score.shape
+    best = np.argmin(score, axis=1)
+    assert best.shape == (N,)
+    D = flat_structure.get_distances_to_area_border()
+    res = np.zeros(N)
+    for i in range(N):
+        res[i] = D[i, best[i]]
+    return flat_structure.flattening.flat2rect(res)
+
+@contract(score='array[NxA]', returns='array[HxW],H*W=N')
+def distance_from_center_for_best(flat_structure, score):
+    N, _ = score.shape
+    best = np.argmin(score, axis=1)
+    assert best.shape == (N,)
+    D = flat_structure.get_distances()
+    res = np.zeros(N)
+    for i in range(N):
+        res[i] = D[i, best[i]]
+    return flat_structure.flattening.flat2rect(res)

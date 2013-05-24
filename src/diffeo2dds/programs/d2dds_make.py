@@ -8,7 +8,7 @@ import os
 __all__ = ['MakeDDS']
 
 
-class MakeDDS(Diffeo2dds.sub):  # @UndefinedVariable
+class MakeDDS(Diffeo2dds.get_sub()):
     """ Creates synthetic DDS from the functions symbolically defined. """
     
     cmd = 'makedds'

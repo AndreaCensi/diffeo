@@ -29,8 +29,8 @@ class DDSLLearn(DDSL.sub, QuickApp):  # @UndefinedVariable
         
 def jobs_learning(context, estimator, stream):
     # learn
-    learner = context.comp(learn_from_stream, GlobalConfig.get_state(),
-                               stream=stream, estimator=estimator)
+    learner = context.comp_config(learn_from_stream,
+                                  stream=stream, estimator=estimator)
     # summarize
     dds = context.comp(get_estimated_dds, learner)
     
@@ -47,10 +47,8 @@ def jobs_learning(context, estimator, stream):
         
          
 @contract(stream='str', estimator='str')
-def learn_from_stream(global_config, stream, estimator):
+def learn_from_stream(stream, estimator):
     """ Returns the estimator instance at the end of the learning. """
-    GlobalConfig.set_state(global_config)
-    
     ddsl_config = get_diffeo2ddslearn_config()
         
     diffeo_learner = ddsl_config.diffeosystem_estimators.instance(estimator)
@@ -67,10 +65,8 @@ def learn_from_stream(global_config, stream, estimator):
 
 
 @contract(stream='str', estimator='str', i='int,>=0', n='int')
-def learn_from_stream_parallel(global_config, stream, estimator, i, n):
+def learn_from_stream_parallel(stream, estimator, i, n):
     """ This version also gives the parallel hints. """
-    GlobalConfig.set_state(global_config)
-    
     ddsl_config = get_diffeo2ddslearn_config()
 
     stream = ddsl_config.streams.instance(stream)

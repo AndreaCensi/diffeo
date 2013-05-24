@@ -4,7 +4,7 @@ import sys
 
 __all__ = ['DDSLList']
 
-class DDSLList(DDSL.sub):  # @UndefinedVariable
+class DDSLList(DDSL.get_sub()):
     """Lists the available configuration"""
     
     cmd = 'list'

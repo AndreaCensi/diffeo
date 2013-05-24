@@ -1,6 +1,7 @@
 from contracts import new_contract, contract
 from diffeo2d.misc_utils import coords_iterate
 import numpy as np
+from astatsa.utils.np_comparisons import show_some
 
 __all__ = ['valid_diffeomorphism', 'diffeo_identity',
            'coords_to_X', 'X_to_coords',
@@ -22,20 +23,24 @@ __all__ = ['valid_diffeomorphism', 'diffeo_identity',
 # @contract(x='array[MxNx2](int32|float32)')
 @contract(x='array[MxNx2]')
 def valid_diffeomorphism(x):
-#     tests = [False] * 4
-#     tests[0] = (0 <= x[:, :, 0]).all()
-#     tests[1] = (x[:, :, 0] < M).all()
-#     tests[2] = (0 <= x[:, :, 1]).all()
-#     tests[3] = (x[:, :, 1] < N).all()
-#     warnings.warn('skipping assertions, would have been :%s' % tests)
-    
     M, N = x.shape[0], x.shape[1]
-    assert (0 <= x[:, :, 0]).all()
-    assert (x[:, :, 0] < M).all()
-    assert (0 <= x[:, :, 1]).all()
-    assert (x[:, :, 1] < N).all()
-
-
+    
+    c = [
+         ('0 <= x[:, :, 0]', x[:, :, 0], lambda y: 0 <= y),
+         ('x[:, :, 0] < %s' % M, x[:, :, 0], lambda y: y < M),
+         ('0 <= x[:, :, 1]', x[:, :, 1], lambda y: 0 <= y),
+         ('x[:, :, 1] < %s' % N, x[:, :, 1], lambda y: y < N),
+    ]
+    
+    m = ''
+    for condition, x, check in c:
+        checks = check(x)
+        if not np.all(checks):
+            m += show_some(x, np.logical_not(checks), condition, MAX_N=4) + '\n'
+            
+    if m:
+        raise ValueError(m)
+    
 @contract(shape='valid_2d_shape', returns='valid_diffeomorphism')
 def diffeo_identity(shape):
     M = shape[0]

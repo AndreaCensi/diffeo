@@ -1,9 +1,19 @@
 from abc import abstractmethod, ABCMeta
-from collections import namedtuple
+from diffeo2dds.model.uncertain_image import any_image_to_rgb
 
+class LogItem():
 
-LogItem = namedtuple('LogItem', 'y0 u y1 x0')
-
+    def __init__(self, y0, u, y1, x0=None):
+        self.y0 = y0
+        self.u = u
+        self.y1 = y1
+        self.x0 = x0
+        
+    def display(self, report):
+        f = report.figure()
+        f.data_rgb('y0', any_image_to_rgb(self.y0))
+        f.data_rgb('y1', any_image_to_rgb(self.y1))
+        
 
 class Stream(object):
     """ 

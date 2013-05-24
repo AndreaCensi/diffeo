@@ -18,12 +18,15 @@ class DiffeoSystemSimulation(RobotInterface):
         Simulation of a DiffeoSystem as a RobotInterface.
     """
     
+    @contract(image_stream='str|code_spec',
+              discdds='str|code_spec')
     def __init__(self, image_stream, discdds):
         '''
-        :param id_discdds: Which DDS dynamics to use.
+        :param discdds: Which DDS dynamics to use.
         
-        :param id_image_stream: What ImageStream to use. Each 
-        image is used to start a new episode.
+        :param image_stream: What ImageStream to use. 
+        Each image is used to start a new episode.
+        
         
         '''
         diffeo2ddslearn_config = get_diffeo2ddslearn_config()

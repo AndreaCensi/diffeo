@@ -4,7 +4,7 @@ import sys
 
 __all__ = ['Diffeo2ddsList']
 
-class Diffeo2ddsList(Diffeo2dds.sub):  # @UndefinedVariable
+class Diffeo2ddsList(Diffeo2dds.get_sub()):
     cmd = 'list'
     description = 'Lists the available configuration'
     

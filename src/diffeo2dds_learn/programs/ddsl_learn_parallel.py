@@ -35,7 +35,7 @@ def jobs_learning_parallel(context, estimator, stream, nthreads, intermediate_re
     for i in range(nthreads):
         c = context.child('c%d' % (i + 1))
         
-        learner_i = c.comp(learn_from_stream_parallel, GlobalConfig.get_state(),
+        learner_i = c.comp_config(learn_from_stream_parallel,
                            stream=stream, estimator=estimator, i=i, n=nthreads,
                            job_id='learn')
     

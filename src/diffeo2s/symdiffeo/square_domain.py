@@ -10,6 +10,8 @@ class SquareDomain:
         self.upper = np.array([x[1] for x in bounds])
         self.lower = np.array([x[0] for x in bounds])
     
-    @contract(p='array[N]')
+    @contract(p='seq[N]')
     def belongs(self, p):
-        return np.all(np.logical_and(p >= self.lower, p <= self.upper))
+        return np.all(np.logical_and(p >= self.lower,
+                                     p <= self.upper))
+        

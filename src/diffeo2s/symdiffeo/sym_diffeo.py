@@ -46,7 +46,7 @@ class SymbolicDiffeo(object):
             Computes the diffeomorphism applied to a point. 
         """
 
-    @contract(point='seq[2](number)')
+    @contract(point='seq[2](number)|array[2](float32)')
     def __call__(self, point):
         return self.apply(np.array(point))
     

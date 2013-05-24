@@ -1,24 +1,24 @@
-- id: test_random_dpx1
-  desc: Synthetic random stream
-  code:
-  - diffeo2dds_sim.library.RobotInteractionStream
-  - agent: random_agent
-    robot: 
-    - diffeo2dds_sim.library.DiffeoSystemSimulation
-    - image_stream:
-      - diffeo2dds_learn.library.RandomImageStream
-      - shape: [64, 64]
-        seed: 42
-        length: 1000
-      discdds: 
-      - diffeo2dds.DDSFromSymbolic
-      - resolution: 64
-        actions: 
-        - original_cmd: [1] # for visualization
-          diffeo: px1
-        - original_cmd: [-1]
-          diffeo: Ipx1
-        topology: plane
+# - id: test_random_dpx1
+#   desc: Synthetic random stream
+#   code:
+#   - diffeo2dds_sim.library.RobotInteractionStream
+#   - agent: random_agent
+#     robot: 
+#     - diffeo2dds_sim.library.DiffeoSystemSimulation
+#     - image_stream:
+#       - diffeo2dds_learn.library.RandomImageStream
+#       - shape: [64, 64]
+#         seed: 42
+#         length: 1000
+#       discdds: 
+#       - diffeo2dds.DDSFromSymbolic
+#       - resolution: 64
+#         actions: 
+#         - original_cmd: [1] # for visualization
+#           diffeo: px1
+#         - original_cmd: [-1]
+#           diffeo: Ipx1
+#         topology: plane
 
 
 - id: "test_random_${id_symdds}_${resolution}_${n}"
@@ -28,7 +28,8 @@
   - n: "${n}"
     stream:
     - diffeo2dds_sim.library.RobotInteractionStream
-    - agent: random_agent
+    - obs_per_episode: 1 
+      agent: random_agent
       robot: 
       - diffeo2dds_sim.library.DiffeoSystemSimulation
       - image_stream:
@@ -39,6 +40,36 @@
          - diffeo2dds.DDSFromSymbolic
          - resolution: "${resolution}"
            symdiffeosystem: "${id_symdds}"
+
+
+- id: "test_gauss_${id_symdds}_${resolution}_${n}"
+  desc: "Synthetic coherent random stream (symdds ${id_symdds}, resolution ${resolution})"
+  code:
+  - diffeo2dds_learn.library.LimitStream
+  - n: "${n}"
+    stream:
+    - diffeo2dds_sim.library.RobotInteractionStream
+    - obs_per_episode: 1 
+      agent: random_agent
+      robot: 
+      - bootstrapping_olympics.library.robots.EquivRobot
+      - robot:
+        - diffeo2dds_sim.library.DiffeoSystemSimulation
+        - image_stream:
+          - diffeo2dds_learn.library.CoherentRandomImageStream
+          - shape: ["${resolution}", "${resolution}"]
+            seed: 42
+            level: 0.9
+          discdds: 
+           - diffeo2dds.DDSFromSymbolic
+           - resolution: "${resolution}"
+             symdiffeosystem: "${id_symdds}"
+        cmd_nuisance: []
+        obs_nuisance: 
+        - - bootstrapping_olympics.library.nuisances.Trim
+          - trim: [[2,2],[2,2]]
+
+
 
 
 - id: "test_random_dpx1_64_10"

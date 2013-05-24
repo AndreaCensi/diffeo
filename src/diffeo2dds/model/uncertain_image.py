@@ -2,8 +2,9 @@ import numpy as np
 from contracts import contract
 from diffeo2d.visualization import scalaruncertainty2rgb
 from diffeo2s.utils import resample_signal, resample_signal_2d
+from reprep.graphics.filter_scale import scale
  
-__all__ = ['UncertainImage']
+__all__ = ['UncertainImage', 'any_image_to_rgb']
  
 class UncertainImage(object):
     
@@ -128,4 +129,25 @@ class UncertainImage(object):
         return ("UncertainImage(%s;y in [%s,%s];u in [%s,%s])" % 
                 (self._values.shape, self._values.min(), self._values.max(),
                  self.scalar_uncertainty.min(), self.scalar_uncertainty.max()))
-                 
+         
+
+@contract(y='array[HxW](float32,>=0,<=1)'
+          '|array[HxWx3](float32,>=0,<=1)'
+          '|array[HxWx3](uint8)',
+          returns='array[HxWx3](uint8)')
+def any_image_to_rgb(y):
+    def bail():
+        msg = 'Invalid image shape %s dtype %s' % (y.shape, y.dtype)
+        raise ValueError(msg)
+    if y.ndim == 2:
+        if not(y.dtype == 'float32'):
+            bail()
+        return scale(y)
+    if y.dtype == 'uint8':
+        if not y.ndim == 3 and y.shape[2] == 3:
+            bail()
+        return y
+    if not y.ndim == 3 and y.dtype == 'float32':
+        bail()
+    return (y * 255).astype('uint8')
+        
