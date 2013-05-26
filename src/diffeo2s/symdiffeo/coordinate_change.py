@@ -1,4 +1,4 @@
-from . import SymbolicDiffeo
+from diffeo2s import SymbolicDiffeo
 from contracts import contract
 import numpy as np
 

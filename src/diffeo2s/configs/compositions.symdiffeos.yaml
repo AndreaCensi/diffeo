@@ -3,7 +3,7 @@
 - id: "I${diffeo}"
   desc: "Inverse of ${diffeo}"
   code:
-  - diffeo2s.make_inverse
+  - diffeo2s.library.make_inverse
   - id_diffeo: "${diffeo}"
 
 
@@ -18,21 +18,21 @@
 - id: "R2${diffeo}"
   desc: "Double application of ${diffeo}"
   code:
-  - diffeo2s.repeat
+  - diffeo2s.library.repeat
   - id_diffeo: "${diffeo}"
     times: 2
 
 - id: "R3${diffeo}"
   desc: "Triple application of ${diffeo}"
   code:
-  - diffeo2s.repeat
+  - diffeo2s.library.repeat
   - id_diffeo: "${diffeo}"
     times: 3
 
 - id: "R4${diffeo}"
   desc: "Triple application of ${diffeo}"
   code:
-  - diffeo2s.repeat
+  - diffeo2s.library.repeat
   - id_diffeo: "${diffeo}"
     times: 4
 
@@ -40,7 +40,7 @@
 - id: "R5${diffeo}"
   desc: "Triple application of ${diffeo}"
   code:
-  - diffeo2s.repeat
+  - diffeo2s.library.repeat
   - id_diffeo: "${diffeo}"
     times: 5
 

@@ -17,12 +17,13 @@ __all__ = ['DiffeomorphismEstimatorDoubleRefine']
 
 class DiffeomorphismEstimatorDoubleRefine(Diffeo2dEstimatorInterface, BootWithInternalLog):
     
+    """ Does not support parallel merging yet. """
     
     @contract(g='int,>1', gamma='float,>1',
               desired_resolution_factor='float',
               change_threshold='float,>=0')
     def __init__(self, g, gamma, desired_resolution_factor,
-                 change_threshold, min_shape):
+                 change_threshold, min_shape, inference_method='order'):
         '''
         
         :param max_displ:
@@ -30,6 +31,7 @@ class DiffeomorphismEstimatorDoubleRefine(Diffeo2dEstimatorInterface, BootWithIn
         :param desired_resolution_factor: 1 = native resolution, >1 better
         '''
         # parameters
+        self.inference_method = inference_method
         self.desired_resolution_factor = desired_resolution_factor
         self.g = g
         self.gamma = gamma
@@ -99,7 +101,7 @@ class DiffeomorphismEstimatorDoubleRefine(Diffeo2dEstimatorInterface, BootWithIn
         
     @contract(max_displ='seq[2](>0,<1)')
     def _get_phase_estimator(self, max_displ):
-        estimator = DiffeomorphismEstimatorFasterGuess(inference_method='order')
+        estimator = DiffeomorphismEstimatorFasterGuess(inference_method=self.inference_method)
         estimator.set_max_displ(max_displ)
         return estimator
     
@@ -122,11 +124,20 @@ class DiffeomorphismEstimatorDoubleRefine(Diffeo2dEstimatorInterface, BootWithIn
         
         self.check_should_switch()
 
+    def info(self, s):
+        if self.current_phase is None:
+            prefix = 'not initialized'
+        else:
+            phase = self.phases[self.current_phase]
+            prefix = ('phase #%d shape %s it %5d' % (self.current_phase,
+                                                    phase.shape, self.phase_obs))
+        BootWithInternalLog.info(self, prefix + ':' + s)
+        
     def check_should_switch(self):
         check_every = 50
         if self.phase_obs % check_every != 0:
             return
-        self.info('Checking at iteration %s' % self.phase_obs)
+        
         estimator = self.estimators[self.current_phase]
         
         if self.last_tmp_guess is None:
@@ -137,12 +148,10 @@ class DiffeomorphismEstimatorDoubleRefine(Diffeo2dEstimatorInterface, BootWithIn
         # self.info('Creating new guess')
         cur_guess = estimator.get_value()
 
-        
         mean_changes = np.mean(np.abs(cur_guess.d - self.last_tmp_guess.d))
         self.last_tmp_guess = cur_guess
         
-        self.info('%d: Mean change since last guess: %f' 
-                  % (self.phase_obs, mean_changes))
+        self.info('Mean change since last guess: %f' % (mean_changes))
         
         # should_switch = self.phase_obs >= obs_per_phase
         should_switch = mean_changes <= self.change_threshold
@@ -157,6 +166,9 @@ class DiffeomorphismEstimatorDoubleRefine(Diffeo2dEstimatorInterface, BootWithIn
 
 
     def display(self, report):
+        if not self.initialized():
+            report.text('warning', 'Estimator not initialized')
+            return
         for i, e in enumerate(self.estimators):
             with report.subsection('phase%d' % i) as sub:
                 e.display(sub) 

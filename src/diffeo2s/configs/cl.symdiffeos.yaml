@@ -3,9 +3,10 @@
 - id: "X${lvel}_R${avel}"
   desc: "Forward at .${lvel} units/s and right at ${avel} deg/s."
   code: 
-  - diffeo2dds.MotionDiffeo
+  - diffeo2s.library.MotionDiffeo
   - interval: 1
     avel: "${avel}"
     lvel: ["${lvel}", 0.0]
     topology: plane
  
+# - id: X0.1_R0.1

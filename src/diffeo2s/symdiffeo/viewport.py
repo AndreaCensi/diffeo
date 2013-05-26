@@ -1,8 +1,8 @@
+from . import SquareDomain, LinearCoordinateChange
 from contracts import contract
-import numpy as np
-from . import SquareDomain, SymbolicDiffeo, LinearCoordinateChange
 from diffeo2d.misc_utils import coords_iterate
- 
+from diffeo2s import SymbolicDiffeo
+import numpy as np
 
 __all__ = ['diffeo_from_function_viewport']
 
@@ -10,7 +10,7 @@ __all__ = ['diffeo_from_function_viewport']
 @contract(diffeo=SymbolicDiffeo, viewport=SquareDomain, shape='valid_2d_shape',
           returns='tuple(valid_diffeomorphism, array[HxW])')
 def diffeo_from_function_viewport(diffeo, manifold, viewport, shape):
-    domain = SquareDomain([[0, shape[0]], [0, shape[1]]]) 
+    domain = SquareDomain([[0, shape[0] - 1], [0, shape[1] - 1]]) 
     domain2viewport = LinearCoordinateChange(domain.bounds, viewport.bounds)
     viewport2domain = domain2viewport.get_inverse()
     # Prepare the grid

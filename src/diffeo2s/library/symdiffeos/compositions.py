@@ -1,6 +1,5 @@
-from . import SymbolicDiffeo
 from contracts import contract
-from ..configuration import get_diffeo2s_config
+from diffeo2s import SymbolicDiffeo, get_diffeo2s_config
 
 __all__ = ['SymDiffeoComposition', 'make_chain', 'make_inverse', 'repeat']
 

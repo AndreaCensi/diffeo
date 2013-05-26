@@ -1,11 +1,13 @@
+from astatsa.utils import show_some
 from contracts import new_contract, contract
-from diffeo2d.misc_utils import coords_iterate
 import numpy as np
-from astatsa.utils.np_comparisons import show_some
+from .misc_utils import coords_iterate
 
-__all__ = ['valid_diffeomorphism', 'diffeo_identity',
-           'coords_to_X', 'X_to_coords',
 
+__all__ = ['valid_diffeomorphism',
+            'diffeo_identity',
+            'coords_to_X',
+            'X_to_coords',
             'diffeo_compose',
             'diffeo_apply',
             'diffeo_local_differences',

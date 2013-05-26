@@ -1,4 +1,4 @@
-from . import diffeo_torus
+from .utils import diffeo_torus
 
 @diffeo_torus
 def identity(X):

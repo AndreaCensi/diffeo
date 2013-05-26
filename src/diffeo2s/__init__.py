@@ -1,5 +1,5 @@
 from diffeo2d import logger
-
-from . import library
-from .symdiffeo import *
 from .configuration import *
+from .interfaces import *
+from .symdiffeo import *
+from . import library

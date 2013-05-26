@@ -1,4 +1,4 @@
-from .diffeomorphism2d import Diffeomorphism2D
+from diffeo2d import Diffeomorphism2D
 from .visualization import angle_legend, scalaruncertainty2rgb
 from reprep import Report
 import numpy as np

@@ -1,5 +1,5 @@
-from . import SymbolicDiffeo
 from contracts import contract
+from diffeo2s import SymbolicDiffeo
 import geometry
 import numpy as np
 

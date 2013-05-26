@@ -2,7 +2,8 @@ from contracts import contract
 from diffeo2d import Diffeomorphism2D
 from diffeo2dds import get_diffeo2dds_config, logger, DiffeoAction, DiffeoSystem
 from diffeo2s import (SquareDomain, diffeo_from_function_viewport,
-    get_diffeo2s_config, make_chain)
+    get_diffeo2s_config)
+from diffeo2s.library.symdiffeos.compositions import make_chain
 import numpy as np
 
 __all__ = ['DDSFromSymbolic']

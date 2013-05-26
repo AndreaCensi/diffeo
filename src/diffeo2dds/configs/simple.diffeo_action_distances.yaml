@@ -1,0 +1,21 @@
+- id: "s-${dd}"
+  desc: "Symmetrized action distance built from ${dd}"
+  code:
+  - diffeo2dds.library.SymmetricDiffeoDistance.from_yaml
+  - diffeo2d_distance: "${dd}"
+
+- id: s-L2
+- id: s-L2iw
+
+
+- id: L2_infow
+  desc: "Symmetrized action distance built from L2, weighted by info"
+  code:
+  - diffeo2dds.library.SymmetricDiffeoDistance.from_yaml
+  - diffeo2d_distance: L2_infow
+
+- id: L2
+  desc: "Symmetrized action distance built from L2"
+  code:
+  - diffeo2dds.library.SymmetricDiffeoDistance.from_yaml
+  - diffeo2d_distance: L2

@@ -1,0 +1,17 @@
+- id: L2
+  desc: "Simple L2 distance"
+  code:
+  - diffeo2d.library.DDL2
+  - {}
+
+- id: L2iw
+  desc: "Simple L2 distance, weighted by information"
+  code:
+  - diffeo2d.library.DDL2iw
+
+
+# - id: L2iw
+#   desc: "Simple L2 distance, weighted by information and scaled (?)"
+#   code:
+#   - diffeo2d.library.DDL2iw
+#   

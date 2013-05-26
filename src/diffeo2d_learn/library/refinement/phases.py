@@ -24,15 +24,20 @@ class PhaseInfo():
             msg += ' - grid: %s\n' % str(self.grid)
             
             raise ValueError(msg)
-        
+
+    @contract(returns='array[2](float)')
+    def get_cell_size(self):
+        """ Returns the cell size in relative units """
+        return self.max_displ / self.grid
+
+            
     @contract(returns='array[2](float)')
     def get_displacement(self):
         return self.grid * 1.0 / self.shape
         
     def __str__(self):
-        resolution = self.max_displ / self.grid
-        return ('Phase(shape=%s, max_displ=%s, grid=%s => solution discretization = %s)' % 
-                (self.shape, self.max_displ, self.grid, resolution))
+        return ('Phase(shape=%s, max_displ=%s, grid=%s => cell sizes = %s)' % 
+                (self.shape, self.max_displ, self.grid, self.get_cell_size()))
         
 @contract(orig_shape='seq[2](int)',
           min_shape='seq[2](int)',
@@ -52,6 +57,8 @@ def get_phase_sequence(orig_shape, desired_resolution_factor, search_grid, gamma
     # for this to work, it means that the displacement is
     last_max_displ = last_search_grid * 1.0 / last_shape
     
+    honor_min_shape = True
+    
     last = PhaseInfo(grid=search_grid,
                      shape=np.array(last_shape),
                      max_displ=last_max_displ)
@@ -63,8 +70,9 @@ def get_phase_sequence(orig_shape, desired_resolution_factor, search_grid, gamma
         if np.all(p.max_displ >= max_displ):
             break
         p2_shape = np.floor(p.shape / gamma).astype('int')
-        # make sure we are not undersampling too much 
-        p2_shape = np.maximum(p2_shape, min_shape)
+        # make sure we are not undersampling too much
+        if honor_min_shape: 
+            p2_shape = np.maximum(p2_shape, min_shape)
         # now we know how much we want
         p2_max_displ = p.max_displ * gamma
         # so what would be the grid to realize it?
@@ -73,6 +81,7 @@ def get_phase_sequence(orig_shape, desired_resolution_factor, search_grid, gamma
         p2 = PhaseInfo(grid=p2_grid, shape=p2_shape, max_displ=p2_max_displ)
         phases.append(p2)
         
+    
         # TODO: make sure the resolution is increasing
 #         
 # - Phase(shape=[32 32], max_displ=[ 0.31864481  0.31864481], grid=[ 11.  11.] => solution discretization = [ 0.02896771  0.02896771])
@@ -86,4 +95,51 @@ def get_phase_sequence(orig_shape, desired_resolution_factor, search_grid, gamma
     
     phases = phases[::-1]
     
+    if honor_min_shape:
+        phases = fix_problems2(phases)
+        
+    
     return phases
+
+def fix_problems(phases):
+    # Let's fix some problems that might arise
+    # basically it does not make sense to have the same shape 
+    # but the discretization increases
+    res = []
+    for p in phases:
+        if not res:
+            res.append(p)
+            continue
+        
+        prev = res[-1]
+        # if two have the same shape
+        if np.any(p.shape != prev.shape):
+            res.append(p)
+            continue
+        
+        # we require that the cell size is smaller 
+        prev_size = prev.get_cell_size()
+        p_size = p.get_cell_size()
+        not_ok = np.all(p_size <= prev_size)
+        
+        if not_ok:
+            continue
+        else:
+            res.append(p)
+                    
+    return res
+
+def fix_problems2(phases):
+    """ Here we ignore if the shape is the same """
+    res = []
+    for p in phases:
+        if not res:
+            res.append(p)
+            continue
+        
+        prev = res[-1]
+        # ignore if two have the same shape
+        if np.any(p.shape != prev.shape):
+            res.append(p)
+                    
+    return res

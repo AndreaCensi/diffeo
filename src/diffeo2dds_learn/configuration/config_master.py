@@ -1,7 +1,15 @@
 from conf_tools import ConfigMaster
+from contracts import contract
+from conf_tools.objspec import ObjectSpec
 
 
-__all__ = ['get_diffeo2ddslearn_config']
+__all__ = [
+   'get_diffeo2ddslearn_config',
+   'get_conftools_diffeoaction_estimators',
+   'get_conftools_diffeosystem_estimators',
+   'get_conftools_image_streams',
+   'get_conftools_streams'
+]
 
 class Diffeo2ddsLearnConfig(ConfigMaster):
     def __init__(self):
@@ -37,7 +45,30 @@ class Diffeo2ddsLearnConfig(ConfigMaster):
  
 get_diffeo2ddslearn_config = Diffeo2ddsLearnConfig.get_singleton 
 
+@contract(returns=ObjectSpec)
+def get_conftools_diffeoaction_estimators():
+    """ Returns the object responsible for instancing UncertainImages. """
+    return get_diffeo2ddslearn_config().diffeoaction_estimators
 
 
+@contract(returns=ObjectSpec)
+def get_conftools_diffeosystem_estimators():
+    """ Returns the object responsible for instancing UncertainImages. """
+    return get_diffeo2ddslearn_config().diffeosystem_estimators
 
 
+@contract(returns=ObjectSpec)
+def get_conftools_streams():
+    """ 
+        Returns the object responsible for instancing Streams
+        of LogItem. 
+    """
+    return get_diffeo2ddslearn_config().streams
+
+
+@contract(returns=ObjectSpec)
+def get_conftools_image_streams():
+    """ 
+        Returns the object responsible for instancing ImageStream.
+    """
+    return get_diffeo2ddslearn_config().ImageStream

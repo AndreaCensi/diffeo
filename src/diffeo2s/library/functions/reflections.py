@@ -1,6 +1,7 @@
 import numpy as np
-from . import diffeo_torus_reflection
+from .utils import diffeo_torus_reflection
 
+__all__ = ['refx', 'refy', 'refxy', 'tran']
 
 @diffeo_torus_reflection
 def refx(X):

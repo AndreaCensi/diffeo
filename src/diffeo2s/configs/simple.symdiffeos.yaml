@@ -8,7 +8,7 @@
 - id: pid
   desc: "Identity (on plane)"
   code: 
-  - diffeo2s.EvalDiffeo
+  - diffeo2s.library.EvalDiffeo
   - function: '[x, y]' 
     inverse:  '[x, y]'
     topology: plane
@@ -16,7 +16,7 @@
 - id: tid
   desc: "Identity (on torus)"
   code: 
-  - diffeo2s.EvalDiffeo
+  - diffeo2s.library.EvalDiffeo
   - function: '[x, y]' 
     inverse:  '[x, y]'
     topology: torus
@@ -24,7 +24,7 @@
 - id: px1
   desc: "Horizontal translation (left), plane topology"
   code: 
-  - diffeo2s.EvalDiffeo
+  - diffeo2s.library.EvalDiffeo
   - function: '[x+0.05, y]' 
     inverse:  '[x-0.05, y]'
     topology: plane
@@ -32,7 +32,7 @@
 - id: tx1
   desc: "Horizontal translation (left), toroidal topology"
   code: 
-  - diffeo2s.EvalDiffeo
+  - diffeo2s.library.EvalDiffeo
   - function: '[x+0.05, y]' 
     inverse:  '[x-0.05, y]'
     topology: torus
@@ -41,7 +41,7 @@
 - id: py1
   desc: Vertical translation  (up)
   code: 
-  - diffeo2s.EvalDiffeo
+  - diffeo2s.library.EvalDiffeo
   - function: '[x, y+0.05]' 
     inverse:  '[x, y-0.05]'
     topology: plane
@@ -49,7 +49,7 @@
 - id: ty1
   desc: Vertical translation  (up)
   code: 
-  - diffeo2s.EvalDiffeo
+  - diffeo2s.library.EvalDiffeo
   - function: '[x, y+0.05]' 
     inverse:  '[x, y-0.05]'
     topology: torus
@@ -57,7 +57,7 @@
 - id: pr1
   desc: Rotation of 15 degrees around the center (plane topology)
   code: 
-  - diffeo2s.EvalDiffeo
+  - diffeo2s.library.EvalDiffeo
   - function: 'rotdeg(p,+15)' 
     inverse:  'rotdeg(p,-15)' 
     topology: plane
@@ -65,7 +65,7 @@
 - id: tr1
   desc: Rotation of 15 degrees around the center (torus topology)
   code: 
-  - diffeo2s.EvalDiffeo
+  - diffeo2s.library.EvalDiffeo
   - function: 'rotdeg(p,+15)' 
     inverse:  'rotdeg(p,-15)' 
     topology: torus
@@ -73,7 +73,7 @@
 - id: pz1
   desc: Zoom in the middle of the image
   code: 
-  - diffeo2s.EvalDiffeo
+  - diffeo2s.library.EvalDiffeo
   - function: 'p * 1.1' 
     inverse:  'p / 1.1' 
     topology: plane
@@ -95,7 +95,7 @@
 - id: "pR${deg}"
   desc: "Rotation of ${deg} degrees around the center (plane topology)"
   code: 
-  - diffeo2s.EvalDiffeo
+  - diffeo2s.library.EvalDiffeo
   - function: 'rotdeg(p,+${deg})' 
     inverse:  'rotdeg(p,-${deg})' 
     topology: plane
@@ -103,7 +103,7 @@
 - id: "pX${perc}"
   desc: "Horizontal translation (left) of ${perc}%, plane topology"
   code: 
-  - diffeo2s.EvalDiffeo
+  - diffeo2s.library.EvalDiffeo
   - function: '[x+0.${perc}*2, y]'  # viewport is [-1,+1]
     inverse:  '[x-0.${perc}*2, y]'
     topology: plane

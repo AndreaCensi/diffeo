@@ -110,8 +110,8 @@ class DiffeoSystemEstimatorFlexible(DiffeoSystemEstimatorInterface):
             except DiffeoActionEstimatorInterface.NotReady:
                 logger.info('Skipping command %r %r' % (i, command))
                 continue
-                
-            action.command = command
+            action.original_cmd = command
+            # action.command = command
             action.label = name
                             
             action_list.append(action)

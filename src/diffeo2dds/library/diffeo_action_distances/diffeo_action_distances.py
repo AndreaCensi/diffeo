@@ -1,42 +1,51 @@
-from .diffeo_action import DiffeoAction
+from .from_diffeo_distance import SymmetricDiffeoDistance
 from contracts import contract
 from diffeo2d import Diffeomorphism2D
+from diffeo2d.library import DDL2, DDL2iw, DDL2iws
+from diffeo2dds import DiffeoAction
 
 __all__ = [
-    'UncertainDiffeoDistance',
-    'DiffeoActionDistance',
     'diffeoaction_comm_distance_L2_infow',
     'diffeoaction_comm_distance_L2',
     'diffeoaction_comm_distance',
     'diffeoaction_anti_distance_L2_infow',
     'diffeoaction_anti_distance_L2',
     'diffeoaction_anti_distance',
-    'diffeoaction_distance']
+    # 'diffeoaction_distance',
+    'diffeoaction_distance_L2',
+    'diffeoaction_distance_L2_infow',
+    'diffeoaction_distance_L2_infow_scaled']
  
-@contract(a1=DiffeoAction, a2=DiffeoAction)
-def diffeoaction_distance(a1, a2, diffeo_distance):
-    """ 
-        Returns the distance between two DiffeoActions
-        as the average of the L2 distance between
-        forward and backward diffeomorphism.
-    """
-    # Note:  forward, forward
-    d = diffeo_distance(a1.diffeo, a2.diffeo)
-    # Note: backward, backward
-    d_inv = diffeo_distance(a1.diffeo_inv, a2.diffeo_inv)
-    return 0.5 * d + 0.5 * d_inv
+diffeoaction_distance_L2 = SymmetricDiffeoDistance(DDL2())
+diffeoaction_distance_L2_infow = SymmetricDiffeoDistance(DDL2iw())
+diffeoaction_distance_L2_infow_scaled = SymmetricDiffeoDistance(DDL2iws())
 
-@contract(a1=DiffeoAction, a2=DiffeoAction)
-def diffeoaction_distance_L2(a1, a2):
-    return diffeoaction_distance(a1, a2, Diffeomorphism2D.distance_L2)
 
-@contract(a1=DiffeoAction, a2=DiffeoAction)
-def diffeoaction_distance_L2_infow(a1, a2):
-    return diffeoaction_distance(a1, a2, Diffeomorphism2D.distance_L2_infow)
+# @contract(a1=DiffeoAction, a2=DiffeoAction)
+# def diffeoaction_distance(a1, a2, diffeo_distance):
+#     """ 
+#         Returns the distance between two DiffeoActions
+#         as the average of the L2 distance between
+#         forward and backward diffeomorphism.
+#     """
+#     # Note:  forward, forward
+#     d = diffeo_distance(a1.diffeo, a2.diffeo)
+#     # Note: backward, backward
+#     d_inv = diffeo_distance(a1.diffeo_inv, a2.diffeo_inv)
+#     return 0.5 * d + 0.5 * d_inv
 
-@contract(a1=DiffeoAction, a2=DiffeoAction)
-def diffeoaction_distance_L2_infow_scaled(a1, a2):
-    return diffeoaction_distance(a1, a2, Diffeomorphism2D.distance_L2_infow_scaled)
+# @contract(a1=DiffeoAction, a2=DiffeoAction)
+# def diffeoaction_distance_L2(a1, a2):
+#     return diffeoaction_distance(a1, a2, Diffeomorphism2D.distance_L2)
+# 
+# @contract(a1=DiffeoAction, a2=DiffeoAction)
+# def diffeoaction_distance_L2_infow(a1, a2):
+#     return diffeoaction_distance(a1, a2, Diffeomorphism2D.distance_L2_infow)
+
+# 
+# @contract(a1=DiffeoAction, a2=DiffeoAction)
+# def diffeoaction_distance_L2_infow_scaled(a1, a2):
+#     return diffeoaction_distance(a1, a2, Diffeomorphism2D.distance_L2_infow_scaled)
 
 
 @contract(a1=DiffeoAction, a2=DiffeoAction)
@@ -78,17 +87,3 @@ def diffeoaction_comm_distance_L2_infow(a1, a2):
     return diffeoaction_comm_distance(a1, a2, diffeoaction_distance_L2_infow)
 
 
-
-class UncertainDiffeoDistance(object):
-    
-    @contract(d1=Diffeomorphism2D, d2=Diffeomorphism2D)
-    def distance(self, d1, d2):
-        raise NotImplemented
-    
-    
-class DiffeoActionDistance(object):
-
-    @contract(a1=DiffeoAction, a2=DiffeoAction)
-    def distance(self, a1, a2):
-        raise NotImplemented
-        

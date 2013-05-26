@@ -1,7 +1,7 @@
 import numpy as np 
 from contracts import contract
 from numpy import cos, pi
-from diffeo2s.library.utils import diffeo_torus
+from .utils import diffeo_torus
 
 P = 3.0
 

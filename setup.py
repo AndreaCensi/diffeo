@@ -14,7 +14,7 @@ setup(
     author_email="andrea@cds.caltech.edu",
     url='http://andreacensi.github.io/diffeo/',
     version=version,
-    description="Code for representing and learning diffeomorphisms",
+    description="Library for representing and learning diffeomorphisms",
     long_description=read('README.md'),
     keywords="",
     license="LGPL",
@@ -23,9 +23,6 @@ setup(
         'Intended Audience :: Developers',
         'Intended Audience :: Science/Research',
         'Topic :: Scientific/Engineering',
-        'Topic :: System :: Clustering',
-        'Topic :: System :: Distributed Computing',
-        'Topic :: System :: Hardware :: Symmetric Multi-processing',
         'License :: OSI Approved :: GNU Library or '
         'Lesser General Public License (LGPL)',
     ],
@@ -35,9 +32,6 @@ setup(
     entry_points={
      'console_scripts': [
        'diffeo = diffeo:diffeo_main',
-       'ds = diffeo2s.programs:d2s_main',
-       'dds = diffeo2dds.programs:d2dds_main',
-       'ddsl = diffeo2dds_learn.programs:ddsl_main',
       ]
     },
       
@@ -50,10 +44,5 @@ setup(
     ],
 
     tests_require=['nose']
-    # extras_require={
-    # 'multiprocessing':  ['redis']
-    # # TODO: learn how to use this feature
-    # # TODO: add gvgen
-    # }
 )
 

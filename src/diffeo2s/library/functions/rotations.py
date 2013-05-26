@@ -1,5 +1,6 @@
 import numpy as np
-from . import diffeo_torus
+from .utils import diffeo_torus
+
 
 
 @diffeo_torus  # actually, it's diffeo_square

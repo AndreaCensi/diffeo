@@ -1,5 +1,12 @@
 import numpy as np
 import itertools
+from contracts import contract
+
+__all__ = ['construct_matrix_iterators',
+           'construct_matrix',
+           'construct_distance_matrix',
+           'iterate_indices']
+
 
 def construct_matrix_iterators(iterators, function):
     
@@ -13,7 +20,11 @@ def construct_matrix_iterators(iterators, function):
         
     return construct_matrix(shape, element)
     
-           
+@contract(shape='seq[2](int)', returns='distance_matrix')
+def construct_distance_matrix(shape, function):
+    return construct_matrix(shape, function)
+
+
 def construct_matrix(shape, function):
     ndim = len(shape)
     if ndim != 2:

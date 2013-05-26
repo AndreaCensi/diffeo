@@ -1,7 +1,7 @@
 from contracts import contract
 import numpy as np
-from diffeo2d.diffeomorphism2d import Diffeomorphism2D
-from diffeo2d.diffeo_basic import diffeo_inverse, diffeo_distance_L2, \
+from diffeo2d import Diffeomorphism2D
+from diffeo2d import diffeo_inverse, diffeo_distance_L2, \
     diffeo_compose
 
 

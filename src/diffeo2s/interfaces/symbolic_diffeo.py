@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 from contracts import contract
-import numpy as np
 from geometry import R2, TorusW
+import numpy as np
 
 __all__ = ['Topology', 'NoInverseAvailable', 'SymbolicDiffeo']
 
@@ -54,7 +54,7 @@ class SymbolicDiffeo(object):
         """ 
             f.conjugate(g) =  f(g(f^-1))
         """
-        from . import SymDiffeoComposition
+        from symdiffeo.library import SymDiffeoComposition
         chain = [self.get_inverse(), g, self]
         return SymDiffeoComposition(chain)
 

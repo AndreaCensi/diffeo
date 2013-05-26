@@ -31,3 +31,13 @@
     desired_resolution_factor: 2.0
     change_threshold: 0.005
     min_shape: [32, 32]
+
+- id: "refine2"
+  desc: "Slightly less picky for the threhsold" 
+  code: 
+  - diffeo2d_learn.library.DiffeomorphismEstimatorDoubleRefine
+  - g: 5
+    gamma: 1.3
+    desired_resolution_factor: 2.0
+    change_threshold: 0.05
+    min_shape: [32, 32]

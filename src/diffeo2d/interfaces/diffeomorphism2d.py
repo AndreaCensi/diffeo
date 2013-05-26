@@ -1,9 +1,3 @@
-from .diffeo_basic import (diffeo_identity, diffeo_apply, diffeo_distance_L2,
-    diffeo_local_differences)
-from .plumbing import FastDiffeoApply
-from .stats import diffeo_stats
-from .visualization import (diffeo_to_rgb_norm, diffeo_to_rgb_angle,
-    scalaruncertainty2rgb)
 from numpy.testing import assert_allclose
 from contracts import contract
 import numpy as np
@@ -19,7 +13,7 @@ class Diffeomorphism2D(object):
     """
                 
     @contract(d='valid_diffeomorphism,array[HxWx2]', variance='None|array[HxW](>=0)')
-    def __init__(self, d, variance=None, E2=None, E3=None, E4=None):
+    def __init__(self, d, variance=None):
         ''' 
             This is a diffeomorphism + variance.
             
@@ -45,14 +39,6 @@ class Diffeomorphism2D(object):
             assert np.isfinite(variance).all()
             self.variance = variance.astype('float32')
             
-            
-        if E2 is not None:
-            self.E2 = E2
-        if E3 is not None:
-            self.E3 = E3
-        if E4 is not None:
-            self.E4 = E4
-            
         # Make them immutable
         self.variance = self.variance.copy()
         self.variance.setflags(write=False)
@@ -60,7 +46,7 @@ class Diffeomorphism2D(object):
         self.d.setflags(write=False)
 
     def resample(self, shape):
-        from diffeo2c.resampling import diffeo_resample
+        from diffeo2c import diffeo_resample
         d2 = diffeo_resample(self.d, shape)
         warnings.warn('remove this dependency')
         from bootstrapping_olympics.library.nuisances.shape.resample \
@@ -80,6 +66,7 @@ class Diffeomorphism2D(object):
     @staticmethod
     def identity(shape):
         """ Returns an identity diffeomorphism of the given shape. """
+        from diffeo2d import diffeo_identity
         return Diffeomorphism2D(diffeo_identity(shape))
 
 #    @contract(returns='array[HxW](>=0,<=1)')
@@ -112,9 +99,11 @@ class Diffeomorphism2D(object):
         if not 'fda' in self.__dict__:
             # print('Initializing fast diffeo apply')
             # note that we do one of this for each new diffeomorphism
+            from diffeo2d import FastDiffeoApply
             self.fda = FastDiffeoApply(self.d)
         result = self.fda(template) 
         if False:
+            from diffeo2d import diffeo_apply
             assert_allclose(result, diffeo_apply(self.d, template))
         
         return result
@@ -164,14 +153,17 @@ class Diffeomorphism2D(object):
         return Diffeomorphism2D(im, var)
             
     @staticmethod
-    def distance_L2(d1, d2):
+    def distance_L2(d1, d2):  # deprecated
         """ Distance that does not take into account the uncertainty. """
+        warnings.warn('deprected function, use Diffeo2Distance objects instead')
         assert isinstance(d1, Diffeomorphism2D)
         assert isinstance(d2, Diffeomorphism2D)
+        from diffeo2d import diffeo_distance_L2
         return diffeo_distance_L2(d1.d, d2.d)
 
     @staticmethod
     def distance_L2_infow(d1, d2):
+        warnings.warn('deprected function, use Diffeo2Distance objects instead')
         """ 
             Distance that weights the mismatch by the product
             of the uncertainties. 
@@ -183,6 +175,7 @@ class Diffeomorphism2D(object):
         dd1_info = d1.get_scalar_info()
         dd2_info = d2.get_scalar_info()
         
+        from diffeo2d import diffeo_local_differences
         x, y = diffeo_local_differences(dd1, dd2)
         dist = np.hypot(x, y)
         info = dd1_info * dd2_info
@@ -197,6 +190,7 @@ class Diffeomorphism2D(object):
     
     @staticmethod
     def distance_L2_infow_scaled(d1, d2):
+        warnings.warn('deprected function, use Diffeo2Distance objects instead')
         # XXX: written while rushing
         a = Diffeomorphism2D.distance_L2_infow(d1, d2)
         dd1_info = d1.get_scalar_info()
@@ -211,16 +205,20 @@ class Diffeomorphism2D(object):
         return (self.d.shape[0], self.d.shape[1])
     
     def get_rgb_norm(self):
+        from diffeo2d import (diffeo_to_rgb_norm)
         return diffeo_to_rgb_norm(self.get_discretized_diffeo())
     
     def get_rgb_angle(self):
+        from diffeo2d import diffeo_to_rgb_angle   
         return diffeo_to_rgb_angle(self.get_discretized_diffeo())
 
     def get_rgb_info(self):
+        from diffeo2d import scalaruncertainty2rgb
         return scalaruncertainty2rgb(self.get_scalar_info())
     
     def display(self, report, full=False, nbins=100):  # @UnusedVariable
         """ Displays this diffeomorphism. """
+        from diffeo2d import diffeo_stats
         stats = diffeo_stats(self.d)
         angle = stats.angle
         norm = stats.norm

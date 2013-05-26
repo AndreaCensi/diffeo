@@ -1,6 +1,9 @@
 from conf_tools import GlobalConfig
 from quickapp import QuickMultiCmdApp
 
+__all__ = ['Diffeo2dds']
+
+
 class Diffeo2dds(QuickMultiCmdApp):
     '''Main program for manipulating symbolic diffeomorphisms.'''
     

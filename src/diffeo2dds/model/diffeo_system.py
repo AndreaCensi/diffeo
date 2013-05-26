@@ -4,10 +4,10 @@ from .uncertain_image import UncertainImage
 from bootstrapping_olympics.utils import raise_x_not_found
 from contracts import contract
 from diffeo2dds import logger
-from diffeo2dds.model.diffeo_action_distances import (diffeoaction_distance_L2,
-    diffeoaction_distance_L2_infow, diffeoaction_anti_distance_L2,
-    diffeoaction_anti_distance_L2_infow, diffeoaction_comm_distance_L2,
-    diffeoaction_comm_distance_L2_infow)
+# from diffeo2dds.library.diffeo_action_distances.diffeo_action_distances import (
+#     diffeoaction_distance_L2, diffeoaction_distance_L2_infow,
+#     diffeoaction_anti_distance_L2, diffeoaction_anti_distance_L2_infow,
+#     diffeoaction_comm_distance_L2, diffeoaction_comm_distance_L2_infow)
 from diffeo2s.utils import construct_matrix
 from reprep import Report
 import numpy as np
@@ -174,23 +174,30 @@ class DiffeoSystem(object):
             return distance(a1, a2)
         K = len(self.actions)
         return construct_matrix((K, K), entries)
+
         
     def actions_distance_L2(self):
+        from diffeo2dds.library import diffeoaction_distance_L2
         return self.actions_distance(diffeoaction_distance_L2)
-    
+
     def actions_distance_L2_infow(self):
+        from diffeo2dds.library import diffeoaction_distance_L2_infow
         return self.actions_distance(diffeoaction_distance_L2_infow)
     
     def actions_anti_distance_L2(self):
+        from diffeo2dds.library import diffeoaction_anti_distance_L2
         return self.actions_distance(diffeoaction_anti_distance_L2)
 
     def actions_anti_distance_L2_infow(self):
+        from diffeo2dds.library import diffeoaction_anti_distance_L2_infow
         return self.actions_distance(diffeoaction_anti_distance_L2_infow)
         
     def actions_comm_distance_L2(self):
+        from diffeo2dds.library import diffeoaction_comm_distance_L2
         return self.actions_distance(diffeoaction_comm_distance_L2)
         
     def actions_comm_distance_L2_infow(self):
+        from diffeo2dds.library import diffeoaction_comm_distance_L2_infow
         return self.actions_distance(diffeoaction_comm_distance_L2_infow)
     
     def plan_friendly_labels(self, plan):

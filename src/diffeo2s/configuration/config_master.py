@@ -1,11 +1,12 @@
 from conf_tools import ConfigMaster
 
+__all__ = ['get_diffeo2s_config']
 
 class Diffeo2sConfig(ConfigMaster):
     def __init__(self):
         ConfigMaster.__init__(self, 'diffeo2s')
 
-        from diffeo2s.symdiffeo import SymbolicDiffeo
+        from diffeo2s import SymbolicDiffeo
         self.symdiffeos = self.add_class_generic('symdiffeos',
                                                  '*.symdiffeos.yaml',
                                                  SymbolicDiffeo)
