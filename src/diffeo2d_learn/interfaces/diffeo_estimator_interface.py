@@ -2,6 +2,7 @@ from abc import abstractmethod
 from contracts import contract
 from reprep import Report
 from contracts import ContractsMeta
+from diffeo2d import Diffeomorphism2D
 
 
 __all__ = ['Diffeo2dEstimatorInterface']
@@ -38,7 +39,7 @@ class Diffeo2dEstimatorInterface(object):
         pass
     
     @abstractmethod
-    @contract(returns='valid_diffeomorphism')
+    @contract(returns=Diffeomorphism2D)
     def get_value(self):
         ''' 
             Returns a Diffeomorphism2D.

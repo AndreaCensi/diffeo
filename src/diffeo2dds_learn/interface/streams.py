@@ -1,7 +1,8 @@
-from abc import abstractmethod, ABCMeta
+from abc import abstractmethod
+from contracts import ContractsMeta
 from diffeo2dds.model.uncertain_image import any_image_to_rgb
 
-class LogItem():
+class LogItem(object):
 
     def __init__(self, y0, u, y1, x0=None):
         self.y0 = y0
@@ -23,7 +24,7 @@ class Stream(object):
          
     """
    
-    __metaclass__ = ABCMeta
+    __metaclass__ = ContractsMeta
         
     @abstractmethod        
     def read_all(self):
@@ -35,7 +36,7 @@ class ImageStream(object):
         Abtracts away a sequence of images.
     """
     
-    __metaclass__ = ABCMeta 
+    __metaclass__ = ContractsMeta 
 
     @abstractmethod        
     def read_all(self):

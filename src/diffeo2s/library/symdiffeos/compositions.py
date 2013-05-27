@@ -15,10 +15,10 @@ class SymDiffeoComposition(SymbolicDiffeo):
         chain = [x.get_inverse() for x in self.chain[::-1]]
         return SymDiffeoComposition(chain)
     
-    def apply(self, point):
+    def apply(self, p):
         for d in self.chain:
-            point = d.apply(point)
-        return point
+            p = d.apply(p)
+        return p
         
     def __repr__(self):
         return ("Comp(%s)" % self.chain)

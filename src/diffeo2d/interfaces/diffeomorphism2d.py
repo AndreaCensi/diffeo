@@ -12,7 +12,7 @@ class Diffeomorphism2D(object):
         Represents a discrete diffeomorphism.
     """
                 
-    @contract(d='valid_diffeomorphism,array[HxWx2]', variance='None|array[HxW](>=0)')
+    @contract(d='valid_diffeomorphism,array[HxWx2]', variance='None|array[HxW](>=0,<=1)')
     def __init__(self, d, variance=None):
         ''' 
             This is a diffeomorphism + variance.
@@ -51,7 +51,9 @@ class Diffeomorphism2D(object):
         warnings.warn('remove this dependency')
         from bootstrapping_olympics.library.nuisances.shape.resample \
             import scipy_image_resample
+        # this might give negative values
         v2 = scipy_image_resample(self.variance, shape)
+        np.clip(v2, 0, 1, out=v2)
         return Diffeomorphism2D(d2, v2)
 
     def __sizeof__(self):

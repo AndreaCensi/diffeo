@@ -1,13 +1,12 @@
-from .. import dmod
-from ..misc_utils import cmap
 from .flattening import Flattening, coords_iterate
 from compmake.utils import memoize_simple
 from contracts import contract
-from diffeo2d import logger
+from diffeo2d import diffeo_identity, logger
 from numpy.testing import assert_allclose
 import numpy as np
 import warnings
-from diffeo2d.diffeo_basic import diffeo_identity
+from diffeo2d.misc_utils import cmap
+from diffeo2d.diffeo_basic import dmod
 
 __all__ = ['FlatStructure', 'flat_structure_cache', 'add_border', 'togrid']
 
@@ -188,7 +187,7 @@ class FlatStructure(object):
     @contract(cell='seq[2](int)', returns='seq[2](int)')
     def get_center_for_cell_area(self, cell):
         res = self.centers[tuple(cell)]
-        return res
+        return res.astype('int')
         
     @memoize_simple
     @contract(returns='array[NxA]')

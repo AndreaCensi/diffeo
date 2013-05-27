@@ -4,3 +4,6 @@
   - diffeo2dds.DDSFromSymbolic
   - resolution: "${resolution}"
     symdiffeosystem: "${symdds}"
+
+
+- id: sym-dcl4r-64

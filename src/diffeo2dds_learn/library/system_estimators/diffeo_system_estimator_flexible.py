@@ -46,7 +46,7 @@ class DiffeoSystemEstimatorFlexible(DiffeoSystemEstimatorInterface):
         if not command in self.command_list:    
             logger.info('Adding new command %s' % str(command))
             self.command_list.append(command)
-            self.estimators.append(self.new_estimator())
+            self.estimators.append(None)
             
         index = self.command_list.index(command)
         return index 
@@ -71,7 +71,16 @@ class DiffeoSystemEstimatorFlexible(DiffeoSystemEstimatorInterface):
             
             j = other.command_list.index(command)
             
-            self.estimators[i].merge(other.estimators[j])
+            a = self.estimators[i] is not None
+            b = other.estimators[j] is not None
+            if a and b:
+                self.estimators[i].merge(other.estimators[j])
+            elif a and not b:
+                pass
+            elif b and not a:
+                self.estimators[i] = other.estimators[j]
+            else:
+                pass
             
         # Now add the ones we don't have.
         for j in range(len(other.command_list)):
@@ -83,17 +92,26 @@ class DiffeoSystemEstimatorFlexible(DiffeoSystemEstimatorInterface):
             logger.info('Adding command %s' % str(command))
             self.command_list.append(command)
             self.estimators.append(other.estimators[j])
-        
-    def update(self, y0, u0, y1):
-        cmd_ind = self.command_index(u0)
-        
-        if self.parallel_hint is not None:
+    
+    def _should_estimate_this(self, u):
+        cmd_ind = self.command_index(u)
+        if self.parallel_hint is None:
+            return True
+        else:
             # check to see if we need to take care of this
             i, n = self.parallel_hint
             ours = cmd_ind % n == i
-            if not ours:
-                return
+            return ours
         
+    
+    def update(self, y0, u0, y1):
+        if not self._should_estimate_this(u0):
+            return
+        
+        cmd_ind = self.command_index(u0)
+        if self.estimators[cmd_ind] is None:
+            self.estimators[cmd_ind] = self.new_estimator()
+            
         est = self.estimators[cmd_ind]
         est.update(y0, y1)
                 
@@ -105,10 +123,13 @@ class DiffeoSystemEstimatorFlexible(DiffeoSystemEstimatorInterface):
             command = np.array(self.command_list[i])
             name = prefix + str(list(command)).replace(' ', '')
             
+            if self.estimators[i] is None:
+                continue
+                
             try:
                 action = self.estimators[i].get_value()
-            except DiffeoActionEstimatorInterface.NotReady:
-                logger.info('Skipping command %r %r' % (i, command))
+            except DiffeoActionEstimatorInterface.NotReady as e:
+                logger.info('Skipping command %r %r: %s' % (i, command, e))
                 continue
             action.original_cmd = command
             # action.command = command
@@ -116,13 +137,24 @@ class DiffeoSystemEstimatorFlexible(DiffeoSystemEstimatorInterface):
                             
             action_list.append(action)
             
+        if not action_list:
+            msg = 'No diffeo actions are ready yet.'
+            logger.warn(msg)
+            # raise DiffeoActionEstimatorInterface.NotReady(msg)
+        
         name = 'Uninterpreted Diffeomorphism System'
         self.system = DiffeoSystem(name, action_list)
         return self.system
     
     def display(self, report): 
-        for i in range(len(self.estimators)):
+        for i, est in enumerate(self.estimators):
             logger.info('Report for %d-th action' % i)
             with report.subsection('d%d' % i) as sub:
-                self.estimators[i].display(sub)
+                sub.text('command', str(self.command_list[i]))
+                if est is None:
+                    sub.text('warn', 'Action for this command was not'
+                             'estimated - parallel hint %s' 
+                             % str(self.parallel_hint))
+                else:
+                    self.estimators[i].display(sub)
             

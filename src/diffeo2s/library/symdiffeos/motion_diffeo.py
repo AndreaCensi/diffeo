@@ -36,9 +36,8 @@ class MotionDiffeo(SymbolicDiffeo):
                             avel=(-self.avel),
                             interval=self.interval)
     
-    @contract(point='array[2]', returns='array[2]')
-    def apply(self, point):
-        return np.dot(self.R, point) + self.t
+    def apply(self, p):
+        return np.dot(self.R, p) + self.t
         
     def __repr__(self):
         return ("MotionDiffeo(%s,%s,%s)" % 

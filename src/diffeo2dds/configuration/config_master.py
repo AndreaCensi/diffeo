@@ -27,6 +27,11 @@ def get_conftools_uncertain_image_distances():
     """ Returns the object responsible for instancing UncertainImagesDistance. """
     return get_diffeo2dds_config().uncertain_image_distances
 
+@contract(returns=ObjectSpec)
+def get_conftools_diffeo_action_distances():
+    """ Returns the object responsible for instancing DiffeoActionDistance. """
+    return get_diffeo2dds_config().diffeo_action_distances
+
 
 class Diffeo2dDynamicsConfig(ConfigMaster):
     def __init__(self):
@@ -54,7 +59,7 @@ class Diffeo2dDynamicsConfig(ConfigMaster):
             
         self.diffeo_action_distances = \
             self.add_class_generic('diffeo_action_distances',
-                                   '*.diffeo_action_distances',
+                                   '*.diffeo_action_distances.yaml',
                                    DiffeoActionDistance)
 
     def get_default_dir(self):

@@ -145,9 +145,9 @@ class DiffeomorphismEstimatorFaster(Diffeo2dEstimatorInterface):
         logger.debug(' Field Shape: %s' % str(self.shape))
         logger.debug('    Fraction: %s' % str(self.max_displ))
         logger.debug(' Search area: %s' % str(self.area))
-        logger.debug('Creating FlatStructure...')
+        # logger.debug('Creating FlatStructure...')
         self.flat_structure = self._create_flat_structure()
-        logger.debug('done creating')
+        # logger.debug('done creating')
 
         buffer_shape = (self.nsensels, self.area_size)
         if self.inference_method == DiffeomorphismEstimatorFaster.Similarity:   

@@ -1,7 +1,7 @@
+from diffeo2dds import UncertainImage
+from diffeoplan import get_dp_config
 from procgraph import Block
-from diffeoplan.configuration.master import get_dp_config
-from diffeoplan.library.images.uncertain_image import UncertainImage
-from procgraph_pil.pil_operations import resize
+from procgraph_pil import resize
 
 class DPDDSPredict(Block):
     Block.alias('dp_discdds_predict')

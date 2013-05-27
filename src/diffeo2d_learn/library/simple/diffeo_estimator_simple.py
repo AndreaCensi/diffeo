@@ -33,8 +33,7 @@ class DiffeomorphismEstimatorSimple(Diffeo2dEstimatorInterface):
     def set_max_displ(self, max_displ):
         self.max_displ = np.array(max_displ)
    
-   
-    @contract(returns='tuple')
+    @contract(returns='bool')
     def initialized(self):
         return self.shape is not None
 
@@ -223,7 +222,7 @@ class DiffeomorphismEstimatorSimple(Diffeo2dEstimatorInterface):
             variance *= (1 / vmax)
             
         # return maximum likelihood plus uncertainty measure
-        return Diffeomorphism2D(d, variance, E2, E3, E4)
+        return Diffeomorphism2D(d, variance)  # , E2, E3, E4)
     
     def summarize_continuous(self, quivername):
         center = np.zeros(list(self.shape) + [2], dtype='float32')
@@ -249,7 +248,7 @@ class DiffeomorphismEstimatorSimple(Diffeo2dEstimatorInterface):
             from diffeo2d_learn.library.simple.display import get_cm
             center[c], spread[c] = get_cm(sim_square)
 
-            p0 = tuple(np.flipud(np.array(c) * self.lengths))
+            # p0 = tuple(np.flipud(np.array(c) * self.lengths))
             # sim_image.paste(Image.fromarray((sim_square * 255).astype('uint8')), p0 + tuple(p0 + self.lengths))
             # zer_image.paste(Image.fromarray((sim_zeroed * 255).astype('uint8')), p0 + tuple(p0 + self.lengths))
             
@@ -332,7 +331,7 @@ class DiffeomorphismEstimatorSimple(Diffeo2dEstimatorInterface):
             
         f = report.figure('estimated')
 
-        report.text('num_samples', self.num_samples)
+        report.data('num_samples', self.num_samples)
         
         if self.num_samples == 0:
             return
@@ -369,12 +368,13 @@ class DiffeomorphismEstimatorSimple(Diffeo2dEstimatorInterface):
 
 
 def sim_continuous(a, b):
-    # XXX strange conversions
-    diff = np.abs(a.astype(np.int16) - b.astype(np.int16)) ** 2
-    # diff = np.abs(a - b)
+    a = a.astype('float32')
+    b = b.astype('float32')
+#     diff = np.abs(a.astype(np.int16) - b.astype(np.int16)) ** 2
+    diff = np.abs(a - b) ** 2
     return diff
 
-def sim_binary(a, b):  # good for 0-1
+def sim_binary(a, b):  # good for data in 0-1
     return a * b
 
 

@@ -42,14 +42,23 @@ class DiffeoSystemSimulation(RobotInterface):
         if self.id_discdds is None:
             self.id_discdds = 'discdds'
             
+        self.shape = None
+    
+    def _make_sure_inited(self):
+        # don't do this in the constructor, because we cannot pickle
+        # generators 
+        if self.shape is not None:
+            return
+    
         # get the first image, look how it is to get shape
         self.images = self.image_stream.read_all() 
         x0 = self.images.next()
         self.shape = x0.shape[:2] 
-        
+            
         
     @contract(returns=BootSpec)
     def get_spec(self):
+        self._make_sure_inited()
         ncmds = self.discdds.get_num_commands()
         cmd = make_streamels_finite_commands(ncommands=ncmds, default=0)
         cmd_spec = StreamSpec(id_stream=None, streamels=cmd, extra={})
@@ -60,6 +69,7 @@ class DiffeoSystemSimulation(RobotInterface):
     
     @contract(returns=EpisodeDesc)
     def new_episode(self):
+        self._make_sure_inited()
         # initialize the state
         rgb = self.images.next()
         # TODO: reshape

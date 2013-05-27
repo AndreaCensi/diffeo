@@ -1,8 +1,7 @@
 from .ddsl import DDSL
 from .ddsl_learn_parallel import DDSLLearnParallel
 from diffeo2dds_learn import get_diffeo2ddslearn_config
-from quickapp import QuickApp
-from quickapp.app_utils import iterate_context_names_pair
+from quickapp import QuickApp, iterate_context_names_pair
 
 
 __all__ = ['DDSLDemo1']
@@ -42,7 +41,8 @@ class DDSLDemo1(DDSL.sub, QuickApp):  # @UndefinedVariable
         
         children = iterate_context_names_pair(context, streams, estimators)
         for c, stream, estimator in children:
-            c.subtask(DDSLLearnParallel, stream=stream, estimator=estimator)
+            c.subtask(DDSLLearnParallel, stream=stream, estimator=estimator,
+                      max_displ=0.24)
 
 
             

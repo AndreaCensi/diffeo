@@ -35,7 +35,8 @@ class DiffeoSystemEstimatorInterface(object):
     @contract(returns=DiffeoSystem)
     def get_value(self):
         ''' 
-            Returns the estimated DiffeoSystem.
+            Returns the estimated DiffeoSystem or raises
+            
         '''
         
     @contract(i='int,>=0,i', n='int,>=1,>=i')

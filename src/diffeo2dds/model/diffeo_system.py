@@ -1,13 +1,9 @@
 from .diffeo_action import DiffeoAction
 from .plan_utils import plan_friendly
 from .uncertain_image import UncertainImage
-from bootstrapping_olympics.utils import raise_x_not_found
+from conf_tools.utils import raise_x_not_found
 from contracts import contract
 from diffeo2dds import logger
-# from diffeo2dds.library.diffeo_action_distances.diffeo_action_distances import (
-#     diffeoaction_distance_L2, diffeoaction_distance_L2_infow,
-#     diffeoaction_anti_distance_L2, diffeoaction_anti_distance_L2_infow,
-#     diffeoaction_comm_distance_L2, diffeoaction_comm_distance_L2_infow)
 from diffeo2s.utils import construct_matrix
 from reprep import Report
 import numpy as np
@@ -23,7 +19,7 @@ class DiffeoSystem(object):
         
         Each DiffeoAction keeps track of forward and backward diffeos.
     """
-    @contract(label='str', actions='list[>=1]')
+    @contract(label='str', actions='list')
     def __init__(self, label, actions):
         """
             :param label: A descriptive label for the system.

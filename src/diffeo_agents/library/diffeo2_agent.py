@@ -14,8 +14,9 @@ class Diffeo2Agent(AgentInterface):
     
     @contract(explorer='string|code_spec',
               estimator='string|code_spec',
+              max_displ='float,>0',
               shape='None|seq[2](int,>0)')
-    def __init__(self, explorer, estimator, servo, shape=None): 
+    def __init__(self, explorer, estimator, max_displ, servo, shape=None): 
         '''
         :param shape: Target shape for the image. If none, use normal resolution.
         :param explorer: Explorer agent
@@ -30,6 +31,8 @@ class Diffeo2Agent(AgentInterface):
         self.last_obs = None
         self.last_data = None
         
+        self.max_displ = [max_displ, max_displ]
+        
     def init(self, boot_spec):
         shape = boot_spec.get_observations().shape()
         is_2D = len(shape) == 2
@@ -43,6 +46,7 @@ class Diffeo2Agent(AgentInterface):
         estimators = get_diffeo2ddslearn_config().diffeosystem_estimators 
         _, self.diffeosystem_estimator = estimators.instance_smarter(self.estimator_spec)
         
+        self.diffeosystem_estimator.set_max_displ(self.max_displ)
         # initialize explorer
         agents = get_boot_config().agents
         _, self.explorer = agents.instance_smarter(self.explorer_spec)
@@ -50,15 +54,15 @@ class Diffeo2Agent(AgentInterface):
         
     def process_observations(self, obs):
         if self.last_obs is not None:
-            t0 = self.last_obs['timestamp']
-            t1 = obs['timestamp']
-            delta = t1 - t0
+            # t0 = self.last_obs['timestamp']
+            # t1 = obs['timestamp']
+            # delta = t1 - t0
             u = obs['commands']
             y0 = self.last_obs['observations']
             y1 = obs['observations']
             
             self.last_data = (y0, u, y1)
-            self.info('t0: %.3f t1: %.3f delta: %.3f u: %s' % (t0, t1, delta, u))
+            # self.info('t0: %.3f t1: %.3f delta: %.3f u: %s' % (t0, t1, delta, u))
             if self.shape is not None:
                 y0 = scipy_image_resample(y0, self.shape)
                 y1 = scipy_image_resample(y1, self.shape)
@@ -70,6 +74,9 @@ class Diffeo2Agent(AgentInterface):
     def choose_commands(self):
         return self.explorer.choose_commands()
 
+    def parallel_process_hint(self, i, n):
+        self.diffeosystem_estimator.parallel_process_hint(i, n)
+        
     def merge(self, other):
         self.diffeosystem_estimator.merge(other.diffeosystem_estimator)
 
@@ -82,25 +89,4 @@ class Diffeo2Agent(AgentInterface):
     
     def publish(self, pub):
         return self.display(pub) 
-
-    
-# 
-#         if self.last_data is not None:
-#             y0, u, y1 = self.last_data
-#             none = np.logical_and(y0 == 0, y1 == 0)
-#             x = y0 - y1
-#             x[none] = np.nan
-# 
-#             pub.array_as_image('y0', y0, filter='scale')
-#             pub.array_as_image('y1', y1, filter='scale')
-#             pub.array_as_image('motion', x, filter='posneg')
-# 
-# #         if self.diffeo_dynamics.commands2dynamics:  # at least one
-# #             de = self.diffeo_dynamics.commands2dynamics[0]
-# #             field = de.get_similarity((10, 10))
-# #             pub.array_as_image('field', field)
-# 
-#         self.diffeosystem_estimator.publish(pub.section('commands'))
-
-
 

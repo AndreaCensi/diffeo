@@ -4,10 +4,11 @@
   - diffeo2d.library.DDL2
   - {}
 
-- id: L2iw
+- id: L2_infow
   desc: "Simple L2 distance, weighted by information"
   code:
   - diffeo2d.library.DDL2iw
+  - {}
 
 
 # - id: L2iw

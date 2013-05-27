@@ -1,13 +1,12 @@
 from .phases import get_phase_sequence
 from bootstrapping_olympics import BootWithInternalLog
-from bootstrapping_olympics.library.nuisances.shape import scipy_image_resample
+from bootstrapping_olympics.library.nuisances import scipy_image_resample
 from contracts import contract
 from diffeo2c.resampling import diffeo_resample
 from diffeo2d.diffeo_basic import diffeo_identity
 from diffeo2d.plumbing import FlatStructure
 from diffeo2d_learn import Diffeo2dEstimatorInterface
-from diffeo2d_learn.library.fast.diffeo_estimator_fast import (
-    DiffeomorphismEstimatorFaster)
+from diffeo2d_learn.library import DiffeomorphismEstimatorFaster
 import numpy as np
 import warnings
 warnings.warn('remove dependency')
@@ -191,12 +190,13 @@ class DiffeomorphismEstimatorDoubleRefine(Diffeo2dEstimatorInterface, BootWithIn
         ests = est.resample(self.orig_shape) 
         return ests
 
-    def publish(self, pub):  # XXX
+    def publish(self, pub):
         return self.display(pub)    
 
-    def merge(self, other):
+    def merge(self, other):  # @UnusedVariable
         """ Merges the values obtained by "other" with ours. """
-        raise ValueError()
+        msg = 'DiffeomorphismEstimatorDoubleRefine does not allow merging.'
+        raise NotImplementedError(msg)
     
 class DiffeomorphismEstimatorFasterGuess(DiffeomorphismEstimatorFaster):
     

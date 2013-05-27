@@ -17,7 +17,7 @@ class Diffeo2ddsLearnConfig(ConfigMaster):
         from diffeo2dds_learn import (DiffeoActionEstimatorInterface, ImageStream,
                                     DiffeoSystemEstimatorInterface, Stream)
         
-        ConfigMaster.__init__(self, 'diffeo2dlearn')
+        ConfigMaster.__init__(self, 'diffeo2ddslearn')
 
         self.streams = \
             self.add_class_generic('streams',
@@ -71,4 +71,4 @@ def get_conftools_image_streams():
     """ 
         Returns the object responsible for instancing ImageStream.
     """
-    return get_diffeo2ddslearn_config().ImageStream
+    return get_diffeo2ddslearn_config().image_streams

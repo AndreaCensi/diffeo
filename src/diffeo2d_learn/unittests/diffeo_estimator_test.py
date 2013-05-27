@@ -1,12 +1,12 @@
 from contracts import contract
 from diffeo2d.diffeo_basic import diffeomorphism_from_function
 from diffeo2d.misc_utils import coords_iterate
-from diffeo2d.tests.testing import for_all_diffeos
 from diffeo2d.visualization.basic import diffeomorphism_to_rgb_cont
 from diffeo2d_learn.library.simple.diffeo_estimator_simple import (
     MATCH_CONTINUOUS)
 import numpy as np
 import time
+from diffeo2d.unittests.testing import for_all_diffeos
 
 
 

@@ -41,7 +41,6 @@ class Dev03(Dev.get_sub(), QuickApp):  # @UndefinedVariable
             
             cs.subtask(DDSLShowStream, nsamples=4, streams=stream)
             
-
         combs = iterate_context_names_pair(context,
                                            Dev03.streams, Dev03.estimators)
         

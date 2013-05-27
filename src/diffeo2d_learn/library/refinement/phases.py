@@ -76,7 +76,7 @@ def get_phase_sequence(orig_shape, desired_resolution_factor, search_grid, gamma
         # now we know how much we want
         p2_max_displ = p.max_displ * gamma
         # so what would be the grid to realize it?
-        p2_grid = np.ceil(p2_max_displ * p2_shape) 
+        p2_grid = np.ceil(p2_max_displ * p2_shape).astype('int') 
         
         p2 = PhaseInfo(grid=p2_grid, shape=p2_shape, max_displ=p2_max_displ)
         phases.append(p2)

@@ -16,7 +16,7 @@ class Diffeo2dConfig(ConfigMaster):
         from diffeo2d.interfaces.diffeo2d_distance import Diffeo2dDistance
         self.diffeo2d_distances = \
             self.add_class_generic('diffeo2d_distances',
-                                   '*.diffeo2d_distances',
+                                   '*.diffeo2d_distances.yaml',
                                    Diffeo2dDistance)
 
     def get_default_dir(self):

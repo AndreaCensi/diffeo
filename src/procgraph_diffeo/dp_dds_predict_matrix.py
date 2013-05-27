@@ -1,6 +1,5 @@
 from contracts import contract
-from diffeoplan.configuration.master import get_dp_config
-from diffeoplan.library.images import UncertainImage
+from diffeoplan import get_dp_config
 from procgraph import Block
 from procgraph_pil import resize
 import itertools

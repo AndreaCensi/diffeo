@@ -1,9 +1,8 @@
 from procgraph import Block
 from contracts import contract
-from diffeoplan.library.diffeo_action.from_symdiffeo import diffeo_action_from_symdiffeo
 import numpy as np
-from diffeoplan.configuration.master import get_dp_config
-from diffeoplan.library.images.uncertain_image import UncertainImage
+from diffeoplan import get_dp_config
+from diffeoplan import UncertainImage
 import contracts
 
 

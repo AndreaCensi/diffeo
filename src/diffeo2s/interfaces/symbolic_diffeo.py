@@ -1,5 +1,5 @@
-from abc import ABCMeta, abstractmethod
-from contracts import contract
+from abc import abstractmethod
+from contracts import contract, ContractsMeta
 from geometry import R2, TorusW
 import numpy as np
 
@@ -20,7 +20,7 @@ class NoInverseAvailable(Exception):
 class SymbolicDiffeo(object):
     """ Interface for a symbolic diffeomorphism. """
     
-    __metaclass__ = ABCMeta
+    __metaclass__ = ContractsMeta
     
     def __init__(self, topology):
         self.topology_s = topology
@@ -40,8 +40,8 @@ class SymbolicDiffeo(object):
         """
          
     @abstractmethod
-    @contract(point='array[2]', returns='array[2]')
-    def apply(self, point):
+    @contract(p='array[2]', returns='array[2]')
+    def apply(self, p):
         """ 
             Computes the diffeomorphism applied to a point. 
         """

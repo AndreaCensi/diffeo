@@ -1,7 +1,8 @@
-from conf_tools import ConfigMaster
+from conf_tools import ConfigMaster, ObjectSpec
+from contracts import contract
 
 
-__all__ = ['get_diffeo2dlearn_config']
+__all__ = ['get_diffeo2dlearn_config', 'get_conftools_diffeo2d_estimators']
 
 class Diffeo2dLearnConfig(ConfigMaster):
     def __init__(self):
@@ -19,7 +20,6 @@ class Diffeo2dLearnConfig(ConfigMaster):
 get_diffeo2dlearn_config = Diffeo2dLearnConfig.get_singleton
 
 
-
-
-
-
+@contract(returns=ObjectSpec)
+def get_conftools_diffeo2d_estimators():
+    return get_diffeo2dlearn_config().diffeo2d_estimators

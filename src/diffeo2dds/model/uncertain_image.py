@@ -3,7 +3,8 @@ from contracts import contract
 from diffeo2d.visualization import scalaruncertainty2rgb
 from diffeo2s.utils import resample_signal, resample_signal_2d
 from reprep.graphics.filter_scale import scale
-from abc import ABCMeta, abstractmethod
+from abc import abstractmethod
+from contracts.metaclass import ContractsMeta
  
 __all__ = ['UncertainImage', 'UncertainImageDistance', 'any_image_to_rgb']
  
@@ -135,7 +136,7 @@ class UncertainImage(object):
 
 
 class UncertainImageDistance(object):
-    __metclass__ = ABCMeta
+    __metclass__ = ContractsMeta
 
     @abstractmethod        
     @contract(y0=UncertainImage, y1=UncertainImage, returns='>=0')

@@ -1,5 +1,5 @@
-from contracts import contract
-from abc import ABCMeta, abstractmethod
+from contracts import contract, ContractsMeta
+from abc import  abstractmethod
 
 __all__ = ['DiffeoSystemStateSpace']
 
@@ -11,7 +11,7 @@ class DiffeoSystemStateSpace:
         to get a "state", and provides functions to plot
         those states (i.e. embedding in R^2).
     """
-    __metaclass__ = ABCMeta
+    __metaclass__ = ContractsMeta
     
     def __init__(self):
         pass

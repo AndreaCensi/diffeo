@@ -24,12 +24,11 @@ class EvalDiffeo(SymbolicDiffeo):
                           function=self.inverse,
                           inverse=self.function)
     
-    @contract(point='array[2]', returns='array[2]')
-    def apply(self, point):
+    def apply(self, p):
         # These are the symbols that can be used 
-        p = point  # @UnusedVariable
-        x = point[0]  # @UnusedVariable
-        y = point[1]  # @UnusedVariable
+        p = p  # @UnusedVariable
+        x = p[0]  # @UnusedVariable
+        y = p[1]  # @UnusedVariable
         dot = np.dot  # @UnusedVariable
         res = eval(self.function)
         res = np.array(res)

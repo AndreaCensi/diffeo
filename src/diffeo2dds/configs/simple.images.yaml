@@ -1,15 +1,11 @@
 - id: lena
   desc: Simple test image
   code: 
-    - procgraph_pil.imread.imread
+    - diffeo2dds.library.load_image
     - filename: images/lena.jpg
 
 - id: "png-${name}"
   desc: "Load PNG file named ${name}"
   code: 
-    - procgraph_pil.imread.imread
+    - diffeo2dds.library.load_image
     - file:filename: "images/${name}.png"
-
-- id: "png-minimap-01"
-
-- id: "png-minimap-02"

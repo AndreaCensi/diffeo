@@ -3,6 +3,9 @@ from diffeo2dds import DiffeoAction, DiffeoSystem, get_diffeo2dds_config, logger
 import numpy as np
 
 
+__all__ = ['HardChoiceIso', 'make_hard_choices']
+
+
 def HardChoiceIso(id_dds, norm_percentile, factor):
     """ Instantiates the given DDS and changes it. """
     config = get_diffeo2dds_config()
