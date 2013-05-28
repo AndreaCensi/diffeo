@@ -61,14 +61,25 @@
   - function: 'rotdeg(p,+15)' 
     inverse:  'rotdeg(p,-15)' 
     topology: plane
+
+# There cannot be rotations of the torus!
+# - id: tr2
+#   desc: Rotation of 45 degrees around the center (torus topology)
+#   code: 
+#   - diffeo2s.library.EvalDiffeo
+#   - function: 'rotdeg(p,+45)' 
+#     inverse:  'rotdeg(p,-45)' 
+#     topology: torus
  
-- id: tr1
-  desc: Rotation of 15 degrees around the center (torus topology)
-  code: 
-  - diffeo2s.library.EvalDiffeo
-  - function: 'rotdeg(p,+15)' 
-    inverse:  'rotdeg(p,-15)' 
-    topology: torus
+
+ 
+# - id: tr1
+#   desc: Rotation of 15 degrees around the center (torus topology)
+#   code: 
+#   - diffeo2s.library.EvalDiffeo
+#   - function: 'rotdeg(p,+15)' 
+#     inverse:  'rotdeg(p,-15)' 
+#     topology: torus
  
 - id: pz1
   desc: Zoom in the middle of the image
@@ -81,16 +92,15 @@
 - id: twirl1
   desc: One small twirl
   code: 
-  - diffeo2s.Twirl
+  - diffeo2s.library.Twirl
   - {}
 
 - id: twirl
   desc: A big twirl
   code: 
-  - diffeo2s.repeat
+  - diffeo2s.library.repeat
   - id_diffeo: "twirl1"
     times: 20
-
 
 - id: "pR${deg}"
   desc: "Rotation of ${deg} degrees around the center (plane topology)"

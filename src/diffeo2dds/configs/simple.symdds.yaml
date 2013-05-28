@@ -67,13 +67,34 @@
 
 - id: dpr1
   desc: |
-    Only rotation
+    Only rotation, plane
   code:
   - diffeo2dds.SymDiffeoSystem
   - actions: 
     - original_cmd: [1] 
       diffeo: pr1
     topology: plane
+
+- id: dpchain1
+  desc: |
+    Only rotation, plane
+  code:
+  - diffeo2dds.SymDiffeoSystem
+  - actions: 
+    - original_cmd: [1] 
+      diffeo: [IR2R4px1, pr1, R2R4px1] # conjugated
+    topology: plane
+
+# There cannot be rotations on the torus
+# - id: dtr1
+#   desc: |
+#     Only rotation, torus
+#   code:
+#   - diffeo2dds.SymDiffeoSystem
+#   - actions: 
+#     - original_cmd: [1] 
+#       diffeo: tr1
+#     topology: torus
 
 
 - id: dcam1

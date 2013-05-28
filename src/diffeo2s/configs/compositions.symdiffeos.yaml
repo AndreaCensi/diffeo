@@ -45,3 +45,16 @@
     times: 5
 
 - id: "R3tx1"
+
+
+# - id: "tchain1"
+#   desc: composition test
+#   code:
+#   - diffeo2s.library.make_chain
+#   - diffeos: [Itr1, tx1, tr1]
+
+- id: "pchain1"
+  desc: composition test
+  code:
+  - diffeo2s.library.make_chain
+  - diffeos: [Ipx1, pr1, px1]

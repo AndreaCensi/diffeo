@@ -11,6 +11,7 @@ __all__ = ['valid_diffeomorphism',
             'diffeo_compose',
             'diffeo_apply',
             'diffeo_local_differences',
+            'diffeo_local_differences_L2',
             'diffeo_distance_Linf',
             'diffeo_distance_L2',
             'diffeo_norm_L2',
@@ -124,7 +125,11 @@ def diffeo_compose(a, b):
 @contract(a='valid_diffeomorphism,array[MxNx2]',
           returns='valid_diffeomorphism,array[MxNx2]')
 def diffeo_inverse(a):
-    """ Inverse of a diffeomorphism """
+    """ 
+        Inverse of a diffeomorphism; this is a very, very not well 
+        conditioned operation to do. We avoid it and estimate the 
+        inverse as well. 
+    """
     M, N = a.shape[0], a.shape[1]
     result = np.empty_like(a)
     result.fill(-1)  # fill invalid data
@@ -183,11 +188,13 @@ def diffeo_apply(diffeo, template):
 
 
 @contract(a='valid_diffeomorphism,array[MxNx2]',
-          b='valid_diffeomorphism,array[MxNx2]')
+          b='valid_diffeomorphism,array[MxNx2]',
+          returns='tuple(array[MxN](float32), array[MxN](float32))')
 def diffeo_local_differences(a, b):
     ''' returns tuple (x,y) with normalized difference fields.
         Each entry is normalized in [-0.5,0.5]  '''
     diff = a - b    
+    # XXX: fixed torus topology
     diffmod0 = dmod(diff[:, :, 0], a.shape[0] / 2) 
     diffmod1 = dmod(diff[:, :, 1], a.shape[1] / 2)    
     M, N = a.shape[:2]
@@ -196,6 +203,15 @@ def diffeo_local_differences(a, b):
     np.multiply(diffmod0, 1.0 / a.shape[0], out=x)
     np.multiply(diffmod1, 1.0 / a.shape[1], out=y)
     return x, y
+
+@contract(a='valid_diffeomorphism,array[MxNx2]',
+          b='valid_diffeomorphism,array[MxNx2]',
+          returns='tuple(array[MxN](float32), array[MxN](float32))')
+def diffeo_local_differences_L2(a, b):
+    ''' Returns the norm of the difference between the two diffeos, pointwise. '''
+    dx, dy = diffeo_local_differences(a, b)
+    norm = np.hypot(dx, dy)
+    return norm
 
 
 @contract(a='valid_diffeomorphism,array[MxNx2]',

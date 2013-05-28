@@ -9,7 +9,11 @@ class SymDiffeoComposition(SymbolicDiffeo):
     def __init__(self, chain):
         self.chain = chain
         # TODO: check same topology
-        SymbolicDiffeo.__init__(self, chain[0].topology_s)
+        topos = [x.topology_s for x in chain]
+        if len(set(topos)) > 1:
+            msg = 'Incompatible topologies for %s: %s' % (chain, topos)
+            raise ValueError(msg)
+        SymbolicDiffeo.__init__(self, topos[0])
 
     def get_inverse(self):
         chain = [x.get_inverse() for x in self.chain[::-1]]
@@ -18,6 +22,7 @@ class SymDiffeoComposition(SymbolicDiffeo):
     def apply(self, p):
         for d in self.chain:
             p = d.apply(p)
+        p = self.topology.normalize(p)
         return p
         
     def __repr__(self):

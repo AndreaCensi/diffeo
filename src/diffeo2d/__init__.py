@@ -17,10 +17,7 @@ from .stats import *
 
 from . import library
 
-
-# from bootstrapping_olympics.utils.change_module import assign_all_symbols_to_module
-# assign_all_symbols_to_module(__name__)
-
+ 
 def get_comptests():
     from . import unittests
     from comptests import get_comptests_app

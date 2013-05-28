@@ -1,5 +1,6 @@
 from abc import abstractmethod
 from contracts import ContractsMeta, contract
+from decent_logs import WithInternalLog
 from diffeo2d_learn import Diffeo2dEstimatorInterface
 from diffeo2dds import DiffeoAction
 from reprep import Report
@@ -7,7 +8,7 @@ from reprep import Report
 __all__ = ['DiffeoActionEstimatorInterface']
 
 
-class DiffeoActionEstimatorInterface(object):
+class DiffeoActionEstimatorInterface(WithInternalLog):
     
     """ 
         Interface for a DiffeoAction estimator.  

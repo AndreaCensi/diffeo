@@ -3,6 +3,7 @@ from bootstrapping_olympics import (AgentInterface, UnsupportedSpec,
 from bootstrapping_olympics.library.nuisances import scipy_image_resample
 from contracts import contract
 from diffeo2dds_learn import get_diffeo2ddslearn_config
+import warnings
 
 
 __all__ = ['Diffeo2Agent']
@@ -45,6 +46,7 @@ class Diffeo2Agent(AgentInterface):
 
         estimators = get_diffeo2ddslearn_config().diffeosystem_estimators 
         _, self.diffeosystem_estimator = estimators.instance_smarter(self.estimator_spec)
+        self.log_add_child('dds_est', self.diffeosystem_estimator)
         
         self.diffeosystem_estimator.set_max_displ(self.max_displ)
         # initialize explorer
@@ -81,11 +83,14 @@ class Diffeo2Agent(AgentInterface):
         self.diffeosystem_estimator.merge(other.diffeosystem_estimator)
 
     def display(self, report):
-        with report.subsection('estimator') as sub:
-            self.diffeosystem_estimator.display(sub)
         with report.subsection('model') as sub:
             discdds = self.diffeosystem_estimator.get_value()
             discdds.display(sub)
+            
+        warnings.warn('removed')
+        if False:
+            with report.subsection('estimator') as sub:
+                self.diffeosystem_estimator.display(sub)
     
     def publish(self, pub):
         return self.display(pub) 

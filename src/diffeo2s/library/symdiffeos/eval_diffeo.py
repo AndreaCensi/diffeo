@@ -2,6 +2,7 @@ from contracts import contract
 from diffeo2s import SymbolicDiffeo
 import geometry
 import numpy as np
+from geometry.formatting import printm
 
 __all__ = ['EvalDiffeo']
 
@@ -32,7 +33,10 @@ class EvalDiffeo(SymbolicDiffeo):
         dot = np.dot  # @UnusedVariable
         res = eval(self.function)
         res = np.array(res)
-        return res
+        
+        res2 = self.topology.normalize(res)
+        # printm('res', res, 'res2', res2, 'diff', res - res2)
+        return res2
     
     def __repr__(self):
         return ("EvalDiffeo(%s,%s,%s)" % 

@@ -1,20 +1,19 @@
 from .phases import get_phase_sequence
-from bootstrapping_olympics import BootWithInternalLog
 from bootstrapping_olympics.library.nuisances import scipy_image_resample
 from contracts import contract
-from diffeo2c.resampling import diffeo_resample
-from diffeo2d.diffeo_basic import diffeo_identity
-from diffeo2d.plumbing import FlatStructure
+from diffeo2c import diffeo_resample
+from diffeo2d import FlatStructure, diffeo_identity
 from diffeo2d_learn import Diffeo2dEstimatorInterface
 from diffeo2d_learn.library import DiffeomorphismEstimatorFaster
 import numpy as np
 import warnings
+from numpy.testing.utils import assert_allclose
 warnings.warn('remove dependency')
  
 __all__ = ['DiffeomorphismEstimatorDoubleRefine']
 
 
-class DiffeomorphismEstimatorDoubleRefine(Diffeo2dEstimatorInterface, BootWithInternalLog):
+class DiffeomorphismEstimatorDoubleRefine(Diffeo2dEstimatorInterface):
     
     """ Does not support parallel merging yet. """
     
@@ -42,6 +41,8 @@ class DiffeomorphismEstimatorDoubleRefine(Diffeo2dEstimatorInterface, BootWithIn
         self.phases = None
         self.current_phase = None
         
+        self.total_obs = 0
+        
     def set_max_displ(self, max_displ):
         self.max_displ = np.array(max_displ)
 
@@ -53,7 +54,7 @@ class DiffeomorphismEstimatorDoubleRefine(Diffeo2dEstimatorInterface, BootWithIn
     def init_structures(self, y_shape):
         self.orig_shape = (y_shape[0], y_shape[1])
         
-        print('max_displ: %s' % self.max_displ)
+        self.info('max_displ: %s' % self.max_displ)
         
         search_grid = (self.g, self.g) 
         self.phases = get_phase_sequence(self.orig_shape,
@@ -63,7 +64,7 @@ class DiffeomorphismEstimatorDoubleRefine(Diffeo2dEstimatorInterface, BootWithIn
                                     max_displ=self.max_displ,
                                     min_shape=self.min_shape)
         for p in self.phases:
-            print('- %s' % p)
+            self.info('- %s' % p)
         
         self.estimators = []
         
@@ -75,11 +76,17 @@ class DiffeomorphismEstimatorDoubleRefine(Diffeo2dEstimatorInterface, BootWithIn
         self.estimators.append(estimator)
         
         self.phase_obs = 0
-        print('now using phase: %s' % phase)
+        self.info('now using phase: %s' % phase)
         
         self.last_tmp_guess = None
         self.reached_end = False
         
+    def __str__(self):
+        if self.current_phase is None:
+            return 'DERefine(not-initialized)'
+        # phase = self.phases[self.current_phase]
+        return 'DERefine(phase=%s,obs=%s;%s)' % (self.current_phase, self.phase_obs, self.estimators[-1])
+    
     def next_phase(self):
         """ Switches to the next phase. """
         cur_estimator = self.estimators[self.current_phase]
@@ -120,17 +127,19 @@ class DiffeomorphismEstimatorDoubleRefine(Diffeo2dEstimatorInterface, BootWithIn
         estimator.update(y0, y1)
         
         self.phase_obs += 1
-        
         self.check_should_switch()
+
+        self.total_obs += 1        
 
     def info(self, s):
         if self.current_phase is None:
             prefix = 'not initialized'
         else:
             phase = self.phases[self.current_phase]
-            prefix = ('phase #%d shape %s it %5d' % (self.current_phase,
-                                                    phase.shape, self.phase_obs))
-        BootWithInternalLog.info(self, prefix + ':' + s)
+            prefix = ('obs %d phase #%d shape %s it %5d' % 
+                      (self.total_obs, self.current_phase,
+                        phase.shape, self.phase_obs))
+        Diffeo2dEstimatorInterface.info(self, prefix + ':' + s)
         
     def check_should_switch(self):
         check_every = 50
@@ -147,14 +156,22 @@ class DiffeomorphismEstimatorDoubleRefine(Diffeo2dEstimatorInterface, BootWithIn
         # self.info('Creating new guess')
         cur_guess = estimator.get_value()
 
-        mean_changes = np.mean(np.abs(cur_guess.d - self.last_tmp_guess.d))
+        changes = np.abs(cur_guess.d - self.last_tmp_guess.d)
+        bins = np.array(range(10)) - 0.5
+        h_changes, _ = np.histogram(changes, bins=bins, density=True)
+        assert_allclose(np.sum(h_changes), 1.0)
+        h_changes_desc = ' '.join(['%d=%.5f' % x for x in enumerate(h_changes)])
+        self.info('changes:\n%s' % h_changes_desc)
+        # self.info('change\npercentile: %s\n%s' % (p, np.percentile(changes, p)))
         self.last_tmp_guess = cur_guess
-        
+        frac_stable = h_changes[0]
+        self.info('Fraction stable: %s' % h_changes[0])
+        mean_changes = np.mean(changes)
         self.info('Mean change since last guess: %f' % (mean_changes))
-        
         # should_switch = self.phase_obs >= obs_per_phase
         should_switch = mean_changes <= self.change_threshold
-
+        should_switch = frac_stable >= 0.8
+        
         if should_switch:
             if self.current_phase < len(self.phases) - 1:
                 self.info('Switching to next phase.')

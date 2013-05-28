@@ -1,12 +1,13 @@
 from .flattening import Flattening, coords_iterate
 from compmake.utils import memoize_simple
 from contracts import contract
-from diffeo2d import diffeo_identity, logger
+from diffeo2d import diffeo_identity
 from numpy.testing import assert_allclose
 import numpy as np
 import warnings
 from diffeo2d.misc_utils import cmap
 from diffeo2d.diffeo_basic import dmod
+from conf_tools.utils import check_is_in
 
 __all__ = ['FlatStructure', 'flat_structure_cache', 'add_border', 'togrid']
 
@@ -15,12 +16,17 @@ class FlatStructure(object):
         This structure describes the topology of the image.
         It allows to associate an area (subset of pixels) to each pixel. 
         
+        There are two main modes: plane and torus.
+        
+        One strong limitation is that each pixel is associated to the same
+        number of neighbors.
     """
           
     @contract(shape='tuple((H,int,>=1),(W,int,>=1))',
               neighborarea='tuple((int,>=1),(int,>=1))',
-              centers='None|(array[HxWx2],valid_diffeomorphism)')
-    def __init__(self, shape, neighborarea, centers=None):
+              centers='None|(array[HxWx2],valid_diffeomorphism)',
+              topology='str')
+    def __init__(self, shape, neighborarea, centers=None, topology='plane'):
         '''
         :param shape:
         :param neighborarea:
@@ -51,12 +57,15 @@ class FlatStructure(object):
         self.N = self.H * self.W
         self.A = self.X * self.Y
         
+        self.topology = topology
+        check_is_in(topology, self.topology, ['torus', 'plane'])
+        
         # this is the important state
         self.neighbor_indices_flat = np.zeros((self.N, self.A), 'int32')
     
-        logger.info('Creating Flattening..')
+        # logger.info('Creating Flattening..')
         self.flattening = Flattening.by_rows(tuple(shape))
-        logger.info('..done')
+        # logger.info('..done')
         
         if centers is None:
             self.centers = diffeo_identity(shape)
@@ -66,7 +75,6 @@ class FlatStructure(object):
                 centers = np.round(centers).astype('int')
             self.centers = centers
             
-        # self.cmg = cmg
         for coord in coords_iterate(shape):
             k = self.flattening.cell2index[coord]
             cm = cmg.copy()
@@ -75,9 +83,26 @@ class FlatStructure(object):
             cm[:, :, 0] += center[0]
             cm[:, :, 1] += center[1]
             # torus topology here
-            cm[:, :, 0] = cm[:, :, 0] % shape[0]  
-            cm[:, :, 1] = cm[:, :, 1] % shape[1]
-            
+            if self.topology == 'torus':
+                cm[:, :, 0] = cm[:, :, 0] % shape[0]  
+                cm[:, :, 1] = cm[:, :, 1] % shape[1]
+            elif self.topology == 'plane':
+                for i in range(2):
+                    # move to the border
+                    cmin = cm[:, :, i].min()
+                    cmax = cm[:, :, i].max()
+                    if cmin < 0:
+                        cm[:, :, i] -= cmin
+                    if cmax >= shape[i]:
+                        cm[:, :, i] -= (cmax - (shape[i] - 1))                    
+            else:
+                assert False
+
+            for i in range(2):
+                assert cm[:, :, i].min() >= 0
+                assert cm[:, :, i].max() < shape[i]
+
+                
             indices = np.zeros(self.area_shape, 'int32')
             for a, b in coords_iterate(self.area_shape):
                 c = tuple(cm[a, b, :])

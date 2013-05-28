@@ -3,11 +3,12 @@ from contracts import contract
 from diffeo2dds import DiffeoSystem
 from reprep import Report
 from contracts import ContractsMeta
+from decent_logs import WithInternalLog
 
 __all__ = ['DiffeoSystemEstimatorInterface']
 
 
-class DiffeoSystemEstimatorInterface(object):
+class DiffeoSystemEstimatorInterface(WithInternalLog):
     
     """ 
         Interface for a DiffeoSystem estimator. It integrates the information

@@ -40,9 +40,14 @@ class DiffeomorphismEstimatorFaster(Diffeo2dEstimatorInterface):
         self.num_samples = 0
 
         self.buffer_NA = None
-
+    
+        self.max_displ = None
+    
     def set_max_displ(self, max_displ):
         self.max_displ = np.array(max_displ)
+        
+    def __str__(self):
+        return '%s(max_displ=%s)' % (type(self).__name__, self.max_displ)
 
 
     def initialized(self):
@@ -197,8 +202,12 @@ class DiffeomorphismEstimatorFaster(Diffeo2dEstimatorInterface):
             plot_vertical_line(pylab, safe_d, 'g--')
             plot_vertical_line(pylab, max_d, 'r--')
             
-        as_grid = self.make_grid(score)
-        f.data_rgb('grid', rgb_zoom(scale(as_grid), 4))
+        if self.shape[0] <= 64: 
+            as_grid = self.make_grid(score)
+            f.data_rgb('grid', rgb_zoom(scale(as_grid), 4))
+        else:
+            report.text('warn', 'grid visualization not done because too big')
+            
         distance_to_border = distance_to_border_for_best(self.flat_structure, score) 
         distance_to_center = distance_from_center_for_best(self.flat_structure, score)
         

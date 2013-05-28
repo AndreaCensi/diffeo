@@ -9,4 +9,4 @@
   code: 
   - diffeo2dds_learn.library.DiffeoActionEstimatorNewUnc
   - diffeo2d_estimator: "${estimator}"
-    score: normrel # norm
+    score: norm # normrel

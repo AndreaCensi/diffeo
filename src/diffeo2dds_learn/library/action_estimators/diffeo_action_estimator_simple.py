@@ -18,6 +18,9 @@ class DiffeoActionEstimatorSimple(DiffeoActionEstimatorInterface):
         self.est = self._new_estimator() 
         self.est_inv = self._new_estimator()
 
+        self.log_add_child('fwd', self.est)
+        self.log_add_child('bkw', self.est_inv)
+
     def _new_estimator(self):
         """ Instances a new estimator. """
         config = get_diffeo2dlearn_config()

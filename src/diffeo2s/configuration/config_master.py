@@ -1,6 +1,8 @@
 from conf_tools import ConfigMaster
+from contracts import contract
+from conf_tools.objspec import ObjectSpec
 
-__all__ = ['get_diffeo2s_config']
+__all__ = ['get_diffeo2s_config', 'get_conftools_symdiffeos']
 
 class Diffeo2sConfig(ConfigMaster):
     def __init__(self):
@@ -17,3 +19,8 @@ class Diffeo2sConfig(ConfigMaster):
 
 get_diffeo2s_config = Diffeo2sConfig.get_singleton
  
+
+
+@contract(returns=ObjectSpec)
+def get_conftools_symdiffeos():
+    return get_diffeo2s_config().symdiffeos

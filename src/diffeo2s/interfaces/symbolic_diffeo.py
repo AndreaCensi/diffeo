@@ -54,9 +54,10 @@ class SymbolicDiffeo(object):
         """ 
             f.conjugate(g) =  f(g(f^-1))
         """
-        from symdiffeo.library import SymDiffeoComposition
+        from diffeo2s.library.symdiffeos.compositions import SymDiffeoComposition
         chain = [self.get_inverse(), g, self]
         return SymDiffeoComposition(chain)
+    
 
         
     

@@ -101,6 +101,16 @@ class DiffeoAction(object):
             with report.subsection('predictions') as pred:
                 self.display_prediction(pred, image.resize(self.diffeo.d.shape[:2]))    
         
+        if False:
+            with report.subsection('composition') as sub:
+                with sub.subsection('d12') as ssub:
+                    d12 = Diffeomorphism2D.compose(self.diffeo, self.diffeo_inv)
+                    d12.display(ssub)
+                with sub.subsection('d21') as ssub:
+                    d21 = Diffeomorphism2D.compose(self.diffeo_inv, self.diffeo)
+                    d21.display(ssub)
+                
+        
     def display_prediction(self, report, image):
         num_pred = 6
         

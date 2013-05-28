@@ -1,6 +1,6 @@
 from contracts import contract
 from diffeo2dds import DiffeoSystem
-from diffeo2dds_learn import (get_diffeo2ddslearn_config, logger,
+from diffeo2dds_learn import (get_diffeo2ddslearn_config,
     DiffeoSystemEstimatorInterface, DiffeoActionEstimatorInterface)
 import numpy as np
 
@@ -9,7 +9,6 @@ __all__ = ['DiffeoSystemEstimatorFlexible']
 
 
 class DiffeoSystemEstimatorFlexible(DiffeoSystemEstimatorInterface):
-    
     '''
         This estimator can use an arbitrary DiffeoActionEstimator. 
     '''
@@ -44,9 +43,10 @@ class DiffeoSystemEstimatorFlexible(DiffeoSystemEstimatorInterface):
         command = tuple(command)
         
         if not command in self.command_list:    
-            logger.info('Adding new command %s' % str(command))
             self.command_list.append(command)
             self.estimators.append(None)
+            index = self.command_list.index(command)
+            self.info('Adding new command #%d %s' % (index, str(command)))
             
         index = self.command_list.index(command)
         return index 
@@ -55,18 +55,39 @@ class DiffeoSystemEstimatorFlexible(DiffeoSystemEstimatorInterface):
     def parallel_process_hint(self, i, n):
         self.parallel_hint = (i, n)
         
+        
+    def summary(self):
+        s = 'Summary:'
+        s += '\n parallel hint: %r' % str(self.parallel_hint)
+        for i, command in enumerate(self.command_list):
+            s += '\n #%s - %s - %s' % (i, command, self.estimators[i])
+        return s
+    
     def merge(self, other):
         """ 
             Merges the values obtained by "other" with ours. 
             Note that we don't make a deep copy of structures.
         """
-        for i in range(len(self.command_list)):
+        self.info('merging')
+        self.info('self: ' + self.summary())
+        self.info('other: ' + other.summary())
+        if self.parallel_hint is not None:
+            ilist, n = self.parallel_hint
+            if not isinstance(ilist, list):
+                ilist = list([ilist])
+            jlist, _ = other.parallel_hint
+            if not isinstance(jlist, list):
+                jlist = list([jlist])
+            ilist.extend(jlist)
+            self.parallel_hint = ilist, n
+                
+        for i, command in enumerate(self.command_list):
             # Note that they are not necessarily in the right order.
             command = self.command_list[i]
             if not command in other.command_list:
-                logger.info('The other does not have %s' % str(command))
-                logger.info('Ours: %s' % self.command_list)
-                logger.info('His:  %s' % other.command_list)
+                self.info('The other does not have %s' % str(command))
+                self.info('Ours: %s' % self.command_list)
+                self.info('His:  %s' % other.command_list)
                 continue
             
             j = other.command_list.index(command)
@@ -74,6 +95,7 @@ class DiffeoSystemEstimatorFlexible(DiffeoSystemEstimatorInterface):
             a = self.estimators[i] is not None
             b = other.estimators[j] is not None
             if a and b:
+                self.info('merging i = %d  j = %d command = %s' % (i, j, command))
                 self.estimators[i].merge(other.estimators[j])
             elif a and not b:
                 pass
@@ -89,7 +111,7 @@ class DiffeoSystemEstimatorFlexible(DiffeoSystemEstimatorInterface):
             if command in self.command_list:
                     continue
                 
-            logger.info('Adding command %s' % str(command))
+            self.info('Adding command %s' % str(command))
             self.command_list.append(command)
             self.estimators.append(other.estimators[j])
     
@@ -111,6 +133,7 @@ class DiffeoSystemEstimatorFlexible(DiffeoSystemEstimatorInterface):
         cmd_ind = self.command_index(u0)
         if self.estimators[cmd_ind] is None:
             self.estimators[cmd_ind] = self.new_estimator()
+            self.log_add_child('action%d_est' % cmd_ind, self.estimators[cmd_ind])
             
         est = self.estimators[cmd_ind]
         est.update(y0, y1)
@@ -129,17 +152,16 @@ class DiffeoSystemEstimatorFlexible(DiffeoSystemEstimatorInterface):
             try:
                 action = self.estimators[i].get_value()
             except DiffeoActionEstimatorInterface.NotReady as e:
-                logger.info('Skipping command %r %r: %s' % (i, command, e))
+                self.info('Skipping command %r %r: %s' % (i, command, e))
                 continue
+            
             action.original_cmd = command
-            # action.command = command
-            action.label = name
-                            
+            action.label = name                            
             action_list.append(action)
             
         if not action_list:
             msg = 'No diffeo actions are ready yet.'
-            logger.warn(msg)
+            self.warn(msg)
             # raise DiffeoActionEstimatorInterface.NotReady(msg)
         
         name = 'Uninterpreted Diffeomorphism System'
@@ -148,7 +170,7 @@ class DiffeoSystemEstimatorFlexible(DiffeoSystemEstimatorInterface):
     
     def display(self, report): 
         for i, est in enumerate(self.estimators):
-            logger.info('Report for %d-th action' % i)
+            self.info('Report for %d-th action' % i)
             with report.subsection('d%d' % i) as sub:
                 sub.text('command', str(self.command_list[i]))
                 if est is None:

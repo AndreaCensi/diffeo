@@ -1,7 +1,6 @@
 from diffeo2dds_learn_rosbag import logger
-from ros_node_utils.conventions.np_images import imgmsg_to_pil
 import numpy as np
-from diffeo2dds_learn.interface.streams import LogItem
+from diffeo2dds_learn import LogItem
 
 __all__ = ['read_bag']
 
@@ -136,6 +135,7 @@ def read_bag(bagfile):
 
 
 def get_image_array(image):
+    from ros_node_utils.conventions.np_images import imgmsg_to_pil
     im, _, _ = imgmsg_to_pil(image)
     pix = np.asarray(im).astype(np.uint8)
     return pix
