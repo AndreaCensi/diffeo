@@ -5,13 +5,14 @@ __all__ = ['PhaseInfo', 'get_phase_sequence']
 
 class PhaseInfo():
     @contract(shape='array[2](int)',
-              max_displ='array[2](float)',
+              max_displ='array[2](float,>0,<=1)',
               grid='array[2](int)')
     def __init__(self, shape, max_displ, grid):
         self.shape = shape
         self.max_displ = max_displ
         self.grid = grid
-        
+        assert np.all(max_displ <= 1)
+        assert np.all(max_displ >= 0)
         # check that these are coherent
         identifiable = self.get_displacement() 
         ok = identifiable >= self.max_displ
@@ -36,7 +37,7 @@ class PhaseInfo():
         return self.grid * 1.0 / self.shape
         
     def __str__(self):
-        return ('Phase(shape=%s, max_displ=%s, grid=%s => cell sizes = %s)' % 
+        return ('Phase(shape=%s, displ=%s, grid=%s, cellsize=%s)' % 
                 (self.shape, self.max_displ, self.grid, self.get_cell_size()))
         
 @contract(orig_shape='seq[2](int)',
@@ -49,14 +50,17 @@ def get_phase_sequence(orig_shape, desired_resolution_factor, search_grid, gamma
                        max_displ, min_shape):
     max_displ = np.array(max_displ)
     search_grid = np.array(search_grid)
-    # so, in the last phase, we will have:
     orig_shape = np.array(orig_shape)
+    min_shape = np.array(min_shape)
+    
+    # so, in the last phase, we will have:
+    
     f = desired_resolution_factor
     last_shape = np.ceil(orig_shape * f).astype('int') 
     last_search_grid = search_grid 
     # for this to work, it means that the displacement is
     last_max_displ = last_search_grid * 1.0 / last_shape
-    
+    last_max_displ = np.minimum(last_max_displ, [1.0, 1.0])
     honor_min_shape = True
     
     last = PhaseInfo(grid=search_grid,
@@ -75,9 +79,13 @@ def get_phase_sequence(orig_shape, desired_resolution_factor, search_grid, gamma
             p2_shape = np.maximum(p2_shape, min_shape)
         # now we know how much we want
         p2_max_displ = p.max_displ * gamma
+        # this is only for very small grid sizes
+        p2_max_displ = np.minimum(p2_max_displ, [1.0, 1.0])
         # so what would be the grid to realize it?
         p2_grid = np.ceil(p2_max_displ * p2_shape).astype('int') 
         
+        assert np.all(p2_max_displ <= 1)
+        assert np.all(p2_max_displ >= 0)
         p2 = PhaseInfo(grid=p2_grid, shape=p2_shape, max_displ=p2_max_displ)
         phases.append(p2)
         

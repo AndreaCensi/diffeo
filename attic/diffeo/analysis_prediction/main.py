@@ -1,4 +1,6 @@
-from . import contract, np
+
+from contracts import contract
+import numpy as np
 from .. import diffeo_compose, diffeo_apply, diffeo_identity
 from ..analysis import Action, imread, resize
 from PIL import Image  # @UnresolvedImport - Eclipse gets confused

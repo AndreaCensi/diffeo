@@ -1,4 +1,7 @@
 from .phases import get_phase_sequence
+import warnings
+from pprint import pformat
+warnings.warn('remove dependency')
 from bootstrapping_olympics.library.nuisances import scipy_image_resample
 from contracts import contract
 from diffeo2c import diffeo_resample
@@ -6,10 +9,8 @@ from diffeo2d import FlatStructure, diffeo_identity
 from diffeo2d_learn import Diffeo2dEstimatorInterface
 from diffeo2d_learn.library import DiffeomorphismEstimatorFaster
 import numpy as np
-import warnings
 from numpy.testing.utils import assert_allclose
-warnings.warn('remove dependency')
- 
+
 __all__ = ['DiffeomorphismEstimatorDoubleRefine']
 
 
@@ -19,31 +20,51 @@ class DiffeomorphismEstimatorDoubleRefine(Diffeo2dEstimatorInterface):
     
     @contract(g='int,>1', gamma='float,>1',
               desired_resolution_factor='float',
-              change_threshold='float,>=0')
+              change_threshold='float,>=0,<=1',
+              stop_at_convergence='bool',
+              min_shape='None|seq[2](int,>=1)',
+              inference_method='str')
     def __init__(self, g, gamma, desired_resolution_factor,
-                 change_threshold, min_shape, inference_method='order'):
+                 change_threshold, min_shape, stop_at_convergence,
+                 inference_method):
         '''
+        :param stop_at_convergence: When the estimate has converged 
+        (according to change_threshold) stop integrating new measurements.
         
         :param max_displ:
         :param g:
         :param desired_resolution_factor: 1 = native resolution, >1 better
         '''
         # parameters
+        self.stop_at_convergence = stop_at_convergence
         self.inference_method = inference_method
         self.desired_resolution_factor = desired_resolution_factor
         self.g = g
         self.gamma = gamma
         self.change_threshold = change_threshold
+        check_every = 50
+        self.check_every = check_every  # TODO: make parameter
         self.min_shape = min_shape
-        
         # variables
         self.estimators = None
         self.phases = None
         self.current_phase = None
-        
         self.total_obs = 0
+
+        
+        # print parameters on the log
+        params = dict(g=g, gamma=gamma,
+                      desired_resolution_factor=desired_resolution_factor,
+                       change_threshold=change_threshold,
+                       check_every=check_every,
+                       min_shape=min_shape, stop_at_convergence=stop_at_convergence,
+                        inference_method=inference_method)
+                  
+        self.info('Parameters:\n%s' % pformat(params))
+        
         
     def set_max_displ(self, max_displ):
+        self.info('Requested max displacement: %s' % str(max_displ))
         self.max_displ = np.array(max_displ)
 
     def initialized(self):
@@ -53,7 +74,9 @@ class DiffeomorphismEstimatorDoubleRefine(Diffeo2dEstimatorInterface):
     @contract(y_shape='seq[2](int)')
     def init_structures(self, y_shape):
         self.orig_shape = (y_shape[0], y_shape[1])
-        
+        if self.max_displ is None:
+            msg = 'Need to call set_max_displ() before update().'
+            raise Exception(msg)
         self.info('max_displ: %s' % self.max_displ)
         
         search_grid = (self.g, self.g) 
@@ -105,7 +128,7 @@ class DiffeomorphismEstimatorDoubleRefine(Diffeo2dEstimatorInterface):
         
         self.last_tmp_guess = None
         
-    @contract(max_displ='seq[2](>0,<1)')
+    @contract(max_displ='seq[2](>0,<=1)')
     def _get_phase_estimator(self, max_displ):
         estimator = DiffeomorphismEstimatorFasterGuess(inference_method=self.inference_method)
         estimator.set_max_displ(max_displ)
@@ -116,6 +139,15 @@ class DiffeomorphismEstimatorDoubleRefine(Diffeo2dEstimatorInterface):
         # init structures if not already
         if not self.initialized():
             self.init_structures(y0.shape)
+            
+        warnings.warn('remove')
+        self.stop_at_convergence = True
+        if self.reached_end and self.stop_at_convergence:
+            if self.total_obs % 100 == 1:
+                self.info('Not integrating anymore (%s)' % self.total_obs)
+            self.total_obs += 1
+            msg = 'Reached convergence and stop_at_converged=True.'
+            raise Diffeo2dEstimatorInterface.LearningConverged(msg)
 
         phase = self.phases[self.current_phase]
         estimator = self.estimators[self.current_phase]
@@ -127,27 +159,31 @@ class DiffeomorphismEstimatorDoubleRefine(Diffeo2dEstimatorInterface):
         estimator.update(y0, y1)
         
         self.phase_obs += 1
-        self.check_should_switch()
+        warnings.warn('remove this')
+        self.check_every = 50
+        if self.phase_obs % self.check_every == 0:
+            if self.should_switch():
+                if self.current_phase < len(self.phases) - 1:
+                    self.info('Switching to next phase.')
+                    self.next_phase()
+                else:
+                    self.info('Reached end of phases.')
+                    self.reached_end = True
 
         self.total_obs += 1        
 
     def info(self, s):
         if self.current_phase is None:
-            prefix = 'not initialized'
+            prefix = '-'
         else:
             phase = self.phases[self.current_phase]
-            prefix = ('obs %d phase #%d shape %s it %5d' % 
+            prefix = ('obs%5d: ph %d obs %d (sh %dx)' % 
                       (self.total_obs, self.current_phase,
-                        phase.shape, self.phase_obs))
+                         self.phase_obs, phase.shape[0]))
         Diffeo2dEstimatorInterface.info(self, prefix + ':' + s)
         
-    def check_should_switch(self):
-        check_every = 50
-        if self.phase_obs % check_every != 0:
-            return
-        
+    def should_switch(self):
         estimator = self.estimators[self.current_phase]
-        
         if self.last_tmp_guess is None:
             self.info('Creating first guess')
             self.last_tmp_guess = estimator.get_value()
@@ -162,24 +198,14 @@ class DiffeomorphismEstimatorDoubleRefine(Diffeo2dEstimatorInterface):
         assert_allclose(np.sum(h_changes), 1.0)
         h_changes_desc = ' '.join(['%d=%.5f' % x for x in enumerate(h_changes)])
         self.info('changes:\n%s' % h_changes_desc)
-        # self.info('change\npercentile: %s\n%s' % (p, np.percentile(changes, p)))
+        
         self.last_tmp_guess = cur_guess
         frac_stable = h_changes[0]
-        self.info('Fraction stable: %s' % h_changes[0])
-        mean_changes = np.mean(changes)
-        self.info('Mean change since last guess: %f' % (mean_changes))
-        # should_switch = self.phase_obs >= obs_per_phase
-        should_switch = mean_changes <= self.change_threshold
-        should_switch = frac_stable >= 0.8
-        
-        if should_switch:
-            if self.current_phase < len(self.phases) - 1:
-                self.info('Switching to next phase.')
-                self.next_phase()
-            else:
-                self.info('Reached end of phases.')
-                self.reached_end = True
 
+        should = frac_stable >= self.change_threshold
+        
+        return should
+    
 
     def display(self, report):
         if not self.initialized():
@@ -188,6 +214,9 @@ class DiffeomorphismEstimatorDoubleRefine(Diffeo2dEstimatorInterface):
         for i, e in enumerate(self.estimators):
             with report.subsection('phase%d' % i) as sub:
                 e.display(sub) 
+        
+        report.text('log', "\n".join(self.get_raw_log_lines()))
+        
         
     def get_value(self):
         if not self.initialized():

@@ -3,6 +3,7 @@ from diffeo2dds import DiffeoSystem
 from diffeo2dds_learn import (get_diffeo2ddslearn_config,
     DiffeoSystemEstimatorInterface, DiffeoActionEstimatorInterface)
 import numpy as np
+import warnings
 
 
 __all__ = ['DiffeoSystemEstimatorFlexible']
@@ -25,6 +26,8 @@ class DiffeoSystemEstimatorFlexible(DiffeoSystemEstimatorInterface):
         
         # becomes (i, n) if parallel_process_hint is called
         self.parallel_hint = None   
+    
+        self.cmds_converged = {}  # cmd_index => msg
     
     def set_max_displ(self, max_displ): 
         self.max_displ = max_displ
@@ -136,8 +139,33 @@ class DiffeoSystemEstimatorFlexible(DiffeoSystemEstimatorInterface):
             self.log_add_child('action%d_est' % cmd_ind, self.estimators[cmd_ind])
             
         est = self.estimators[cmd_ind]
-        est.update(y0, y1)
-                
+        if cmd_ind in self.cmds_converged:
+            return
+        
+        try:
+            est.update(y0, y1)
+        except DiffeoActionEstimatorInterface.LearningConverged as e:
+            self.cmds_converged[cmd_ind] = str(e)
+            self._raise_converged_if_all_converged()
+            
+    def _raise_converged_if_all_converged(self): 
+        """ Checks that all estimators have converged. """
+        if not 'cmds_converged' in self.__dict__:
+            self.cmds_converged = {}
+        warnings.warn('Note, it might be that we have not seen all actions yet...')
+        converged = []
+        for cmd_ind, estimator in enumerate(self.estimators):
+            if estimator is not None:
+                if not cmd_ind in self.cmds_converged:
+                # this one has not finished
+                    return
+                else:
+                    converged.append(self.cmds_converged[cmd_ind])
+        # All have converged
+        msg = 'All actions have been estimated:\n'
+        msg += "\n".join('- %s' % e for e in converged)
+        raise DiffeoSystemEstimatorInterface.LearningConverged(msg)
+        
     @contract(returns=DiffeoSystem)            
     def get_value(self, prefix=''):
         n = len(self.estimators)

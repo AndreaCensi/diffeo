@@ -1,0 +1,15 @@
+- id: "r-dds-${symdds}-${resolution}"
+  desc: A robot with DDS dynamics
+  code:
+  - diffeo2dds_sim.library.DiffeoSystemSimulation
+  - image_stream:
+    - diffeo2dds_learn.library.RandomImageStream
+    - shape: ["${resolution}", "${resolution}"]
+      seed: 42
+    discdds: 
+     - diffeo2dds.DDSFromSymbolic
+     - resolution: "${resolution}"
+       symdiffeosystem: "${symdds}"
+
+
+- id: r-dds-drx1-68

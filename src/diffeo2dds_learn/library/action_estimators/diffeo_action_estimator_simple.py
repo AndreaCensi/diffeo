@@ -1,8 +1,9 @@
 from contracts import contract
-from diffeo2d_learn import get_diffeo2dlearn_config
+from diffeo2d_learn import Diffeo2dEstimatorInterface, get_diffeo2dlearn_config
 from diffeo2dds import DiffeoAction
 from diffeo2dds_learn import DiffeoActionEstimatorInterface
 
+ 
 __all__ = ['DiffeoActionEstimatorSimple']
 
 
@@ -30,19 +31,30 @@ class DiffeoActionEstimatorSimple(DiffeoActionEstimatorInterface):
         return estimator            
 
     def update(self, y0, y1):
-        est = self.est
-        est_inv = self.est_inv
-        
-        # XXX: cleaning up with state or not
         if y0.ndim == 3:
             # if there are 3 channels...
             for ch in range(3):
-                est.update(y0[:, :, ch], y1[:, :, ch])
-                est_inv.update(y1[:, :, ch], y0[:, :, ch])
+                self._update(y0[:, :, ch], y1[:, :, ch])
         else:
             assert y0.ndim == 2
-            est.update(y0, y1)
-            est_inv.update(y1, y0)
+            self._update(y0, y1)
+            
+    def _update(self, y0, y1):
+        converged = []
+        try:
+            self.est.update(y0, y1)
+        except Diffeo2dEstimatorInterface.LearningConverged as e1:
+            converged.append(e1)
+        
+        try:
+            self.est_inv.update(y1, y0)
+        except Diffeo2dEstimatorInterface.LearningConverged as e1:
+            converged.append(e1)
+        
+        if len(converged) == 2:
+            msg = 'Both have finished:\n' + "\n".join('- %s' % e for e in converged)
+            raise DiffeoActionEstimatorInterface.LearningConverged(msg)
+        
             
     @contract(returns=DiffeoAction)
     def get_value(self):

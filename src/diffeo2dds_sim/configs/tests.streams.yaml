@@ -1,0 +1,10 @@
+
+- id: "s-${robot}"
+  desc: Stream from robot observations and random agent
+  code:
+  - diffeo2dds_sim.library.RobotInteractionStream
+  - obs_per_episode: 1 
+    agent: random_agent
+    robot: "${robot}"
+
+- id: s-boot-r-dds-drx1-68

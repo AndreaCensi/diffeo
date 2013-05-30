@@ -26,7 +26,7 @@ class DDSLLearn(DDSL.sub, QuickApp):  # @UndefinedVariable
         
         m = self.options.max_displ
         max_displ = (m, m)
-        jobs_learning(context, estimator, stream, max_displ)
+        return jobs_learning(context, estimator, stream, max_displ)
         
         
 def jobs_learning(context, estimator, stream, max_displ):
@@ -47,6 +47,7 @@ def jobs_learning(context, estimator, stream, max_displ):
     dds_report = context.comp(report_dds, dds)
     context.add_report(learner_report, 'learner', **params)
     context.add_report(dds_report, 'dds', **params)
+    return dds
         
          
 @contract(stream='str', estimator='str', max_displ='seq[2](float)')
@@ -63,7 +64,10 @@ def learn_from_stream(stream, estimator, max_displ):
         y0 = log_item.y0
         y1 = log_item.y1
         u = log_item.u
-        estimator.update(y0, u, y1)
+        try:
+            estimator.update(y0, u, y1)
+        except DiffeoSystemEstimatorInterface.LearningConverged:
+            break
         
     return estimator 
 

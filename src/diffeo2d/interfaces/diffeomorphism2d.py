@@ -103,7 +103,9 @@ class Diffeomorphism2D(object):
             # note that we do one of this for each new diffeomorphism
             from diffeo2d import FastDiffeoApply
             self.fda = FastDiffeoApply(self.d)
-        result = self.fda(template) 
+        result = self.fda(template)
+        
+        # Change to True to test 
         if False:
             from diffeo2d import diffeo_apply
             assert_allclose(result, diffeo_apply(self.d, template))
@@ -119,8 +121,8 @@ class Diffeomorphism2D(object):
             <var> is the variance of diffeomorphism
         """
         dd_info = self.get_scalar_info()
-        if True:  # XX: redundant
-            assert np.isfinite(dd_info).all()
+#         if True:  # XX: redundant
+#             assert np.isfinite(dd_info).all()
         
         im2 = self._d_apply(im)
         
@@ -137,11 +139,11 @@ class Diffeomorphism2D(object):
             
             var2 = dd_info * dvar
             
-        if False:  # XX: redundant
-            assert np.isfinite(dd_info).all()
-            assert np.isfinite(var).all()
-            assert np.isfinite(im2).all()
-            assert np.isfinite(var2).all()
+#         if False:  # XX: redundant
+#             assert np.isfinite(dd_info).all()
+#             assert np.isfinite(var).all()
+#             assert np.isfinite(im2).all()
+#             assert np.isfinite(var2).all()
                                              
         return im2, var2
     
@@ -221,14 +223,17 @@ class Diffeomorphism2D(object):
     def display(self, report, full=False, nbins=100):  # @UnusedVariable
         """ Displays this diffeomorphism. """
         from diffeo2d import diffeo_stats
+        print('getting stats')
         stats = diffeo_stats(self.d)
         angle = stats.angle
         norm = stats.norm
         
+        print('getting colors')
         norm_rgb = self.get_rgb_norm()
         angle_rgb = self.get_rgb_angle()
         info_rgb = self.get_rgb_info()
         
+        print('figures')
         f = report.figure(cols=6)
         f.data_rgb('norm_rgb', norm_rgb,
                     caption="Norm(D). white=0, blue=maximum (%.2f). " % np.max(norm))
@@ -243,9 +248,24 @@ class Diffeomorphism2D(object):
         f.data_rgb('var_rgb', info_rgb,
                     caption='Uncertainty (green=sure, red=unknown %s)' % varmax_text)
 
+        print('histogram of norm values')
         with f.plot('norm_hist', caption='histogram of norm values') as pylab:
             pylab.hist(norm.flat, nbins)
+            
+            ax = pylab.gca()
+            ax.set_xlabel('pixels')
+            ax2 = ax.twiny()
+            new_tick_locations = ax.get_xticks()  # np.array(range(40))
 
+            def tick_function(X):
+                x = float(X * 1.0 / self.get_shape()[0])
+                return '%.3f' % x
+
+            ax2.set_xticks(new_tick_locations)
+            ax2.set_xticklabels(map(tick_function, new_tick_locations))
+            ax2.set_xlabel('viewport fraction (unitless)')
+
+        print('histogram of certainty values')
         angles = np.array(angle.flat)
         valid_angles = angles[np.logical_not(np.isnan(angles))]
         if len(valid_angles) > 0:
@@ -254,7 +274,8 @@ class Diffeomorphism2D(object):
                 pylab.hist(valid_angles, nbins)
             
         try:
-            with f.plot('var_hist', caption='histogram of certainty values') as pylab:
+            with f.plot('var_hist',
+                        caption='histogram of certainty values') as pylab:
                 pylab.hist(self.variance.flat, nbins)
         except:
             print('hist plot exception')

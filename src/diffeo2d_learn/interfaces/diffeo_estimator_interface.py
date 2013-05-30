@@ -26,13 +26,22 @@ class Diffeo2dEstimatorInterface(WithInternalLog):
             Sets the maximum displacement to be used, in resolution-independent
             units.  Must be called before any call to update().
         """
+
     
+    class LearningConverged(Exception):
+        """ 
+            Thrown by update() to signal that they do not need more 
+            data to converge. 
+        """
+        pass
     
     @abstractmethod
     @contract(y0='array[MxN]', y1='array[MxN]')
     def update(self, y0, y1):
         """ 
-            Considers the sample for learning 
+            Considers the sample for learning.
+            
+            Might throw  Diffeo2dEstimatorInterface.LearningConverged. 
         """
     
     class NotReady(Exception):

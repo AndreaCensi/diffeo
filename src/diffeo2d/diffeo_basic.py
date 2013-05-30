@@ -206,7 +206,7 @@ def diffeo_local_differences(a, b):
 
 @contract(a='valid_diffeomorphism,array[MxNx2]',
           b='valid_diffeomorphism,array[MxNx2]',
-          returns='tuple(array[MxN](float32), array[MxN](float32))')
+          returns='array[MxN](float32)')
 def diffeo_local_differences_L2(a, b):
     ''' Returns the norm of the difference between the two diffeos, pointwise. '''
     dx, dy = diffeo_local_differences(a, b)

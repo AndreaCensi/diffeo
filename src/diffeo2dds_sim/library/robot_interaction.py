@@ -1,8 +1,8 @@
 from bootstrapping_olympics import get_boot_config
 from bootstrapping_olympics.misc import bd_sequence_from_robot_agent
+from contracts import contract
 from diffeo2dds_learn import Stream, LogItem
 import itertools
-from contracts import contract
 
 __all__ = ['RobotInteractionStream']
 

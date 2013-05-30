@@ -8,21 +8,9 @@ import numpy as np
 import warnings
 
 
-__all__ = ['DiffeoActionEstimatorNewUnc']
+__all__ = ['DiffeoActionEstimatorNewUnc', 'consistency_based_uncertainty2',
+           'consistency_based_uncertainty']
 
-# 
-# def length_score_norm(v, v_inv):
-#     return np.linalg.norm(np.array(v) + v_inv) 
-# 
-# def length_score_norm_relative(v, v_inv):
-#     l = np.linalg.norm(v)
-#     l_inv = np.linalg.norm(v_inv)
-#     l_mean = 0.5 * (l + l_inv)
-#     if l_mean == 0:
-#         return 0
-#     else:
-#         return np.linalg.norm(np.array(v) + v_inv) / l_mean
-#     
 
 class DiffeoActionEstimatorNewUnc(DiffeoActionEstimatorSimple):
     """ This implements the new consistency-based uncertainty detection. """
@@ -69,8 +57,8 @@ def consistency_based_uncertainty(action, normalize_distance):
     return a
 
 
-@contract(d1='valid_diffeomorphism,array[HxW]',
-          d2='valid_diffeomorphism,array[HxW]',
+@contract(d1='valid_diffeomorphism,array[HxWx2]',
+          d2='valid_diffeomorphism,array[HxWx2]',
           returns='seq[2](array[HxW](>=0,<=1))')
 def consistency_based_uncertainty2(d1, d2, normalize_distance=True):
     """ Returns the assigned uncertainty field for the two diffeomorphisms. """
@@ -103,43 +91,3 @@ def consistency_based_uncertainty2(d1, d2, normalize_distance=True):
     v2 = normalize(e2)
     return v1, v2
      
-     
-# 
-# def consistency_based_uncertainty2(field, field_inv, length_score):
-#     
-#     Y, X = np.meshgrid(range(field.shape[1]), range(field.shape[0]))
-#     
-#     D = np.zeros(X.shape + (2,))
-#     D[:, :, 0] = field[:, :, 0] - X
-#     D[:, :, 1] = field[:, :, 1] - Y
-#     
-#     D_inv = np.zeros(X.shape + (2,))
-#     D_inv[:, :, 0] = field_inv[:, :, 0] - X
-#     D_inv[:, :, 1] = field_inv[:, :, 1] - Y
-#     
-#     E = np.zeros(X.shape)
-#     E_inv = np.zeros(X.shape)
-#     
-#     for c in itertools.product(range(X.shape[0]), range(X.shape[1])):
-#         v = D[c]
-#         v_inv = D_inv[tuple(D[c])]
-#         # Length score
-#         score = length_score(v, v_inv)
-#         
-#         if np.isnan(score):
-#             print('Debugger break, something unexpected happened')
-#             pdb.set_trace()
-#         E[tuple(c)] = score
-#         
-#         v = D_inv[c]
-#         v_inv = D[tuple(D_inv[c])]
-#         # Length score
-#         score = length_score(v, v_inv)
-#         if np.isnan(score):
-#             pdb.set_trace()
-#         E_inv[tuple(c)] = score
-#         
-#     action.diffeo.variance = 1 - E / np.max(E)
-#     action.diffeo.variance_max = np.max(E)
-#     action.diffeo_inv.variance = 1 - E_inv / np.max(E_inv)
-#     action.diffeo_inv.variance_max = np.max(E_inv)

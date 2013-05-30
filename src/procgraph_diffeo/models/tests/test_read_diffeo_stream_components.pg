@@ -1,0 +1,9 @@
+--- model test_read_diffeo_stream_components
+""" Tries the read_diffeo_stream component. """
+config stream = test_random_dpx1_64_500
+
+|read_diffeo_stream_components stream=$stream| -> y0, u, y1
+
+y0 -> |info|
+u -> |info|
+y1 -> |info|

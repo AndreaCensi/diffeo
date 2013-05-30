@@ -9,7 +9,6 @@ __all__ = ['DiffeoSystemEstimatorInterface']
 
 
 class DiffeoSystemEstimatorInterface(WithInternalLog):
-    
     """ 
         Interface for a DiffeoSystem estimator. It integrates the information
         in pairs of images and returns a DiffeoSystem from get_value()
@@ -26,10 +25,21 @@ class DiffeoSystemEstimatorInterface(WithInternalLog):
             units.  Must be called before any call to update().
         """
     
+    class LearningConverged(Exception):
+        """ 
+        Thrown by update() to signal that they do not need more data to converge. 
+        """
+        pass
+
+
     @abstractmethod
     @contract(y0='array[MxN]|array[MxNx3]',
               u0='array[K]', y1='array[MxN]|array[MxNx3]')
     def update(self, y0, u0, y1):
+        """ 
+            Might throw DiffeoSystemEstimatorInterface.LearningConverged
+            to signal that no more data is necessary.
+        """
         pass
 
     @abstractmethod

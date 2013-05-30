@@ -9,7 +9,9 @@ from reprep import Report
 import numpy as np
 import warnings
 
+
 __all__ = ['DiffeoSystem']
+
 
 class DiffeoSystem(object):
     """
@@ -156,9 +158,11 @@ class DiffeoSystem(object):
         
         if self.actions:
             overview += '\nResolution: %s' % str(self.get_shape())
+            
         report.text('overview', overview)
     
         for i, action in enumerate(self.actions):
+            print('dds.display action: %d' % i)
             sec = report.section('action%d' % i)
             action.display(report=sec, image=image)
             

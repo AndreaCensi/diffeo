@@ -5,7 +5,7 @@ from diffeo2d import diffeo_inverse, diffeo_distance_L2, \
     diffeo_compose
 
 
-class Action:
+class Action(object):
     @contract(diffeo=Diffeomorphism2D)
     def __init__(self, diffeo, label, primitive, invertible, original_cmd):
         self.diffeo = diffeo

@@ -42,13 +42,24 @@ class FlatStructure(object):
             is a K x N array.
 
         '''
+        neighborarea = np.array(neighborarea)
+        
+        if not np.all(neighborarea <= shape):
+            neighborarea = np.minimum(neighborarea, shape)
+            
+        assert neighborarea[0] <= shape[0]
+        assert neighborarea[1] <= shape[1]
         # for each sensel, create an area 
-        cmg = cmap(np.array(neighborarea))
+        cmg = cmap(np.array(neighborarea), max_shape=shape)
         
         # if the area size is even, it is bumbed to the next integer
         assert cmg.shape[0] >= neighborarea[0]
         assert cmg.shape[1] >= neighborarea[1]
-        
+        assert cmg.shape[0] <= neighborarea[0] + 1
+        assert cmg.shape[1] <= neighborarea[1] + 1
+        # but we cannot be bigger than the area anyway
+        assert cmg.shape[0] <= shape[0]
+        assert cmg.shape[1] <= shape[1]
         self.area_shape = cmg.shape[0], cmg.shape[1]
         self.shape = shape
         self.H, self.W = shape
@@ -88,19 +99,26 @@ class FlatStructure(object):
                 cm[:, :, 1] = cm[:, :, 1] % shape[1]
             elif self.topology == 'plane':
                 for i in range(2):
-                    # move to the border
                     cmin = cm[:, :, i].min()
-                    cmax = cm[:, :, i].max()
                     if cmin < 0:
-                        cm[:, :, i] -= cmin
+                        cm[:, :, i] -= cmin                    
+                    assert cm[:, :, i].min() >= 0
+
+                    cmax = cm[:, :, i].max()
                     if cmax >= shape[i]:
-                        cm[:, :, i] -= (cmax - (shape[i] - 1))                    
+                        delta = -(cmax - (shape[i] - 1))                    
+                        cm[:, :, i] += delta
+                    
+                    assert cm[:, :, i].max() < shape[i]
+                    assert cm[:, :, i].min() >= 0
+                        
             else:
                 assert False
 
             for i in range(2):
-                assert cm[:, :, i].min() >= 0
-                assert cm[:, :, i].max() < shape[i]
+                cmin, cmax = cm[:, :, i].min(), cm[:, :, i].max()
+                assert cmin >= 0
+                assert cmax < shape[i]
 
                 
             indices = np.zeros(self.area_shape, 'int32')
@@ -142,7 +160,7 @@ class FlatStructure(object):
         valueflat = self.flattening.rect2flat(value)
         warnings.warn('Not tested yet')
         # Alternative:
-        #  return valueflat[self.neighbor_indices_flat]
+#         return valueflat[self.neighbor_indices_flat]
         return valueflat.take(self.neighbor_indices_flat, out=out)
 
     @contract(value='array[HxW]', returns='array[NxA]')
@@ -185,10 +203,10 @@ class FlatStructure(object):
                 d = np.hypot(dxn, dyn)
                 D[i, jj] = d
         return D 
-    
+     
     @memoize_simple
     @contract(returns='array[NxA]')
-    def get_distances_to_area_center(self):
+    def get_distances_to_area_center_slow(self):
         """ 
             This returns the distance of each neighbor to the center 
             of the area border. This is the same thing as get_distances()
@@ -209,35 +227,65 @@ class FlatStructure(object):
                 D[i, jj] = d
         return D 
     
+    @memoize_simple
+    @contract(returns='array[NxA]')
+    def get_distances_to_area_center(self):
+        """ 
+            This returns the distance of each neighbor to the center 
+            of the area border. This is the same thing as get_distances()
+            only if the area center is on the nominal pixel. 
+        """
+        D = np.zeros((self.N, self.A))
+        for i in xrange(self.N):
+            pi = self.flattening.index2cell[i]
+            area_center = self.get_center_for_cell_area(pi)
+            js = self.neighbor_indices_flat[i, :]
+            pjs = self.flattening.index2cell[js]
+            assert pjs.shape[1] == 2
+            dx = area_center[0] - pjs[:, 0]
+            dy = area_center[1] - pjs[:, 1]
+            dxn = dmod(dx, self.shape[0] / 2)
+            dyn = dmod(dy, self.shape[1] / 2)
+            d = np.hypot(dxn, dyn)
+            D[i, :] = d
+        return D 
+    
     @contract(cell='seq[2](int)', returns='seq[2](int)')
     def get_center_for_cell_area(self, cell):
         res = self.centers[tuple(cell)]
         return res.astype('int')
         
-    @memoize_simple
     @contract(returns='array[NxA]')
     def get_distances_to_area_border(self):
         """ This returns the distance of each neighbor to the border of the area """
         D = np.zeros((self.N, self.A))
-        Xd = np.floor(self.X / 2.0)
-        Yd = np.floor(self.Y / 2.0)
         for i in xrange(self.N):
-            pi = self.flattening.index2cell[i]
-            area_center = self.get_center_for_cell_area(pi)
-
-            for jj in xrange(self.A):
-                j = self.neighbor_indices_flat[i, jj]
-                pj = self.flattening.index2cell[j]
-                dx = area_center[0] - pj[0]
-                dy = area_center[1] - pj[1]
-                dxn = dmod(dx, self.shape[0] / 2)
-                dyn = dmod(dy, self.shape[1] / 2)
-                d_up = np.abs((-Yd) - dyn)
-                d_down = np.abs((+Yd) - dyn)
-                d_left = np.abs((-Xd) - dxn)
-                d_right = np.abs((+Xd) - dxn)
-                D[i, jj] = np.min([d_up, d_down, d_left, d_right])
+            js = self.neighbor_indices_flat[i, :]
+            pjs = self.flattening.index2cell[js]            
+            assert pjs.shape[1] == 2
+            
+            up = np.min(pjs[:, 0])
+            down = np.max(pjs[:, 0])
+            left = np.min(pjs[:, 1])
+            right = np.max(pjs[:, 1])
+            d_up = pjs[:, 0] - up
+            d_down = down - pjs[:, 0]
+            d_left = pjs[:, 1] - left
+            d_right = right - pjs[:, 1]
+             
+            assert np.all(d_up) >= 0
+            assert np.all(d_down) >= 0
+            assert np.all(d_left) >= 0
+            assert np.all(d_right) >= 0
+            
+            d = np.minimum(np.minimum(d_up, d_down), np.minimum(d_right, d_left))
+            assert np.all(d) >= 0
+            
+            
+            D[i, :] = d
+                
         return D 
+
         
     @contract(v='array[NxA]', returns='array[HxWxXxY],N=H*W,A=X*Y')
     def unrolled2multidim(self, v):

@@ -24,9 +24,20 @@ class DiffeoActionEstimatorInterface(WithInternalLog):
             units.  Must be called before any call to update().
         """
     
+    class LearningConverged(Exception):
+        """ 
+            Thrown by update() to signal that they do not need 
+            more data to converge. 
+        """
+        pass
+
     @abstractmethod
     @contract(y0='array[MxN]|array[MxNx3]', y1='array[MxN]|array[MxNx3]')
     def update(self, y0, y1):
+        """ 
+            Might throw DiffeoActionEstimatorInterface.LearningConverged 
+            to signal that no more data is necessary. 
+        """
         pass
     
     NotReady = Diffeo2dEstimatorInterface.NotReady

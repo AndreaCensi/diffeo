@@ -3,7 +3,7 @@ import numpy as np
 
 __all__ = ['SquareDomain']
 
-class SquareDomain:
+class SquareDomain(object):
     @contract(bounds='seq[N,>0](seq[2])')
     def __init__(self, bounds):
         self.bounds = bounds

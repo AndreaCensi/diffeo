@@ -3,7 +3,8 @@ from bootstrapping_olympics import (AgentInterface, UnsupportedSpec,
 from bootstrapping_olympics.library.nuisances import scipy_image_resample
 from contracts import contract
 from diffeo2dds_learn import get_diffeo2ddslearn_config
-import warnings
+from diffeo2dds_learn import DiffeoSystemEstimatorInterface
+from bootstrapping_olympics import PassiveAgentInterface
 
 
 __all__ = ['Diffeo2Agent']
@@ -68,8 +69,12 @@ class Diffeo2Agent(AgentInterface):
             if self.shape is not None:
                 y0 = scipy_image_resample(y0, self.shape)
                 y1 = scipy_image_resample(y1, self.shape)
-                
-            self.diffeosystem_estimator.update(y0=y0, u0=u, y1=y1)
+            
+            try: 
+                self.diffeosystem_estimator.update(y0=y0, u0=u, y1=y1)
+            except DiffeoSystemEstimatorInterface.LearningConverged as e:
+                msg = 'DiffeoSystem converged: %s' % str(e)
+                raise PassiveAgentInterface.LearningConverged(msg)
         
         self.last_obs = obs
         
@@ -84,14 +89,16 @@ class Diffeo2Agent(AgentInterface):
 
     def display(self, report):
         with report.subsection('model') as sub:
+            print('getting dds')
             discdds = self.diffeosystem_estimator.get_value()
+            print('displaying dds')
             discdds.display(sub)
-            
-        warnings.warn('removed')
-        if False:
+        
+        if False:    
             with report.subsection('estimator') as sub:
                 self.diffeosystem_estimator.display(sub)
-    
+            
+            
     def publish(self, pub):
         return self.display(pub) 
 

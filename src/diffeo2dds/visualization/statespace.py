@@ -4,7 +4,7 @@ from abc import  abstractmethod
 __all__ = ['DiffeoSystemStateSpace']
 
 
-class DiffeoSystemStateSpace:
+class DiffeoSystemStateSpace(object):
     """ 
         This class if for visualization/debug only.
         It integrates what would be "uninterpreted" commands

@@ -1,0 +1,12 @@
+--- model visualize_diffeo_stream1
+""" Basic visualization """
+config stream = test_random_dpx1_64_500
+config out= "${stream}.mp4"
+
+|read_diffeo_stream_components stream=$stream| -> y0, u, y1
+y0 -> |torgb| -> |border| -> y0rgb
+y1 -> |torgb| -> |border| -> y1rgb
+
+y0, y1 -> |sync| -> |diffeo_show_mismatch| -> |border|  -> diffrgb
+
+y0rgb, y1rgb, diffrgb -> |grid| -> |pil_zoom factor=4| -> |mencoder file=$out firstpass_bitrate=10000000|

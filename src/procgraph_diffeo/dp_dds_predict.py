@@ -3,6 +3,8 @@ from diffeoplan import get_dp_config
 from procgraph import Block
 from procgraph_pil import resize
 
+__all__ = ['DPDDSPredict']
+
 class DPDDSPredict(Block):
     Block.alias('dp_discdds_predict')
     

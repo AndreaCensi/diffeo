@@ -2,7 +2,7 @@ from diffeo2dds_learn import ImageStream
 from contracts import contract
 import numpy as np
 import warnings
-from procgraph_cv.opencv_utils import smooth
+# from procgraph_cv.opencv_utils import smooth
 
 __all__ = ['RandomImageStream', 'CoherentRandomImageStream']
 
@@ -21,7 +21,8 @@ class RandomImageStream(ImageStream):
             y = np.random.rand(*shape) * 255
             y = y.astype('uint8') 
             yield y
-            
+      
+      
 
 class CoherentRandomImageStream(ImageStream):
     
@@ -38,18 +39,28 @@ class CoherentRandomImageStream(ImageStream):
         while True:
             yield self.get_image()
     
-    @contract(returns='array[HxWx3](float32)')
+    @contract(returns='array[HxWx3](float32,>=0,<=1)')
     def get_image(self):    
         shape = (self.shape[0], self.shape[1])
         y = np.random.rand(*shape)
         y = y >= self.level
         y = y.astype('float32')
         # print self.sigma
-        y = smooth(y, gaussian_std=self.sigma)
-        y = np.dstack((y, y, y))
+        y = scipy_smooth(y, gaussian_std=self.sigma)
         y -= y.min()
-        y *= 1.0 / y.max()
+        ymax = y.max()
+        if ymax > 0:
+            y *= 1.0 / ymax
+        y = np.dstack((y, y, y))
         return y
     
+    
+@contract(y='array[HxW]', returns='array[HxW]', gaussian_std='float,>0')
+def scipy_smooth(y, gaussian_std):
+    import scipy.ndimage
+    y2 = scipy.ndimage.filters.gaussian_filter(y, sigma=gaussian_std,
+                                          order=0, mode='nearest')
+    
+    return y2
     
     
