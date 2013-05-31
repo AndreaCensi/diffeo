@@ -86,3 +86,15 @@
     min_shape: [64, 32]
 
 
+- id: "refine_exp28"
+  desc: "Shape min 64x64, threshold 0.9"
+  code: 
+  - diffeo2d_learn.library.DiffeomorphismEstimatorDoubleRefine
+  - g: 5
+    gamma: 1.3
+    desired_resolution_factor: 1.0
+    change_threshold: 0.9
+    min_shape: [64, 64]
+    inference_method: order
+    stop_at_convergence: true
+

@@ -42,7 +42,7 @@ def jobs_learning(context, estimator, stream, max_displ):
     context.comp(save_results, estimator, stream, outdir, dds)
     
     # create reports
-    params = dict(stream=stream, estimator=estimator)
+    params = dict(stream=stream, estimator=estimator, max_displ=max_displ)
     learner_report = context.comp(report_learner, learner) 
     dds_report = context.comp(report_dds, dds)
     context.add_report(learner_report, 'learner', **params)
