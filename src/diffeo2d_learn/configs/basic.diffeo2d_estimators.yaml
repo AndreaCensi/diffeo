@@ -23,7 +23,7 @@
   - match_method: binary
 
 - id: "refine0"
-  desc: "Same resolution"
+  desc: "Gets to the native resolution (g=5,gamma=1.3,threshold=0.8)"
   code: 
   - diffeo2d_learn.library.DiffeomorphismEstimatorDoubleRefine
   - g: 5
@@ -33,6 +33,18 @@
     min_shape: [32, 32]
     inference_method: order
     stop_at_convergence: true
+
+- id: "refine0ns"
+  desc: "Gets to the native resolution (g=5,gamma=1.3,threshold=0.8), does not stop"
+  code: 
+  - diffeo2d_learn.library.DiffeomorphismEstimatorDoubleRefine
+  - g: 5
+    gamma: 1.3
+    desired_resolution_factor: 1.0
+    change_threshold: 0.8
+    min_shape: [32, 32]
+    inference_method: order
+    stop_at_convergence: false
 
 
 - id: "refine1"
