@@ -4,7 +4,6 @@ from diffeo2dds_learn import LogItem
 
 __all__ = ['read_bag']
 
-
     
 def read_bag(bagfile):
     """ 
@@ -59,7 +58,9 @@ def read_bag(bagfile):
             i += 1
             Y0 = get_image_array(Y0_ros)
             Y1 = get_image_array(Y1_ros)
-            U0 = U0_ros.data
+            U0 = np.array(U0_ros.data)
+            # print describe_value(Y0)
+            # print describe_value(Y1)
             r = 0
             yield LogItem(y0=Y0, u=U0, y1=Y1, x0=None)
 
@@ -135,7 +136,7 @@ def read_bag(bagfile):
 
 
 def get_image_array(image):
-    from ros_node_utils.conventions.np_images import imgmsg_to_pil
+    from ros_node_utils import imgmsg_to_pil
     im, _, _ = imgmsg_to_pil(image)
     pix = np.asarray(im).astype(np.uint8)
     return pix

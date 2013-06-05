@@ -34,7 +34,15 @@ class DiffeoActionEstimatorSimple(DiffeoActionEstimatorInterface):
         if y0.ndim == 3:
             # if there are 3 channels...
             for ch in range(3):
-                self._update(y0[:, :, ch], y1[:, :, ch])
+                y0ch = y0[:, :, ch]
+                y1ch = y1[:, :, ch]
+                if y0.dtype == 'float32':
+                    self._update(y0ch, y1ch)
+                else:
+                    assert y0.dtype == 'uint8'
+                    uint2float = lambda x: x.astype('float32') / 255.0
+                    self._update(uint2float(y0ch), uint2float(y1ch))
+                
         else:
             assert y0.ndim == 2
             self._update(y0, y1)

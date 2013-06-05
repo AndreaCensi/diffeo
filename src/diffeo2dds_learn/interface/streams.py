@@ -1,9 +1,10 @@
 from abc import abstractmethod
-from contracts import ContractsMeta
+from contracts import ContractsMeta, contract
 from diffeo2dds.model.uncertain_image import any_image_to_rgb
 
 class LogItem(object):
 
+    @contract(y0='array,shape(x)', y1='array,shape(x)', u='array')
     def __init__(self, y0, u, y1, x0=None):
         self.y0 = y0
         self.u = u
@@ -28,6 +29,7 @@ class Stream(object):
         
     @abstractmethod        
     def read_all(self):
+        """ Yields a sequence of LogItems. """
         pass
     
 
