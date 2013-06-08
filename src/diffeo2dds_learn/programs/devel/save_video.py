@@ -4,10 +4,9 @@ __all__ = ['video_visualize_diffeo_stream1', 'video_visualize_diffeo_stream1_rob
 
 def video_visualize_diffeo_stream1(id_stream, out):
     """ Creates a video for a stream. """
-    import procgraph_diffeo  # @UnusedImport
     from procgraph import pg
     config = dict(out=out, stream=id_stream)
-    pg('visualize_diffeo_stream1', config=config)
+    pg('visualize_diffeo_stream1', config=config, additional_modules=['procgraph_diffeo'])
     return out
 
 def video_visualize_diffeo_stream1_robot(id_robot, boot_root, out):

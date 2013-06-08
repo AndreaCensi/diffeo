@@ -8,6 +8,7 @@ from diffeo2s.utils import construct_matrix
 from reprep import Report
 import numpy as np
 import warnings
+from diffeo2dds.configuration.config_master import get_conftools_uncertain_images
 
 
 __all__ = ['DiffeoSystem']
@@ -153,7 +154,8 @@ class DiffeoSystem(object):
             :param report: instance of reprep.Report to fill.
             :param image: RGB image to use as test.
         '''
-            
+        if image is None:
+            image = get_conftools_uncertain_images().instance('lena')
         overview = 'Displaying a discrete DDS with %d actions' % len(self.actions)
         
         if self.actions:
