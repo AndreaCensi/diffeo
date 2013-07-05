@@ -36,6 +36,7 @@ setup(
     },
       
     install_requires=[
+        'scikits-image',
         'PyContracts',
         'PyGeometry',
         'compmake',
