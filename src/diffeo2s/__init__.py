@@ -1,4 +1,10 @@
-from diffeo2d import logger
+import logging
+
+logging.basicConfig()
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+
 from .configuration import *
 from .interfaces import *
 from .symdiffeo import *

@@ -1,7 +1,8 @@
-from . import SquareDomain, LinearCoordinateChange
+from .coordinate_change import LinearCoordinateChange
+from .square_domain import SquareDomain
 from contracts import contract
-from diffeo2d.misc_utils import coords_iterate
 from diffeo2s import SymbolicDiffeo
+from diffeo2s.utils import coords_iterate
 import numpy as np
 
 __all__ = ['diffeo_from_function_viewport']

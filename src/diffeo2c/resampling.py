@@ -1,6 +1,5 @@
 from contracts import contract, new_contract
 import numpy as np
-import warnings
 
 __all__ = ['diffeoc_from_diffeou', 'diffeou_from_diffeoc', 'diffeo_resample']
 
@@ -71,8 +70,7 @@ def diffeo_resample(d, shape, order=3):
         Resamples a diffeomorphism.
     """
     shape = tuple(shape)
-    warnings.warn('remove this dependency')
-    from bootstrapping_olympics.library.nuisances.shape import scipy_image_resample
+    from .scipy_resample import scipy_image_resample
 
     # First we convert to resolution-independent coordinates
     du = diffeou_from_diffeoc(d)

@@ -2,6 +2,7 @@ from numpy.testing import assert_allclose
 from contracts import contract
 import numpy as np
 import warnings
+from diffeo2c.scipy_resample import scipy_image_resample
 
 
 __all__ = ['Diffeomorphism2D']
@@ -48,9 +49,6 @@ class Diffeomorphism2D(object):
     def resample(self, shape):
         from diffeo2c import diffeo_resample
         d2 = diffeo_resample(self.d, shape)
-        warnings.warn('remove this dependency')
-        from bootstrapping_olympics.library.nuisances.shape.resample \
-            import scipy_image_resample
         # this might give negative values
         v2 = scipy_image_resample(self.variance, shape)
         np.clip(v2, 0, 1, out=v2)

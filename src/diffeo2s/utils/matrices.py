@@ -5,7 +5,8 @@ from contracts import contract
 __all__ = ['construct_matrix_iterators',
            'construct_matrix',
            'construct_distance_matrix',
-           'iterate_indices']
+           'iterate_indices',
+           'coords_iterate']
 
 
 def construct_matrix_iterators(iterators, function):
@@ -48,3 +49,8 @@ def iterate_indices(shape):
     else:
         raise NotImplementedError
         assert(False)
+
+@contract(size='valid_2d_shape')
+def coords_iterate(size):
+    for x in itertools.product(range(size[0]), range(size[1])):
+        yield x

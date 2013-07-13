@@ -1,8 +1,6 @@
 from .phases import get_phase_sequence
 import warnings
 from pprint import pformat
-warnings.warn('remove dependency')
-from bootstrapping_olympics.library.nuisances import scipy_image_resample
 from contracts import contract
 from diffeo2c import diffeo_resample
 from diffeo2d import FlatStructure, diffeo_identity
@@ -10,6 +8,8 @@ from diffeo2d_learn import Diffeo2dEstimatorInterface
 from diffeo2d_learn.library import DiffeomorphismEstimatorFaster
 import numpy as np
 from numpy.testing.utils import assert_allclose
+from diffeo2c.scipy_resample import scipy_image_resample
+
 
 __all__ = ['DiffeomorphismEstimatorDoubleRefine']
 
@@ -205,7 +205,6 @@ class DiffeomorphismEstimatorDoubleRefine(Diffeo2dEstimatorInterface):
         should = frac_stable >= self.change_threshold
         
         return should
-    
 
     def display(self, report):
         if not self.initialized():
@@ -216,7 +215,6 @@ class DiffeomorphismEstimatorDoubleRefine(Diffeo2dEstimatorInterface):
                 e.display(sub) 
         
         report.text('log', "\n".join(self.get_raw_log_lines()))
-        
         
     def get_value(self):
         if not self.initialized():
@@ -243,6 +241,8 @@ class DiffeomorphismEstimatorDoubleRefine(Diffeo2dEstimatorInterface):
         """ Merges the values obtained by "other" with ours. """
         msg = 'DiffeomorphismEstimatorDoubleRefine does not allow merging.'
         raise NotImplementedError(msg)
+    
+    
     
 class DiffeomorphismEstimatorFasterGuess(DiffeomorphismEstimatorFaster):
     

@@ -50,35 +50,36 @@ def jobs_learning_parallel(context, estimator, stream, max_displ,
         # If we want to generate intermediate reports
         if intermediate_reports:
             params_i = dict(stream=stream, estimator=estimator, i=i, n=nthreads)
-            c.add_report(c.comp(report_learner, learner_i),
+            # 'lena' needed
+            c.add_report(c.comp_config(report_learner, learner_i),
                          'learner_partial', **params_i)
             
-            diffeo_i = c.comp(get_estimated_dds, learner_i,
+            diffeo_i = c.comp_config(get_estimated_dds, learner_i,
                               job_id='summarize')
             
-            c.add_report(c.comp(report_dds, diffeo_i),
+            c.add_report(c.comp_config(report_dds, diffeo_i),
                          'dds_partial', **params_i)
             
     # TODO: redo this in a hierarchical way
     current = partial[0]
     for i in range(1, nthreads):
-        current = context.comp(merge, current, partial[i],
+        current = context.comp_config(merge, current, partial[i],
                                job_id='merge-%sof%s' % (i, nthreads - 1))
     # final learner
     learner = current
     # final model
-    dds = context.comp(get_estimated_dds, current,
+    dds = context.comp_config(get_estimated_dds, current,
                        job_id='summarize')
 
     # save dds
     outdir = context.get_output_dir()
-    context.comp(save_results, estimator, stream, outdir, dds)    
+    context.comp_config(save_results, estimator, stream, outdir, dds)    
     
     params = dict(estimator=estimator, stream=stream)
-    context.add_report(context.comp(report_learner, learner),
+    context.add_report(context.comp_config(report_learner, learner),
                        "learner", **params) 
     
-    context.add_report(context.comp(report_dds, dds),
+    context.add_report(context.comp_config(report_dds, dds),
                        "dds", **params)
 
     
