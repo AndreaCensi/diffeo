@@ -7,4 +7,4 @@
     agent: random_agent
     robot: "${robot}"
 
-- id: s-boot-r-dds-drx1-68
+- id: r-dds-drx1-68

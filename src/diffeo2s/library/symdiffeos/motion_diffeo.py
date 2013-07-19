@@ -4,7 +4,9 @@ from geometry import se2, SE2
 import geometry
 import numpy as np
 
+
 __all__ = ['MotionDiffeo']
+
 
 class MotionDiffeo(SymbolicDiffeo):
     """ A rigid motion of the plane/torus. """
