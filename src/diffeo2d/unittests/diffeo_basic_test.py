@@ -1,14 +1,17 @@
-from .. import (diffeo_identity, diffeo_compose, dmod, diffeo_distance_Linf,
-    diffeo_from_function, diffeo_inverse, diffeo_distance_L2)
-from diffeo2d.tests.testing import for_all_diffeo_pairs, for_all_diffeos
-from diffeo2s.library import identity, rotx, rotx2
 from functools import wraps
+
 from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
 from numpy.testing import assert_allclose
 
+from diffeo2d.unittests.testing import for_all_diffeo_pairs, for_all_diffeos
+from diffeo2s.library import identity, rotx, rotx2
+
+from diffeo2d import (diffeo_identity, diffeo_compose, dmod, diffeo_distance_Linf,
+    diffeo_from_function, diffeo_inverse, diffeo_distance_L2)
 
 
+# from diffeo2d.tests.testing import for_all_diffeo_pairs, for_all_diffeos
 def diffeo_composition_test_1():
     shape = (90, 90)
     identity = diffeo_identity(shape)

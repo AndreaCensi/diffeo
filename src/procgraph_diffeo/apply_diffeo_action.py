@@ -1,8 +1,10 @@
 from contracts import contract
-from diffeoplan import UncertainImage, get_dp_config
-from procgraph import Block
 import contracts
+
+from diffeoplan import UncertainImage, get_dp_config
 import numpy as np
+from procgraph import Block
+
 
 __all__ = ['ApplyDiffeoAction']
 

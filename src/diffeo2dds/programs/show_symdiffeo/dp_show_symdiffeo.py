@@ -1,6 +1,7 @@
+import os
+
 from procgraph_pil import resize
 from reprep import Report
-import os
 
 
 @declare_command('show-symdiffeo',

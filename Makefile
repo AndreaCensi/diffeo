@@ -1,4 +1,4 @@
-package=compmake
+package=diffeo
 
 include pypackage.mk
 	

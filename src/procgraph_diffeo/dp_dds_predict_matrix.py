@@ -1,12 +1,15 @@
+import itertools
+
 from contracts import contract
+import contracts
+
 from diffeo2dds import UncertainImage
 from diffeoplan import get_dp_config
+import numpy as np
 from procgraph import Block
 from procgraph_images import make_images_grid
 from procgraph_pil import resize
-import contracts
-import itertools
-import numpy as np
+
 
 __all__ = ['DPDDSPredictMatrix']
 

@@ -1,8 +1,9 @@
-from diffeo2d import FastDiffeoApply, diffeo_apply
-from diffeo2d.tests.testing import for_all_dd
 from numpy.testing import assert_allclose
+
+from diffeo2d import FastDiffeoApply, diffeo_apply
 import numpy as np
 
+from .testing import for_all_dd
 
 
 @for_all_dd

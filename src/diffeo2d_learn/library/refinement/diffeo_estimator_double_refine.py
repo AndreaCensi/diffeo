@@ -1,14 +1,17 @@
-from .phases import get_phase_sequence
-import warnings
 from pprint import pformat
+import warnings
+
 from contracts import contract
+from numpy.testing.utils import assert_allclose
+
 from diffeo2c import diffeo_resample
+from diffeo2c.scipy_resample import scipy_image_resample
 from diffeo2d import FlatStructure, diffeo_identity
 from diffeo2d_learn import Diffeo2dEstimatorInterface
 from diffeo2d_learn.library import DiffeomorphismEstimatorFaster
 import numpy as np
-from numpy.testing.utils import assert_allclose
-from diffeo2c.scipy_resample import scipy_image_resample
+
+from .phases import get_phase_sequence
 
 
 __all__ = ['DiffeomorphismEstimatorDoubleRefine']

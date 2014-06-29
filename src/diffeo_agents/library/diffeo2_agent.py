@@ -1,10 +1,10 @@
+from contracts import contract
+
 from bootstrapping_olympics import (AgentInterface, UnsupportedSpec,
     get_boot_config)
-from bootstrapping_olympics.library.nuisances import scipy_image_resample
-from contracts import contract
-from diffeo2dds_learn import get_diffeo2ddslearn_config
-from diffeo2dds_learn import DiffeoSystemEstimatorInterface
 from bootstrapping_olympics import PassiveAgentInterface
+from bootstrapping_olympics.library.nuisances import scipy_image_resample
+from diffeo2dds_learn import DiffeoSystemEstimatorInterface, get_diffeo2ddslearn_config
 
 
 __all__ = ['Diffeo2Agent']

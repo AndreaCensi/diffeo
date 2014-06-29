@@ -1,6 +1,7 @@
+from diffeo2dds_learn import LogItem
 from diffeo2dds_learn_rosbag import logger
 import numpy as np
-from diffeo2dds_learn import LogItem
+
 
 __all__ = ['read_bag']
 
@@ -14,7 +15,7 @@ def read_bag(bagfile):
             for Y0, u, Y1 in read_bag(bagfile):
                 ....
     """
-    import rosbag
+    import rosbag  # @UnresolvedImport
     logger.info('Reading bag file %r' % bagfile)
     bag = rosbag.Bag(bagfile)
     

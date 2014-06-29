@@ -1,5 +1,7 @@
 from contracts import contract
+
 import numpy as np
+
 
 __all__ = ['PhaseInfo', 'get_phase_sequence']
 
