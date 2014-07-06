@@ -1,13 +1,16 @@
-from bootstrapping_olympics import (make_streamels_finite_commands,
-    make_streamels_rgb_float, RobotInterface, RobotObservations, EpisodeDesc,
+
+import time
+import warnings
+
+from contracts import contract
+
+from bootstrapping_olympics import (RobotInterface, RobotObservations, EpisodeDesc,
     BootSpec, StreamSpec)
 from bootstrapping_olympics.utils import unique_timestamp_string
-from contracts import contract
 from diffeo2dds import UncertainImage, get_diffeo2dds_config
 from diffeo2dds_learn import get_diffeo2ddslearn_config
 import numpy as np
-import time
-import warnings
+from streamels import make_streamels_finite_commands, make_streamels_rgb_float
 
 
 __all__ = ['DiffeoSystemSimulation']

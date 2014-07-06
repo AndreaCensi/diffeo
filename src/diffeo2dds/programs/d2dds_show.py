@@ -1,7 +1,10 @@
-from .d2dds import Diffeo2dds
+import os
+
 from diffeo2dds import logger, get_diffeo2dds_config, UncertainImage
 from reprep import Report
-import os
+
+from .d2dds import Diffeo2dds
+
 
 __all__ = ['Diffeo2ddsShow']
 

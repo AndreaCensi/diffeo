@@ -18,8 +18,15 @@ from .stats import *
 from . import library
 
  
-def get_comptests():
+# def get_comptests():
+#     from . import unittests
+#     from comptests import get_comptests_app
+#     app = get_comptests_app(get_diffeo2d_config())
+#     return [app]
+
+
+def jobs_comptests(context):
     from . import unittests
-    from comptests import get_comptests_app
-    app = get_comptests_app(get_diffeo2d_config())
-    return [app]
+    from comptests import jobs_registrar
+    config = get_diffeo2d_config()
+    return jobs_registrar(context, config)
