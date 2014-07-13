@@ -6,7 +6,7 @@ __all__ = ['get_diffeo2d_config',
 
 @contract(returns=ObjectSpec)
 def get_conftools_diffeo2d_distances():
-    """ Returns the object responsible for instancing UncertainImagesDistance. """
+    """ Returns the object responsible for instancing Diffeo2dDistance. """
     return get_diffeo2d_config().diffeo2d_distances
 
 class Diffeo2dConfig(ConfigMaster):

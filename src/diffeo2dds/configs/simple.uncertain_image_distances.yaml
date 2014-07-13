@@ -1,14 +1,14 @@
 - id: neigh1
   desc: "Neighbor distance for a scaled image (160,120)"
   code:
-  - diffeoplan.library.DistanceNeighbor
+  - diffeo2dds.library.uncertain_image_distances.DistanceNeighbor
   - size: [160, 120]
     neighborarea: [4, 4]
 
 - id: neigh1eff
   desc: "More efficient"
   code:
-  - diffeoplan.library.DistanceNeighborEff
+  - diffeo2dds.library.uncertain_image_distances.DistanceNeighborEff
   - size: [160, 120]
     neighborarea: [4, 4]
 
@@ -16,7 +16,7 @@
 - id: neigh2
   desc: Neighbor distance for a scaled image
   code:
-  - diffeoplan.library.DistanceNeighbor
+  - diffeo2dds.library.uncertain_image_distances.DistanceNeighbor
   - size: [40, 30]
     neighborarea: [2, 2]
     
@@ -24,14 +24,14 @@
 - id: neigh2eff
   desc: Neighbor distance for a scaled image
   code:
-  - diffeoplan.library.DistanceNeighborEff
+  - diffeo2dds.library.uncertain_image_distances.DistanceNeighborEff
   - size: [40, 30]
     neighborarea: [2, 2]
 
 - id: "c${distance}"
   desc: "Distance ${distance} on cropped image."
   code:
-  - diffeoplan.library.DistanceCrop
+  - diffeo2dds.library.uncertain_image_distances.DistanceCrop
   - distance: "${distance}"
     top: 0.25
     left: 0.25
@@ -43,75 +43,75 @@
 - id: N01
   desc: XXX
   code:
-  - diffeoplan.library.DistanceNeighborRatio
+  - diffeo2dds.library.uncertain_image_distances.DistanceNeighborRatio
   - ratios: [0.01, 0.01]
 
 - id: N10
   desc: XXX
   code:
-  - diffeoplan.library.DistanceNeighborRatio
+  - diffeo2dds.library.uncertain_image_distances.DistanceNeighborRatio
   - ratios: [0.1, 0.1]
 
 - id: N30
   desc: XXX
   code:
-  - diffeoplan.library.DistanceNeighborRatio
+  - diffeo2dds.library.uncertain_image_distances.DistanceNeighborRatio
   - ratios: [0.3, 0.3]
 
 - id: N20
   desc: XXX
   code:
-  - diffeoplan.library.DistanceNeighborRatio
+  - diffeo2dds.library.uncertain_image_distances.DistanceNeighborRatio
   - ratios: [0.2, 0.2]
 
 - id: D05
   desc: XXX
   code:
-  - diffeoplan.library.DistanceNeighborDist
+  - diffeo2dds.library.uncertain_image_distances.DistanceNeighborDist
   - ratios: [0.05, 0.05]
 
 
 - id: D10
   desc: XXX
   code:
-  - diffeoplan.library.DistanceNeighborDist
+  - diffeo2dds.library.uncertain_image_distances.DistanceNeighborDist
   - ratios: [0.1, 0.1]
 
 - id: D20
   desc: XXX
   code:
-  - diffeoplan.library.DistanceNeighborDist
+  - diffeo2dds.library.uncertain_image_distances.DistanceNeighborDist
   - ratios: [0.2, 0.2]
 
 - id: D30
   desc: XXX
   code:
-  - diffeoplan.library.DistanceNeighborDist
+  - diffeo2dds.library.uncertain_image_distances.DistanceNeighborDist
   - ratios: [0.3, 0.3]
 
 
 - id: L1
   desc: L1 distance
   code:
-  - diffeoplan.library.DistanceNorm
+  - diffeo2dds.library.uncertain_image_distances.DistanceNorm
   - order: 1
 
 
 - id: L2
   desc: L2
   code:
-  - diffeoplan.library.DistanceNorm
+  - diffeo2dds.library.uncertain_image_distances.DistanceNorm
   - order: 2
 
 - id: L1w
   desc: "L1, weighted by uncertainty"
   code:
-  - diffeoplan.library.DistanceNormWeighted
+  - diffeo2dds.library.uncertain_image_distances.DistanceNormWeighted
   - order: 1
 
 
 - id: L2w
   desc: "L2, weighted by uncertainty"
   code:
-  - diffeoplan.library.DistanceNormWeighted
+  - diffeo2dds.library.uncertain_image_distances.DistanceNormWeighted
   - order: 2
