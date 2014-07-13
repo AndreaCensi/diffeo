@@ -1,14 +1,14 @@
-import itertools
-
 from contracts import contract
-import contracts
-
-from diffeo2dds import UncertainImage
-from diffeoplan import get_dp_config
-import numpy as np
+from diffeo2dds import (UncertainImage, get_conftools_discdds, 
+    get_diffeo2dds_config)
 from procgraph import Block
 from procgraph_images import make_images_grid
 from procgraph_pil import resize
+import contracts
+import itertools
+import numpy as np
+
+
 
 
 __all__ = ['DPDDSPredictMatrix']
@@ -30,11 +30,10 @@ class DPDDSPredictMatrix(Block):
     def init(self):
         contracts.disable_all()
         id_discdds = self.config.id_discdds
+        config = get_diffeo2dds_config()
+        config.load(self.config.config_dir)
         
-        dp_config = get_dp_config()
-    
-        dp_config.load(self.config.config_dir)
-        self.discdds = dp_config.discdds.instance(id_discdds)
+        self.discdds = get_conftools_discdds().instance(id_discdds)
         
         N = self.config.nsteps
         m = make_matrix(nsteps=N, mult=self.config.mult)

@@ -1,11 +1,14 @@
 from conf_tools import ConfigMaster, ObjectSpec
 from contracts import contract 
 
-__all__ = ['get_diffeo2dds_config',
-           'get_conftools_discdds',
-           'get_conftools_uncertain_images',
-           'get_conftools_uncertain_image_distances',
-           'get_conftools_symdds']
+__all__ = [
+   'get_diffeo2dds_config',
+   'get_conftools_discdds',
+   'get_conftools_uncertain_images',
+   'get_conftools_uncertain_image_distances',
+   'get_conftools_symdds',
+]
+
 
 @contract(returns=ObjectSpec)
 def get_conftools_discdds():

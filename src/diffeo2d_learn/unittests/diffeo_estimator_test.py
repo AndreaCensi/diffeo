@@ -1,14 +1,13 @@
-import time
-
 from contracts import contract
-
-from diffeo2d.diffeo_basic import diffeomorphism_from_function
-from diffeo2d.misc_utils import coords_iterate
+from diffeo2d import coords_iterate, diffeomorphism_from_function
 from diffeo2d.unittests.testing import for_all_diffeos
 from diffeo2d.visualization.basic import diffeomorphism_to_rgb_cont
 from diffeo2d_learn.library.simple.diffeo_estimator_simple import (
     MATCH_CONTINUOUS)
 import numpy as np
+import time
+
+
 
 
 @contract(diffeo='valid_diffeomorphism,array[MxNx2]', y='array[MxN]',
@@ -42,11 +41,13 @@ def estimation(fid, f):  # @UnusedVariable
     K = 50
     epsilon = 1
     from diffeo2d_learn.library.simple.diffeo_estimator_simple import DiffeomorphismEstimatorSimple
-    de = DiffeomorphismEstimatorSimple([0.2, 0.2], MATCH_CONTINUOUS)
+    de = DiffeomorphismEstimatorSimple(MATCH_CONTINUOUS)
+    de.set_max_displ([0.1, 0.1])
     for y0, y1 in generate_input(shape, K, diffeo, epsilon=epsilon):
         de.update(y0, y1)
 
-    diff2d = de.summarize()
+    diff2d = de.get_value()
+    
     diffeo_learned = diff2d.d
 
     from reprep import Report
@@ -74,5 +75,5 @@ def estimation(fid, f):  # @UnusedVariable
     print('Writing to %r.' % filename)
     r.to_html(filename)
 
-
-
+    de.summarize_averaged() # This fails because variance not normalized 
+    de.summarize_smooth()# This fails

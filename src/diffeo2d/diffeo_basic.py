@@ -4,21 +4,23 @@ import numpy as np
 from .misc_utils import coords_iterate
 
 
-__all__ = ['valid_diffeomorphism',
-            'diffeo_identity',
-            'coords_to_X',
-            'X_to_coords',
-            'diffeo_compose',
-            'diffeo_apply',
-            'diffeo_local_differences',
-            'diffeo_local_differences_L2',
-            'diffeo_distance_Linf',
-            'diffeo_distance_L2',
-            'diffeo_norm_L2',
-            'dmod',
-            'diffeo_inverse',
-            'diffeo_from_function',
-            'diffeomorphism_from_function']
+__all__ = [
+    'valid_diffeomorphism',
+    'diffeo_identity',
+    'coords_to_X',
+    'X_to_coords',
+    'diffeo_compose',
+    'diffeo_apply',
+    'diffeo_local_differences',
+    'diffeo_local_differences_L2',
+    'diffeo_distance_Linf',
+    'diffeo_distance_L2',
+    'diffeo_norm_L2',
+    'dmod',
+    'diffeo_inverse',
+    'diffeo_from_function',
+    'diffeomorphism_from_function',
+]
 
 
 

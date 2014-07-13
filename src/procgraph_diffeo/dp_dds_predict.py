@@ -1,10 +1,11 @@
-from diffeo2dds import UncertainImage
-from diffeoplan import get_dp_config
+from diffeo2dds import (UncertainImage, get_conftools_discdds, 
+    get_diffeo2dds_config)
 from procgraph import Block
 from procgraph_pil import resize
 
 
 __all__ = ['DPDDSPredict']
+
 
 class DPDDSPredict(Block):
     Block.alias('dp_discdds_predict')
@@ -20,10 +21,10 @@ class DPDDSPredict(Block):
     def init(self):
         id_discdds = self.config.id_discdds
         
-        dp_config = get_dp_config()
-    
-        dp_config.load(self.config.config_dir)
-        self.discdds = dp_config.discdds.instance(id_discdds)
+        config = get_diffeo2dds_config()
+        config.load(self.config.config_dir)
+        
+        self.discdds = get_conftools_discdds().instance(id_discdds)
         
         plan = self.config.plan
         self.action = self.discdds.plan2action(plan)

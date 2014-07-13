@@ -113,6 +113,10 @@ class DiffeomorphismEstimatorSimple(Diffeo2dEstimatorInterface):
 
     @contract(shape='seq[2](int, >0)')
     def init_structures(self, shape):
+        if not hasattr(self, 'max_displ'):
+            msg = 'You forgot to call set_max_displ().'
+            raise ValueError(msg)
+        
         self.shape = shape
         self.nsensels = shape[0] * shape[1]
 

@@ -50,7 +50,7 @@ def iterate_indices(shape):
         raise NotImplementedError
         assert(False)
 
-@contract(size='valid_2d_shape')
+# @contract(size='valid_2d_shape')
 def coords_iterate(size):
     for x in itertools.product(range(size[0]), range(size[1])):
         yield x

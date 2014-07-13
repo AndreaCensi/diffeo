@@ -1,9 +1,10 @@
 from contracts import contract
-import contracts
-
-from diffeoplan import UncertainImage, get_dp_config
-import numpy as np
+from diffeo2dds import UncertainImage
+from diffeo2s import get_conftools_symdiffeos
 from procgraph import Block
+import contracts
+import numpy as np
+
 
 
 __all__ = ['ApplyDiffeoAction']
@@ -28,7 +29,7 @@ class ApplyDiffeoAction(Block):
     @contract(shape='seq[2](>=1)')
     def init_diffeo(self, shape):
         id_symdiffeo = self.config.id_symdiffeo
-        symdiffeo = get_dp_config().symdiffeos.instance(id_symdiffeo)
+        symdiffeo = get_conftools_symdiffeos().instance(id_symdiffeo)
         label = 'tmp'
         original_cmd = [np.zeros(1)]
         self.info('creating diffeo_action')

@@ -8,8 +8,11 @@ import numpy as np
 __all__ = ['diffeo_from_function_viewport']
 
 
-@contract(diffeo=SymbolicDiffeo, viewport=SquareDomain, shape='valid_2d_shape',
-          returns='tuple(valid_diffeomorphism, array[HxW])')
+@contract(diffeo=SymbolicDiffeo, viewport=SquareDomain, 
+          #shape='valid_2d_shape',
+#           returns='tuple(valid_diffeomorphism, array[HxW])'
+          returns='tuple(array[HxW])'
+          )
 def diffeo_from_function_viewport(diffeo, manifold, viewport, shape):
     domain = SquareDomain([[0, shape[0] - 1], [0, shape[1] - 1]]) 
     domain2viewport = LinearCoordinateChange(domain.bounds, viewport.bounds)

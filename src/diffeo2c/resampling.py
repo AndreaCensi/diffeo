@@ -4,6 +4,10 @@ import numpy as np
 __all__ = ['diffeoc_from_diffeou', 'diffeou_from_diffeoc', 'diffeo_resample']
 
 new_contract('valid_diffeou', 'array[HxWx2](float32,>=0,<=1)')
+
+
+
+
 # from diffeo2d.misc_utils import coords_iterate
 # from diffeo2d.diffeo_basic import coords_to_X, X_to_coords
 
@@ -33,6 +37,7 @@ new_contract('valid_diffeou', 'array[HxWx2](float32,>=0,<=1)')
 #     for c in coords_iterate((H, W)):
 #         f[c[0], c[1], :] = X_to_coords(du[c], (H, W))
 #     return f
+
 
 @contract(d='array[HxWx2],valid_diffeomorphism',
           returns='array[HxWx2],valid_diffeou')

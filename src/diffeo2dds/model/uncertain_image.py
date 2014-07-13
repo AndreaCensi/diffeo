@@ -1,12 +1,15 @@
-import numpy as np
-from contracts import contract
+from abc import abstractmethod
+from contracts import ContractsMeta, contract
 from diffeo2d.visualization import scalaruncertainty2rgb
 from diffeo2s.utils import resample_signal, resample_signal_2d
-from reprep.graphics.filter_scale import scale
-from abc import abstractmethod
-from contracts.metaclass import ContractsMeta
+from reprep.graphics import scale
+import numpy as np
  
-__all__ = ['UncertainImage', 'UncertainImageDistance', 'any_image_to_rgb']
+__all__ = [       
+    'UncertainImage', 
+    'UncertainImageDistance', 
+    'any_image_to_rgb',
+]
  
  
 class UncertainImage(object):
