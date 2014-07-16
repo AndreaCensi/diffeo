@@ -3,7 +3,7 @@ from boot_agents.diffeo.diffeo_display import (diffeo_to_rgb_norm,
 from boot_agents.diffeo.diffeo_estimator import Diffeomorphism2D
 from boot_agents.diffeo.tests.diffeo_creation_test import (CurvedPylab, plot_grid,
     plot_smiley)
-from diffeoplan.library import SquareDomain, diffeo_from_function_viewport
+# from di ffeoplan.library import SquareDomain, diffeo_from_function_viewport
 from reprep import scale
 from reprep.plot_utils import turn_all_axes_off
 

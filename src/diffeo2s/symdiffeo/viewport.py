@@ -5,13 +5,16 @@ from diffeo2s import SymbolicDiffeo
 from diffeo2s.utils import coords_iterate
 import numpy as np
 
-__all__ = ['diffeo_from_function_viewport']
+__all__ = [
+    'diffeo_from_function_viewport',
+]
 
 
-@contract(diffeo=SymbolicDiffeo, viewport=SquareDomain, 
+@contract(diffeo=SymbolicDiffeo, 
+          viewport=SquareDomain, 
           #shape='valid_2d_shape',
 #           returns='tuple(valid_diffeomorphism, array[HxW])'
-          returns='tuple(array[HxW])'
+          returns='tuple(array[HxW], array[HxW])'
           )
 def diffeo_from_function_viewport(diffeo, manifold, viewport, shape):
     domain = SquareDomain([[0, shape[0] - 1], [0, shape[1] - 1]]) 
