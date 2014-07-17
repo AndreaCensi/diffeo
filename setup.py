@@ -11,7 +11,7 @@ version = "1.0dev1"
 setup(
     name='diffeo',
     author="Andrea Censi",
-    author_email="andrea@cds.caltech.edu",
+    author_email="censi@mit.edu",
     url='http://andreacensi.github.io/diffeo/',
     version=version,
     description="Library for representing and learning diffeomorphisms",
