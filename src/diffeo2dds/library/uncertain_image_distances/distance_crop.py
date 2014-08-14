@@ -2,7 +2,9 @@ from contracts import contract
 from diffeo2dds import (UncertainImageDistance, 
     get_conftools_uncertain_image_distances)
 
-__all__ = ['DistanceCrop']
+__all__ = [
+    'DistanceCrop',
+]
 
 class DistanceCrop(UncertainImageDistance):
 

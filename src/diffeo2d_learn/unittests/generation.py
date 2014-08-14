@@ -1,3 +1,4 @@
-from diffeo2d_learn.configuration import get_conftools_diffeo2d_estimators
-from comptests.registrar import comptests_for_all
+from comptests import comptests_for_all
+from diffeo2d_learn import get_conftools_diffeo2d_estimators
+
 for_all_diffeo2d_estimators = comptests_for_all(get_conftools_diffeo2d_estimators())

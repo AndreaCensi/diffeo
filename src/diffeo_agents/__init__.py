@@ -21,7 +21,7 @@ def jobs_comptests(context):
     from pkg_resources import resource_filename  # @UnresolvedImport
     dirname = resource_filename("diffeo_agents", "configs")
 
-    from bootstrapping_olympics.configuration.master import get_boot_config
+    from bootstrapping_olympics.configuration import get_boot_config
     from comptests.registrar import jobs_registrar
 
     boot_config = get_boot_config()

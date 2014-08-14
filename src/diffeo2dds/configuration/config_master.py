@@ -10,6 +10,33 @@ __all__ = [
 ]
 
 
+class Diffeo2dDynamicsConfig(ConfigMaster):
+    def __init__(self):
+        ConfigMaster.__init__(self, 'diffeo2dds')
+ 
+        from diffeo2dds import (UncertainImage, UncertainImageDistance,
+                                SymDiffeoSystem, DiffeoSystem, DiffeoActionDistance)
+
+        self.add_class_generic('images', '*.images.yaml',  UncertainImage)
+        
+        self.add_class_generic('uncertain_image_distances',
+                           '*.uncertain_image_distances.yaml',
+                           UncertainImageDistance)
+        
+        self.add_class_generic('symdds', '*.symdds.yaml', SymDiffeoSystem)
+        
+        self.add_class_generic('discdds', '*.discdds.yaml', DiffeoSystem)
+            
+        self.add_class_generic('diffeo_action_distances',
+                               '*.diffeo_action_distances.yaml',
+                               DiffeoActionDistance)
+
+    def get_default_dir(self):
+        return "diffeo2dds.configs" 
+ 
+get_diffeo2dds_config = Diffeo2dDynamicsConfig.get_singleton
+ 
+
 @contract(returns=ObjectSpec)
 def get_conftools_discdds():
     """ Returns the object responsible for instancing DiffeoSystem. """
@@ -34,40 +61,3 @@ def get_conftools_uncertain_image_distances():
 def get_conftools_diffeo_action_distances():
     """ Returns the object responsible for instancing DiffeoActionDistance. """
     return get_diffeo2dds_config().diffeo_action_distances
-
-
-class Diffeo2dDynamicsConfig(ConfigMaster):
-    def __init__(self):
-        ConfigMaster.__init__(self, 'diffeo2dds')
- 
-        from diffeo2dds import (UncertainImage, UncertainImageDistance,
-                                SymDiffeoSystem, DiffeoSystem, DiffeoActionDistance)
-
-        self.uncertain_images = self.add_class_generic('images', '*.images.yaml',
-                                             UncertainImage)
-        
-        self.uncertain_image_distances = \
-            self.add_class_generic('uncertain_image_distances',
-                           '*.uncertain_image_distances.yaml',
-                           UncertainImageDistance)
-        
-        self.symdds = \
-            self.add_class_generic('symdds',
-                                   '*.symdds.yaml',
-                                   SymDiffeoSystem)
-        
-        self.discdds = \
-            self.add_class_generic('discdds', '*.discdds.yaml',
-                                   DiffeoSystem)
-            
-        self.diffeo_action_distances = \
-            self.add_class_generic('diffeo_action_distances',
-                                   '*.diffeo_action_distances.yaml',
-                                   DiffeoActionDistance)
-
-    def get_default_dir(self):
-        from pkg_resources import resource_filename  # @UnresolvedImport
-        return resource_filename("diffeo2dds", "configs")
- 
-get_diffeo2dds_config = Diffeo2dDynamicsConfig.get_singleton
- 

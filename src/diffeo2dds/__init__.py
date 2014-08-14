@@ -9,15 +9,6 @@ from . import library
 from .visualization import *
 
 
-
-# def get_comptests():
-#     from . import unittests
-#     from comptests import get_comptests_app
-#     get_diffeo2dds_config().load('default')
-#     app = get_comptests_app(get_diffeo2dds_config())
-#     return [app]
-
-
 def jobs_comptests(context):
     import warnings
     from . import unittests

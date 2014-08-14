@@ -1,12 +1,17 @@
 ''' Some utilities for testing. '''
+from comptests.registrar import comptests_for_all
+from diffeo2d import get_conftools_diffeo2d
 from diffeo2d.diffeo_basic import diffeomorphism_from_function
+from diffeo2d.unittests.utils.generation import fancy_test_decorator
 from diffeo2s.library import DiffeoLibrary
-from geometry.manifolds.tests.checks_generation import fancy_test_decorator
 
 for_all_diffeos = fancy_test_decorator(
         lister=lambda: list(DiffeoLibrary.diffeos.keys()),
         arguments=lambda fid: (fid, DiffeoLibrary.diffeos[fid]),
         attributes=lambda fid: dict(diffeo=fid))
+
+for_all_diffeos2d = comptests_for_all(get_conftools_diffeo2d())
+
 
 
 def dd_lister():
