@@ -4,7 +4,7 @@ import warnings
 
 from contracts import contract
 
-from bootstrapping_olympics import (RobotInterface, RobotObservations, EpisodeDesc,
+from bootstrapping_olympics import (RobotInterface, EpisodeDesc,
     BootSpec, StreamSpec)
 from bootstrapping_olympics.utils import unique_timestamp_string
 from diffeo2dds import UncertainImage, get_diffeo2dds_config
