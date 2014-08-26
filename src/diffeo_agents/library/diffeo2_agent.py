@@ -1,15 +1,18 @@
-from contracts import contract
-
-from bootstrapping_olympics import (AgentInterface, UnsupportedSpec,
+from bootstrapping_olympics import (
+    BasicAgent, LearningAgent, LearningConverged, ServoingAgent, UnsupportedSpec, 
     get_boot_config)
-from bootstrapping_olympics import PassiveAgentInterface
 from bootstrapping_olympics.library.nuisances import scipy_image_resample
-from diffeo2dds_learn import DiffeoSystemEstimatorInterface, get_diffeo2ddslearn_config
+from contracts import contract
+from diffeo2dds_learn import (DiffeoSystemEstimatorInterface, 
+    get_diffeo2ddslearn_config)
 
 
-__all__ = ['Diffeo2Agent']
 
-class Diffeo2Agent(AgentInterface):
+__all__ = [
+    'Diffeo2Agent',
+]
+
+class Diffeo2Agent(BasicAgent, LearningAgent, ServoingAgent):
     '''
     
     '''
@@ -74,7 +77,7 @@ class Diffeo2Agent(AgentInterface):
                 self.diffeosystem_estimator.update(y0=y0, u0=u, y1=y1)
             except DiffeoSystemEstimatorInterface.LearningConverged as e:
                 msg = 'DiffeoSystem converged: %s' % str(e)
-                raise PassiveAgentInterface.LearningConverged(msg)
+                raise LearningConverged(msg)
         
         self.last_obs = obs
         

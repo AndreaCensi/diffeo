@@ -1,8 +1,8 @@
+from boot_manager import DataCentral
 from bootstrapping_olympics.library.nuisances import scipy_image_resample
-from bootstrapping_olympics.programs.manager import DataCentral
+from contracts import contract
 from diffeo2dds_learn import LogItem, Stream
 import itertools
-from contracts import contract
 import numpy as np
 
 __all__ = ['BootStream']
