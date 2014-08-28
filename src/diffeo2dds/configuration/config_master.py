@@ -50,7 +50,7 @@ def get_conftools_symdds():
 @contract(returns=ObjectSpec)
 def get_conftools_uncertain_images():
     """ Returns the object responsible for instancing UncertainImages. """
-    return get_diffeo2dds_config().uncertain_images
+    return get_diffeo2dds_config().images
 
 @contract(returns=ObjectSpec)
 def get_conftools_uncertain_image_distances():
