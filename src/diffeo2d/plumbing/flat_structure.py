@@ -1,5 +1,5 @@
 from .flattening import Flattening, coords_iterate
-from compmake.utils import memoize_simple
+from memos import memoize_simple
 from contracts import contract
 from diffeo2d import diffeo_identity
 from numpy.testing import assert_allclose

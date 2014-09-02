@@ -7,7 +7,11 @@ from . import library
 def jobs_comptests(context):
     # config
     from conf_tools import GlobalConfig
-    GlobalConfig.global_load_dirs(['diffeo2d_learn.configs'])
+    config_dirs = [
+        'diffeo2d_learn.configs',
+    ]
+    GlobalConfig.global_load_dirs(config_dirs)
+     
 
     # unittests 
     from . import unittests

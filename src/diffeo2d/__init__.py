@@ -21,7 +21,13 @@ from . import library
 
 
 def jobs_comptests(context):
+    from conf_tools import GlobalConfig
+    config_dirs = [
+        'diffeo2d.configs',
+    ]
+    GlobalConfig.global_load_dirs(config_dirs)
+    
     from . import unittests
+    
     from comptests import jobs_registrar
-    config = get_diffeo2d_config()
-    return jobs_registrar(context, config)
+    jobs_registrar(context, get_diffeo2d_config())

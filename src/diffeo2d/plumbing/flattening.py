@@ -1,4 +1,4 @@
-from compmake.utils import memoize_simple as memoize
+from memos import memoize_simple as memoize
 from contracts import contract
 from diffeo2d.misc_utils import coords_iterate
 import numpy as np

@@ -17,15 +17,21 @@ class Diffeo2dDynamicsConfig(ConfigMaster):
         from diffeo2dds import (UncertainImage, UncertainImageDistance,
                                 SymDiffeoSystem, DiffeoSystem, DiffeoActionDistance)
 
-        self.add_class_generic('images', '*.images.yaml',  UncertainImage)
+        self.add_class_generic('images', 
+                               '*.images.yaml', 
+                               UncertainImage)
         
         self.add_class_generic('uncertain_image_distances',
-                           '*.uncertain_image_distances.yaml',
-                           UncertainImageDistance)
+                               '*.uncertain_image_distances.yaml',
+                               UncertainImageDistance)
         
-        self.add_class_generic('symdds', '*.symdds.yaml', SymDiffeoSystem)
+        self.add_class_generic('symdds', 
+                               '*.symdds.yaml', 
+                               SymDiffeoSystem)
         
-        self.add_class_generic('discdds', '*.discdds.yaml', DiffeoSystem)
+        self.add_class_generic('discdds', 
+                               '*.discdds.yaml', 
+                               DiffeoSystem)
             
         self.add_class_generic('diffeo_action_distances',
                                '*.diffeo_action_distances.yaml',

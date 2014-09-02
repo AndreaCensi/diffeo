@@ -1,18 +1,17 @@
 
 from .library import *
+from conf_tools.global_config import GlobalConfig
 
 def jobs_comptests(context):
-    from pkg_resources import resource_filename  # @UnresolvedImport
-    dirname = resource_filename("diffeo_agents", "configs")
+    
+    config_dirs = [
+        'diffeo_agents.configs',
+    ]
+    GlobalConfig.global_load_dirs(config_dirs)
 
-    from bootstrapping_olympics.configuration import get_boot_config
-    from comptests.registrar import jobs_registrar
-
-    boot_config = get_boot_config()
-    boot_config.load(dirname)
+    from bootstrapping_olympics import get_boot_config
+    from comptests import jobs_registrar
 
     # unittests for boot olympics
     import bootstrapping_olympics.unittests
-    j1 = jobs_registrar(context, boot_config)
-
-    return j1
+    jobs_registrar(context, get_boot_config())

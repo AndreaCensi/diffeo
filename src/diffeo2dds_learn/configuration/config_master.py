@@ -1,6 +1,5 @@
-from conf_tools import ConfigMaster
+from conf_tools import ConfigMaster,  ObjectSpec
 from contracts import contract
-from conf_tools.objspec import ObjectSpec
 
 
 __all__ = [
@@ -40,8 +39,7 @@ class Diffeo2ddsLearnConfig(ConfigMaster):
                                     DiffeoSystemEstimatorInterface)
 
     def get_default_dir(self):
-        from pkg_resources import resource_filename  # @UnresolvedImport
-        return resource_filename("diffeo2dds_learn", "configs")
+        return "diffeo2dds_learn.configs"
  
 get_diffeo2ddslearn_config = Diffeo2ddsLearnConfig.get_singleton 
 

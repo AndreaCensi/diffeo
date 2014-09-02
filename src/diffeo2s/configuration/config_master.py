@@ -14,8 +14,7 @@ class Diffeo2sConfig(ConfigMaster):
                                                  SymbolicDiffeo)
 
     def get_default_dir(self):
-        from pkg_resources import resource_filename  # @UnresolvedImport
-        return resource_filename("diffeo2s", "configs")
+        return "diffeo2s.configs"
 
 get_diffeo2s_config = Diffeo2sConfig.get_singleton
  
